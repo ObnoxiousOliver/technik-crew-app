@@ -8,8 +8,10 @@
 
 <script lang="ts" setup>
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword } from '@firebase/auth'
+import { doc, getDoc, getFirestore } from '@firebase/firestore'
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import CryptoJS from 'crypto-js'
 
 const router = useRouter()
 
@@ -22,12 +24,20 @@ onMounted(() => {
   })
 })
 
+const db = getFirestore()
+
 const name = ref('')
 const password = ref('')
 
-function submit () {
-  const email = name.value + '@leibniz-technik-crew.web.app'
-  console.log('Logging in as', email)
+async function submit () {
+  console.log('Logging in as', name.value)
+
+  const userDoc = await getDoc(doc(db, `users/${name.value}`))
+  const encryptedEmail = userDoc.get('encrypted-email')
+
+  const key = CryptoJS.enc.Base64.parse(name.value)
+  const iv = CryptoJS.enc.Base64.parse('                   ')
+  const email = CryptoJS.AES.decrypt(encryptedEmail, key, { iv }).toString(CryptoJS.enc.Utf8)
 
   signInWithEmailAndPassword(getAuth(), email, password.value)
     .then(() => {
