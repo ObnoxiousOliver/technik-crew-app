@@ -1,25 +1,62 @@
+import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import LoginView from '../views/LoginView.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
-    path: '/',
-    name: 'home',
-    component: HomeView
+    path: '/login',
+    name: 'login',
+    component: LoginView,
+    meta: {
+      requiresAuth: false
+    }
   },
   {
-    path: '/about',
-    name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
+    path: '/change-password',
+    name: 'change-password',
+    component: () => import('../views/ChangePasswordView.vue'),
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/dashboard',
+    alias: '/',
+    name: 'dashboard',
+    component: () => import('../views/DashboardView.vue'),
+    meta: {
+      requiresAuth: true
+    }
   }
 ]
 
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes
+})
+
+router.beforeEach((to, from, next) => {
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    if (getAuth().currentUser) {
+      next()
+      console.log('[Router]', 'User logged in')
+    } else {
+      onAuthStateChanged(getAuth(), (user) => {
+        if (user) {
+          next()
+          console.log('[Router]', 'User logged in')
+        } else {
+          next({
+            path: '/login',
+            query: { redirect: to.fullPath }
+          })
+          console.log('[Router]', 'User not logged in')
+        }
+      })()
+    }
+  } else {
+    next()
+  }
 })
 
 export default router
