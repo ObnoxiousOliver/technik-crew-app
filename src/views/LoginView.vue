@@ -32,8 +32,8 @@ const password = ref('')
 async function submit () {
   console.log('Logging in as', name.value)
 
-  const userDoc = await getDoc(doc(db, `users/${name.value}`))
-  const encryptedEmail = userDoc.get('encrypted-email')
+  const userDoc = await getDoc(doc(db, `user-mail/${name.value}`))
+  const encryptedEmail = userDoc.get('email')
 
   const key = CryptoJS.enc.Base64.parse(name.value)
   const iv = CryptoJS.enc.Base64.parse('                   ')
