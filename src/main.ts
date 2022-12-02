@@ -1,5 +1,6 @@
 import { createApp } from 'vue'
 import App from './App.vue'
+import RouterPage from './layout/RouterPage.vue'
 import './registerServiceWorker'
 import router from './router'
 
@@ -26,4 +27,7 @@ getAuth(app)
 getFirestore(app)
 
 // Create and mount app
-createApp(App).use(router).mount('#app')
+createApp(App)
+  .component('page', RouterPage)
+  .use(router)
+  .mount('#app')

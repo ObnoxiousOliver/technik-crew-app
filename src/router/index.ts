@@ -4,29 +4,38 @@ import LoginView from '../views/LoginView.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
-    path: '/login',
     name: 'login',
+    path: '/login',
     component: LoginView,
     meta: {
       requiresAuth: false
     }
   },
   {
-    path: '/change-password',
-    name: 'change-password',
-    component: () => import('../views/ChangePasswordView.vue'),
+    path: '/',
+    redirect: '/dashboard',
+    component: () => import('../views/UserView.vue'),
     meta: {
       requiresAuth: true
-    }
-  },
-  {
-    path: '/dashboard',
-    alias: '/',
-    name: 'dashboard',
-    component: () => import('../views/DashboardView.vue'),
-    meta: {
-      requiresAuth: true
-    }
+    },
+    children: [
+      {
+        name: 'dashboard',
+        path: '/dashboard',
+        component: () => import('../views/DashboardView.vue'),
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        name: 'change-password',
+        path: '/change-password',
+        component: () => import('../views/ChangePasswordView.vue'),
+        meta: {
+          requiresAuth: true
+        }
+      }
+    ]
   }
 ]
 
