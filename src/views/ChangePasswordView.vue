@@ -5,7 +5,7 @@
     <form @submit.prevent="submit">
       E-mail: <input type="email" v-model="email">
       <button type="submit">
-        Change!
+        Send
       </button>
     </form>
   </div>
