@@ -1,4 +1,5 @@
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
+import { doc } from 'firebase/firestore'
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import LoginView from '../views/LoginView.vue'
 
@@ -8,7 +9,7 @@ const routes: Array<RouteRecordRaw> = [
     path: '/login',
     component: LoginView,
     meta: {
-      requiresAuth: false
+      title: 'Anmelden'
     }
   },
   {
@@ -24,18 +25,19 @@ const routes: Array<RouteRecordRaw> = [
         path: '/dashboard',
         component: () => import('../views/DashboardView.vue'),
         meta: {
-          requiresAuth: true
-        }
-      },
-      {
-        name: 'change-password',
-        path: '/change-password',
-        component: () => import('../views/ChangePasswordView.vue'),
-        meta: {
-          requiresAuth: true
+          requiresAuth: true,
+          title: 'Dashboard'
         }
       }
     ]
+  },
+  {
+    name: 'reset-password',
+    path: '/reset-password',
+    component: () => import('../views/ResetPasswordView.vue'),
+    meta: {
+      title: 'Passwort zurücksetzen'
+    }
   }
 ]
 
@@ -65,6 +67,14 @@ router.beforeEach((to, from, next) => {
     }
   } else {
     next()
+  }
+})
+
+router.afterEach((to) => {
+  if (to.meta.title) {
+    document.title = to.meta.title + ' | Technik Crew'
+  } else {
+    document.title = 'Technik Crew'
   }
 })
 
