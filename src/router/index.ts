@@ -6,10 +6,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     name: 'login',
     path: '/login',
-    component: LoginView,
-    meta: {
-      requiresAuth: false
-    }
+    component: LoginView
   },
   {
     path: '/',
@@ -26,16 +23,13 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           requiresAuth: true
         }
-      },
-      {
-        name: 'change-password',
-        path: '/change-password',
-        component: () => import('../views/ChangePasswordView.vue'),
-        meta: {
-          requiresAuth: true
-        }
       }
     ]
+  },
+  {
+    name: 'reset-password',
+    path: '/reset-password',
+    component: () => import('../views/ResetPasswordView.vue')
   }
 ]
 

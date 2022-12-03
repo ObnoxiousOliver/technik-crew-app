@@ -1,6 +1,6 @@
 <template>
   <div>
-    Change Password
+    Reset Password
     <br>
     <form @submit.prevent="submit">
       E-mail: <input type="email" v-model="email">
