@@ -12,9 +12,9 @@ module.exports = defineConfig({
     themeColor: '#000000',
     msTileColor: '#000000',
     appleMobileWebAppCapable: 'yes',
-    appleMobileWebAppStatusBarStyle: 'black',
+    appleMobileWebAppStatusBarStyle: 'black-translucent',
     iconPaths: {
-      favicon: './public/img/icons/favicon.png'
+      favicon: './public/img/icons/favicon.svg'
     }
   }
 })
