@@ -18,7 +18,6 @@
 
   background: #171717;
   border-radius: r.$radius;
-  user-select: none;
   cursor: pointer;
 }
 </style>

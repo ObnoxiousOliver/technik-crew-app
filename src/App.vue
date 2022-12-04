@@ -44,6 +44,7 @@ body {
   background: r.$bg-primary;
   color: r.$text-primary;
   font-family: Rubik, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  user-select: none;
 }
 
 p {

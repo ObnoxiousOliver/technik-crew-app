@@ -6,7 +6,7 @@
 
     <form class="reset-form" @submit.prevent="submit">
       <div>
-        <p>Bestätige die E-Mail Adresse deines Accounts, um dir die E-Mail zum ändern deines Passworts zu senden.</p>
+        <p>Bestätige die E-Mail Adresse deines Accounts, damir wir dir die E-Mail zum ändern deines Passworts senden können.</p>
         <p>Wenn du deine E-Mail nicht mehr kennst oder ändern willst wende dich an die Admins.</p>
         <p>
           <RouterLink to="/admins">
@@ -20,7 +20,7 @@
       />
       <Btn type="submit">Senden</Btn>
     </form>
-</Page>
+  </Page>
 </template>
 
 <script lang="ts" setup>
