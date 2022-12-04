@@ -18,7 +18,7 @@
   font-weight: 600;
 
   background: #171717;
-  border-radius: 12px;
+  border-radius: r.$radius;
   user-select: none;
   cursor: pointer;
   transition: .5s;

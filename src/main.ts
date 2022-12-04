@@ -1,8 +1,11 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import RouterPage from './layout/RouterPage.vue'
+import AppButton from './components/AppButton.vue'
 import './registerServiceWorker'
 import router from './router'
+import 'bootstrap-icons/font/bootstrap-icons.scss'
+import VWave from 'v-wave'
 
 // Import the functions you need from the SDKs you need
 import { initializeApp } from 'firebase/app'
@@ -28,6 +31,8 @@ getFirestore(app)
 
 // Create and mount app
 createApp(App)
-  .component('page', RouterPage)
+  .use(VWave)
+  .component('Page', RouterPage)
+  .component('Btn', AppButton)
   .use(router)
   .mount('#app')

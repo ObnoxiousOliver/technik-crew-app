@@ -1,13 +1,10 @@
 <template>
-  <page>
-    dashboard<br>
-    {{ auth.currentUser.displayName }}<br>
-    {{ auth.currentUser.email }}<br>
-    <router-link to="/reset-password">
-      Change Password
-    </router-link>
-    <button @click="logout">Logout</button>
-  </page>
+  {{ auth.currentUser.displayName }}<br>
+  {{ auth.currentUser.email }}<br>
+  <router-link to="/reset-password">
+    Change Password
+  </router-link>
+  <button @click="logout">Logout</button>
 </template>
 
 <script lang="ts" setup>
