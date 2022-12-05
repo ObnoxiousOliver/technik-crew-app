@@ -81,7 +81,7 @@ const float = computed(() => focused.value || inputValue.value?.trim().length > 
     transform-origin: 0 100%;
     pointer-events: none;
     user-select: none;
-    transition: .2s;
+    transition: .5s cubic-bezier(0.19, 1, 0.22, 1);
   }
 
   &--float {

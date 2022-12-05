@@ -37,12 +37,18 @@ onMounted(() => {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
   background: r.$bg-primary;
   color: r.$text-primary;
   font-family: Rubik, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  user-select: none;
+}
+
+p {
+  margin-bottom: 1rem;
 }
 
 :focus {

@@ -1,5 +1,5 @@
 <template>
-  <page>
+  <Page :navigation="false">
     <form
       @submit.prevent="submit"
       class="login-form"
@@ -19,7 +19,7 @@
       <router-link class="login-form__reset-password" to="/reset-password">Passwort vergessen?</router-link>
       <LoginButton class="login-form__login-btn" type="submit">Login</LoginButton>
     </form>
-  </page>
+  </Page>
 </template>
 
 <script lang="ts" setup>
