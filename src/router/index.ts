@@ -28,9 +28,47 @@ const routes: Array<RouteRecordRaw> = [
           requiresAuth: true,
           title: 'Dashboard'
         }
+      },
+      {
+        name: 'events',
+        path: '/events',
+        component: () => import('../views/DashboardView.vue'),
+        meta: {
+          requiresAuth: true,
+          title: 'Termine'
+        }
+      },
+      {
+        name: 'equipment',
+        path: '/equipment',
+        component: () => import('../views/DashboardView.vue'),
+        meta: {
+          requiresAuth: true,
+          title: 'Equipment'
+        }
+      },
+      {
+        name: 'wiki',
+        path: '/wiki',
+        component: () => import('../views/DashboardView.vue'),
+        meta: {
+          requiresAuth: true,
+          title: 'Wiki'
+        }
       }
     ]
   },
+
+  {
+    name: 'settings',
+    path: '/settings',
+    component: () => import('../views/DashboardView.vue'),
+    meta: {
+      requiresAuth: true,
+      title: 'Einstellungen'
+    }
+  },
+
   {
     name: 'reset-password',
     path: '/reset-password',
@@ -72,7 +110,7 @@ router.beforeEach((to, from, next) => {
 
 router.afterEach((to) => {
   if (to.meta.title) {
-    document.title = to.meta.title + ' | Technik Crew'
+    document.title = to.meta.title as string
   } else {
     document.title = 'Technik Crew'
   }

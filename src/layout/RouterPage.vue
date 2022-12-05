@@ -120,7 +120,6 @@ function onScroll () {
     align-items: center;
     height: 4rem;
     background: r.$bg-primary;
-    backdrop-filter: blur(2rem);
 
     &__title {
       font-weight: 600;
