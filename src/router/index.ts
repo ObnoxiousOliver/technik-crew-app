@@ -1,5 +1,4 @@
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
-import { doc } from 'firebase/firestore'
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import LoginView from '../views/LoginView.vue'
 
@@ -62,10 +61,20 @@ const routes: Array<RouteRecordRaw> = [
   {
     name: 'settings',
     path: '/settings',
-    component: () => import('../views/DashboardView.vue'),
+    component: () => import('../views/SettingsView.vue'),
     meta: {
       requiresAuth: true,
       title: 'Einstellungen'
+    }
+  },
+
+  {
+    name: 'profile',
+    path: '/settings/profile',
+    component: () => import('../views/ProfileView.vue'),
+    meta: {
+      requiresAuth: true,
+      title: 'Profil'
     }
   },
 
