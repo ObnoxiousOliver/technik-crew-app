@@ -1,5 +1,5 @@
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
-import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
+import { createRouter, createWebHistory, NavigationGuardNext, RouteRecordRaw } from 'vue-router'
 import LoginView from '../views/LoginView.vue'
 
 const routes: Array<RouteRecordRaw> = [
@@ -64,7 +64,8 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('../views/SettingsView.vue'),
     meta: {
       requiresAuth: true,
-      title: 'Einstellungen'
+      title: 'Einstellungen',
+      depth: 10
     }
   },
 
@@ -74,7 +75,8 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('../views/ProfileView.vue'),
     meta: {
       requiresAuth: true,
-      title: 'Profil'
+      title: 'Profil',
+      depth: 100
     }
   },
 
@@ -83,7 +85,8 @@ const routes: Array<RouteRecordRaw> = [
     path: '/reset-password',
     component: () => import('../views/ResetPasswordView.vue'),
     meta: {
-      title: 'Passwort zurücksetzen'
+      title: 'Passwort zurücksetzen',
+      depth: 100
     }
   }
 ]
@@ -114,6 +117,23 @@ router.beforeEach((to, from, next) => {
     }
   } else {
     next()
+  }
+})
+
+router.beforeEach((to, from) => {
+  let transitionName: string | undefined = to.meta.transition as string | undefined
+
+  if (!transitionName) {
+    const toDepth: number = to.meta.depth as number ?? to.path.split('/').length
+    const fromDepth: number = from.meta.depth as number ?? to.path.split('/').length
+    const depthDiff = fromDepth - toDepth
+
+    transitionName = depthDiff <= 0 ? 'slide-left' : 'slide-right'
+  }
+
+  console.log(transitionName)
+  if (transitionName) {
+    to.meta.transitionName = transitionName
   }
 })
 

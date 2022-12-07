@@ -1,7 +1,7 @@
 <template>
   <RouterView class="router" v-slot="{ Component }">
       <template v-if="Component">
-        <Transition name="router">
+        <Transition :name="route.meta.transitionName">
           <component :is="Component"></component>
         </Transition>
       </template>
@@ -45,6 +45,7 @@ body {
   color: r.$text-primary;
   font-family: Rubik, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   user-select: none;
+  overflow: hidden;
 }
 
 p {
@@ -68,9 +69,26 @@ a {
   }
 }
 
-.router {
+.slide-left {
   &-enter-active {
+    z-index: 1;
+    transition: .5s cubic-bezier(0.19, 1, 0.22, 1);
+  }
+  &-enter-from {
+    transform: translateX(100vw);
+  }
+  &-leave-active {
+    transition: .5s;
+  }
+}
 
+.slide-right {
+  &-leave-active {
+    z-index: 1;
+    transition: .5s cubic-bezier(0.19, 1, 0.22, 1);
+  }
+  &-leave-to {
+    transform: translateX(100vw);
   }
 }
 </style>

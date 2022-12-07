@@ -66,9 +66,10 @@ function onScroll () {
 @use '../scss' as r;
 
 .page {
-  height: 100vh;
-  position: relative;
+  position: fixed;
+  inset: 0;
   overflow: hidden;
+  background: r.$bg-primary;
 
   &--heading-hidden {
     .page {
