@@ -1,5 +1,5 @@
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
-import { createRouter, createWebHistory, NavigationGuardNext, RouteRecordRaw } from 'vue-router'
+import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import LoginView from '../views/LoginView.vue'
 
 const routes: Array<RouteRecordRaw> = [
@@ -31,7 +31,7 @@ const routes: Array<RouteRecordRaw> = [
       {
         name: 'events',
         path: '/events',
-        component: () => import('../views/DashboardView.vue'),
+        component: () => import('../views/EventView.vue'),
         meta: {
           requiresAuth: true,
           title: 'Termine'
@@ -65,7 +65,8 @@ const routes: Array<RouteRecordRaw> = [
     meta: {
       requiresAuth: true,
       title: 'Einstellungen',
-      depth: 10
+      depth: 10,
+      defaultBackPath: '/dashboard'
     }
   },
 
@@ -76,7 +77,8 @@ const routes: Array<RouteRecordRaw> = [
     meta: {
       requiresAuth: true,
       title: 'Profil',
-      depth: 100
+      depth: 100,
+      defaultBackPath: '/settings'
     }
   },
 
@@ -86,7 +88,8 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('../views/ResetPasswordView.vue'),
     meta: {
       title: 'Passwort zurücksetzen',
-      depth: 100
+      depth: 100,
+      defaultBackPath: '/settings'
     }
   }
 ]
@@ -131,7 +134,6 @@ router.beforeEach((to, from) => {
     transitionName = depthDiff <= 0 ? 'slide-left' : 'slide-right'
   }
 
-  console.log(transitionName)
   if (transitionName) {
     to.meta.transitionName = transitionName
   }
