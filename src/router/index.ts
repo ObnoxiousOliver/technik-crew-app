@@ -1,5 +1,4 @@
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
-import { doc } from 'firebase/firestore'
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import LoginView from '../views/LoginView.vue'
 
@@ -32,7 +31,7 @@ const routes: Array<RouteRecordRaw> = [
       {
         name: 'events',
         path: '/events',
-        component: () => import('../views/DashboardView.vue'),
+        component: () => import('../views/EventView.vue'),
         meta: {
           requiresAuth: true,
           title: 'Termine'
@@ -62,10 +61,24 @@ const routes: Array<RouteRecordRaw> = [
   {
     name: 'settings',
     path: '/settings',
-    component: () => import('../views/DashboardView.vue'),
+    component: () => import('../views/SettingsView.vue'),
     meta: {
       requiresAuth: true,
-      title: 'Einstellungen'
+      title: 'Einstellungen',
+      depth: 10,
+      defaultBackPath: '/dashboard'
+    }
+  },
+
+  {
+    name: 'profile',
+    path: '/settings/profile',
+    component: () => import('../views/ProfileView.vue'),
+    meta: {
+      requiresAuth: true,
+      title: 'Profil',
+      depth: 100,
+      defaultBackPath: '/settings'
     }
   },
 
@@ -74,7 +87,9 @@ const routes: Array<RouteRecordRaw> = [
     path: '/reset-password',
     component: () => import('../views/ResetPasswordView.vue'),
     meta: {
-      title: 'Passwort zurücksetzen'
+      title: 'Passwort zurücksetzen',
+      depth: 100,
+      defaultBackPath: '/settings'
     }
   }
 ]
@@ -105,6 +120,22 @@ router.beforeEach((to, from, next) => {
     }
   } else {
     next()
+  }
+})
+
+router.beforeEach((to, from) => {
+  let transitionName: string | undefined = to.meta.transition as string | undefined
+
+  if (!transitionName) {
+    const toDepth: number = to.meta.depth as number ?? to.path.split('/').length
+    const fromDepth: number = from.meta.depth as number ?? to.path.split('/').length
+    const depthDiff = fromDepth - toDepth
+
+    transitionName = depthDiff <= 0 ? 'slide-left' : 'slide-right'
+  }
+
+  if (transitionName) {
+    to.meta.transitionName = transitionName
   }
 })
 

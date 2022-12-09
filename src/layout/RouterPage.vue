@@ -7,7 +7,7 @@
   >
     <nav v-if="props.navigation" class="page__navigation">
       <button
-        @click="$router.go(-1)"
+        @click="back"
         aria-label="Zurück"
         class="page__back-btn"
         v-wave
@@ -38,6 +38,7 @@
 
 <script lang="ts" setup>
 import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
 const scroller = ref(null as null | HTMLElement)
 
@@ -45,8 +46,21 @@ const props = defineProps({
   navigation: {
     type: Boolean,
     default: () => true
-  }
+  },
+  back: String
 })
+
+const router = useRouter()
+const route = useRoute()
+function back () {
+  if (history.back) {
+    router.back()
+  } else if (route.meta.defaultBackPath) {
+    router.push(route.meta.defaultBackPath)
+  } else {
+    router.push('/')
+  }
+}
 
 onMounted(() => {
   scroller.value?.addEventListener('scroll', onScroll)
@@ -66,9 +80,10 @@ function onScroll () {
 @use '../scss' as r;
 
 .page {
-  height: 100vh;
-  position: relative;
+  position: fixed;
+  inset: 0;
   overflow: hidden;
+  background: r.$bg-primary;
 
   &--heading-hidden {
     .page {
