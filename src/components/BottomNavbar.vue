@@ -16,5 +16,7 @@
   border-radius: r.$radius;
   background: rgba(r.$bg-secondary, 0.8);
   backdrop-filter: blur(1rem);
+  max-width: 20rem;
+  margin: 0 auto;
 }
 </style>

@@ -23,6 +23,7 @@
     display: flex;
     align-items: center;
     height: 4rem;
+    margin: 0 -1.5rem;
     padding: 0 1.5rem;
     background: r.$bg-primary;
     font-weight: 600;
@@ -36,7 +37,7 @@
   &__scroller {
     position: absolute;
     inset: 0;
-    padding: 4rem 1.5rem 5rem;
+    padding: 4rem 0 5rem;
     overflow: auto;
   }
 }

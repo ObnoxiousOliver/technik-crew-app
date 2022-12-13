@@ -109,6 +109,8 @@ function onScroll () {
     inset: 0;
     padding: 4rem 1.5rem 0;
     overflow: auto;
+    max-width: 30rem;
+    margin: 0 auto;
   }
 
   &__title {
