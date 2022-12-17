@@ -84,6 +84,8 @@ function onScroll () {
   inset: 0;
   overflow: hidden;
   background: r.$bg-primary;
+  max-width: 30rem;
+  margin: 0 auto;
 
   &--heading-hidden {
     .page {
@@ -109,8 +111,6 @@ function onScroll () {
     inset: 0;
     padding: 4rem 1.5rem 0;
     overflow: auto;
-    max-width: 30rem;
-    margin: 0 auto;
   }
 
   &__title {
@@ -127,6 +127,10 @@ function onScroll () {
       transform-origin: 0 0;
       transition: transform .5s;
       transition-timing-function: cubic-bezier(0.19, 1, 0.22, 1);
+    }
+
+    :deep(i) {
+      margin-right: .5em;
     }
   }
 
@@ -154,6 +158,10 @@ function onScroll () {
       transition-timing-function: cubic-bezier(0.19, 1, 0.22, 1);
       user-select: none;
       pointer-events: none;
+
+      :deep(i) {
+        margin-right: .5em;
+      }
     }
   }
 

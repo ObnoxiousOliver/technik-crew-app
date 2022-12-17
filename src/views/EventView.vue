@@ -1,21 +1,27 @@
 <template>
   <UserPage>
     <template #title>
-      Termine
+      <i class="bi-calendar-week"/>Termine
     </template>
-    <EventCalendar :events="events" />
+    <EventCalendar :events="events" @needUpdate="updateEvents">
+      <template #btns>
+        <Btn @click="updateEvents" aria-label="Aktualisieren">
+          <i class="bi-arrow-clockwise"></i>
+        </Btn>
+      </template>
+    </EventCalendar>
     <!-- {{ events }} -->
 
-    <!-- <button @click="addEvent">Add</button> -->
+    <button @click="addEvent">Add</button>
   </UserPage>
 </template>
 
 <script lang="ts" setup>
 import UserPage from '../layout/UserPage.vue'
 import EventCalendar from '../components/EventCalendar.vue'
-import { addDoc, collection, doc, getDocs, getFirestore, limit, onSnapshot, query, where } from '@firebase/firestore'
+import { addDoc, collection, getDocs, getFirestore, query, where } from '@firebase/firestore'
 import { onMounted, ref } from 'vue'
-import { EventDB } from '@/model/event'
+import Event, { EventDB } from '@/model/event'
 
 const db = getFirestore()
 
@@ -36,15 +42,8 @@ async function updateEvents () {
 }
 
 async function addEvent () {
-  addDoc(collection(db, 'events'), {
-    id: Math.random().toString(),
-    name: 'New Event',
-    description: 'This is a new event',
-    wholeDay: true,
-    startDate: new Date().getTime(),
-    endDate: null
-  } as EventDB)
+  await addDoc(collection(db, 'events'), new Event({ color: 'red' }).toDB())
 
-  updateEvents()
+  await updateEvents()
 }
 </script>
