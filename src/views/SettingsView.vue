@@ -20,10 +20,20 @@
 </template>
 
 <script lang="ts" setup>
+import { getAuth, signOut } from '@firebase/auth'
+import { useRouter } from 'vue-router'
 import SettingsList from '../components/SettingsList.vue'
 import SettingsListItem from '../components/SettingsListItem.vue'
 
-function logout () {
-  // TODO: Implement logout functionality
+const auth = getAuth()
+const router = useRouter()
+
+async function logout () {
+  try {
+    await signOut(auth)
+    router.push('/login')
+  } catch (e) {
+    console.error(e)
+  }
 }
 </script>

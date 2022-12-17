@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <Page :navigation="false">
     <RouterView class="router" v-slot="{ Component }">
       <template v-if="Component">
         <Transition name="router">
@@ -15,7 +15,7 @@
       <NavBtn to="/equipment" icon="speaker" />
       <NavBtn to="/settings" icon="gear" />
     </Navbar>
-  </div>
+  </Page>
 </template>
 
 <script lang="ts" setup>
