@@ -43,6 +43,12 @@ const props = defineProps({
   events: Array
 })
 
+const show = ref(false)
+
+setTimeout(() => {
+  show.value = true
+}, 1000)
+
 const emit = defineEmits([
   'needUpdate'
 ])
@@ -85,6 +91,10 @@ function getDate (dateNumber: number, wholeDay: boolean): string {
 
   return dateString
 }
+
+function log (...args) {
+  console.log(...args)
+}
 </script>
 
 <style lang="scss" scoped>
@@ -118,7 +128,18 @@ function getDate (dateNumber: number, wholeDay: boolean): string {
       border-width: 0;
     }
 
-    .cv-header-days, .cv-header-day, .cv-weeks, .cv-week, .cv-day, .cv-item {
+    .cv-weeknumber {
+      color: r.$text-secondary;
+      border-width: 0 1px 0 0;
+      width: 1.5rem;
+
+      span {
+        display: inline-block;
+        transform: rotate(-90deg)translateX(-.5rem);
+      }
+    }
+
+    .cv-header-days, .cv-header-day, .cv-weeks, .cv-week, .cv-day, .cv-item, .cv-weeknumber {
       border-color: r.$bg-stroke;
     }
 

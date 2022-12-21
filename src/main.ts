@@ -6,6 +6,7 @@ import './registerServiceWorker'
 import router from './router'
 import 'bootstrap-icons/font/bootstrap-icons.scss'
 import VWave from 'v-wave'
+import { vfmPlugin } from 'vue-final-modal'
 
 // Import the functions you need from the SDKs you need
 import { initializeApp } from 'firebase/app'
@@ -32,6 +33,7 @@ getFirestore(app)
 // Create and mount app
 createApp(App)
   .use(VWave)
+  .use(vfmPlugin())
   .component('Page', RouterPage)
   .component('Btn', AppButton)
   .use(router)

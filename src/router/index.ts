@@ -59,6 +59,17 @@ const routes: Array<RouteRecordRaw> = [
   },
 
   {
+    name: 'new-event',
+    path: '/events/new',
+    component: () => import('../views/NewEventView.vue'),
+    meta: {
+      requriesAuth: true,
+      title: 'Neuer Termin',
+      depth: 10,
+      defaultBackPath: '/events'
+    }
+  },
+  {
     name: 'settings',
     path: '/settings',
     component: () => import('../views/SettingsView.vue'),

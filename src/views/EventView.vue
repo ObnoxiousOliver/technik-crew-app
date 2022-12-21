@@ -12,7 +12,9 @@
     </EventCalendar>
     <!-- {{ events }} -->
 
-    <button @click="addEvent">Add</button>
+    <RouterLink to="/events/new">Add</RouterLink>
+
+    <!-- <button @click="addEvent">Add</button> -->
   </UserPage>
 </template>
 
