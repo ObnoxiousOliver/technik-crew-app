@@ -21,9 +21,9 @@
 <script lang="ts" setup>
 import UserPage from '../layout/UserPage.vue'
 import EventCalendar from '../components/EventCalendar.vue'
-import { addDoc, collection, getDocs, getFirestore, query, where } from '@firebase/firestore'
+import { collection, getDocs, getFirestore, query, where } from '@firebase/firestore'
 import { onMounted, ref } from 'vue'
-import Event, { EventDB } from '@/model/event'
+import { EventDB } from '@/model/event'
 
 const db = getFirestore()
 
@@ -41,11 +41,5 @@ async function updateEvents () {
   querySnapshot.forEach(doc => {
     events.value.push(doc.data() as EventDB)
   })
-}
-
-async function addEvent () {
-  await addDoc(collection(db, 'events'), new Event({ color: 'red' }).toDB())
-
-  await updateEvents()
 }
 </script>

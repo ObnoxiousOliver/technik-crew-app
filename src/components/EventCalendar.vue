@@ -101,7 +101,7 @@ function log (...args) {
 @use '../scss' as r;
 
 .calendar {
-  height: 24rem;
+  height: unset;
 
   :deep() {
     .cv-day, .cv-header-day {
@@ -126,6 +126,11 @@ function log (...args) {
 
     .cv-weeks {
       border-width: 0;
+    }
+
+    .cv-week {
+      min-height: 5.2rem;
+      scroll-padding: 1rem;
     }
 
     .cv-weeknumber {

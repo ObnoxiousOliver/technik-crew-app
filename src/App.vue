@@ -10,7 +10,8 @@
 
 <script lang="ts" setup>
 import { getAuth, onAuthStateChanged } from '@firebase/auth'
-import { onMounted } from 'vue'
+import { createPinia } from 'pinia'
+import { onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
@@ -27,6 +28,11 @@ onMounted(() => {
   })
 })
 
+const pinia = createPinia()
+
+watch(pinia.state, () => {
+  localStorage.setItem('store', pinia.state.value)
+})
 </script>
 
 <style lang="scss">
