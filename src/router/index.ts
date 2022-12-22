@@ -40,7 +40,7 @@ const routes: Array<RouteRecordRaw> = [
       {
         name: 'equipment',
         path: '/equipment',
-        component: () => import('../views/DashboardView.vue'),
+        component: () => import('../views/EquipmentView.vue'),
         meta: {
           requiresAuth: true,
           title: 'Equipment'
