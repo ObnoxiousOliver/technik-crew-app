@@ -1,10 +1,10 @@
 <template>
-  <Page :navigation="false">
+  <Page class="login-page" :navigation="false">
     <form
       @submit.prevent="submit"
       class="login-form"
     >
-      <img class="login-form__logo" src="../assets/technik-crew-logo.svg" alt="Technik Crew Logo">
+      <img @click.prevent="logoClick" ref="logo" class="login-form__logo" src="../assets/technik-crew-logo.svg" alt="Technik Crew Logo">
       <FloatingLabelInput
         label="Name"
         v-model="name"
@@ -16,6 +16,7 @@
         type="password"
         autocomplete="current-password"
       />
+
       <router-link class="login-form__reset-password" to="/reset-password">Passwort vergessen?</router-link>
       <LoginButton class="login-form__login-btn" type="submit">Login</LoginButton>
     </form>
@@ -37,7 +38,7 @@ const router = useRouter()
 onMounted(() => {
   onAuthStateChanged(getAuth(), (user) => {
     if (user) {
-      router.push('/dashboard')
+      router.replace('/dashboard')
     }
   })()
 })
@@ -64,9 +65,45 @@ async function submit () {
       console.error('Auth', err)
     })
 }
+
+const logo = ref(null as null | HTMLImageElement)
+let scale = 1
+let triggered = false
+function logoClick () {
+  if (!logo.value) return
+  if (triggered) return
+  scale += (1 + (scale - 1) * 30) * 0.005
+  logo.value.style.transform = `scaleX(${scale})`
+
+  if (scale > 90) {
+    triggered = true
+    logo.value.style.transition = 'transform 1s'
+    logo.value.style.transform = `scale(${scale}, 100)`
+
+    setTimeout(() => {
+      logo.value.style.transition = '0s'
+      logo.value.style.transform = 'scale(0)'
+
+      setTimeout(() => {
+        logo.value.style.transition = 'transform .5s'
+        logo.value.style.transform = null
+
+        setTimeout(() => {
+          logo.value.style.transition = null
+          scale = 1
+          triggered = false
+        }, 500)
+      }, 100)
+    }, 1000)
+  }
+}
 </script>
 
 <style lang="scss" scoped>
+.login-page :deep(.page__scroller) {
+  overflow-x: hidden;
+}
+
 .login-form {
   display: flex;
   flex-flow: column nowrap;
@@ -87,12 +124,14 @@ async function submit () {
   }
 
   &__logo {
-    max-width: 12rem;
-    width: 100%;
+    max-width: 15rem;
+    width: calc(80%);
+    height: auto;
     margin: 2rem auto 4rem;
     user-select: none;
-    pointer-events: none;
     touch-action: none;
+    transition: transform .2s;
+    transform-origin: center 71%;
   }
 }
 </style>
