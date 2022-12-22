@@ -32,6 +32,10 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+
+    :deep(i) {
+      margin-right: 1rem;
+    }
   }
 
   &__scroller {

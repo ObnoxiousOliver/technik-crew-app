@@ -1,7 +1,7 @@
 <template>
   <Page>
     <template #title>
-      Einstellungen
+      <i class="bi-gear" />Einstellungen
     </template>
 
     <SettingsList>
