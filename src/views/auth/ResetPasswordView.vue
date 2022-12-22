@@ -26,7 +26,7 @@
 <script lang="ts" setup>
 import { getAuth, sendPasswordResetEmail } from '@firebase/auth'
 import { ref } from 'vue'
-import FloatingLabelInput from '../components/FloatingLabelInput.vue'
+import FloatingLabelInput from '../../components/FloatingLabelInput.vue'
 
 const email = ref('')
 const auth = getAuth()

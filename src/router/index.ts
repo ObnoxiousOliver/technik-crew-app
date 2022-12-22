@@ -1,6 +1,6 @@
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
-import LoginView from '../views/LoginView.vue'
+import LoginView from '../views/auth/LoginView.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -8,15 +8,30 @@ const routes: Array<RouteRecordRaw> = [
     path: '/login',
     component: LoginView,
     meta: {
-      title: 'Anmelden'
+      requiresNoAuth: true,
+      title: 'Anmelden',
+      depth: 0
     }
   },
+  {
+    name: 'sign-up',
+    alias: '/sign-up',
+    path: '/sign-up/enter-code',
+    component: () => import('../views/auth/signUp/EnterCodeView.vue'),
+    meta: {
+      requiresNoAuth: true,
+      title: 'Registrieren',
+      depth: 1
+    }
+  },
+
   {
     path: '/',
     redirect: '/dashboard',
     component: () => import('../views/UserView.vue'),
     meta: {
-      requiresAuth: true
+      requiresAuth: true,
+      depth: 10
     },
     children: [
       {
@@ -61,11 +76,11 @@ const routes: Array<RouteRecordRaw> = [
   {
     name: 'settings',
     path: '/settings',
-    component: () => import('../views/SettingsView.vue'),
+    component: () => import('../views/settings/SettingsView.vue'),
     meta: {
       requiresAuth: true,
       title: 'Einstellungen',
-      depth: 10,
+      depth: 11,
       defaultBackPath: '/dashboard'
     }
   },
@@ -73,7 +88,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     name: 'profile',
     path: '/settings/profile',
-    component: () => import('../views/ProfileView.vue'),
+    component: () => import('../views/settings/ProfileView.vue'),
     meta: {
       requiresAuth: true,
       title: 'Profil',
@@ -85,7 +100,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     name: 'reset-password',
     path: '/reset-password',
-    component: () => import('../views/ResetPasswordView.vue'),
+    component: () => import('../views/auth/ResetPasswordView.vue'),
     meta: {
       title: 'Passwort zurücksetzen',
       depth: 100,
@@ -114,6 +129,21 @@ router.beforeEach((to, from, next) => {
             path: '/login',
             query: { redirect: to.fullPath }
           })
+          console.log('[Router]', 'User not logged in')
+        }
+      })()
+    }
+  } else if (to.matched.some(record => record.meta.requiresNoAuth)) {
+    if (getAuth().currentUser) {
+      next('/')
+      console.log('[Router]', 'User logged in')
+    } else {
+      onAuthStateChanged(getAuth(), (user) => {
+        if (user) {
+          next('/')
+          console.log('[Router]', 'User logged in')
+        } else {
+          next()
           console.log('[Router]', 'User not logged in')
         }
       })()
