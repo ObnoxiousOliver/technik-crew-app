@@ -72,9 +72,11 @@ async function submit () {
   }
 
   submitting.value = true
-  const ticket: TicketDB = await getTicket(code.value)
+  const ticket: TicketDB | undefined = await getTicket(code.value)
 
-  if (!ticket.invalid) {
+  if (ticket?.invalid) {
+    errorMsg.value = 'Der Code wurde schon eingelöst'
+  } else if (ticket) {
     try {
       // Check if user was already created with ticket
       const userExisits = (await getDoc(doc(getFirestore(), `user-mail/${ticket.username}`))).exists()
@@ -96,8 +98,6 @@ async function submit () {
     ticketStore.code = code.value
 
     router.push('/sign-up/email')
-  } else if (ticket.invalid) {
-    errorMsg.value = 'Der Code wurde schon eingelöst'
   } else {
     errorMsg.value = 'Ungültiger Code'
   }
