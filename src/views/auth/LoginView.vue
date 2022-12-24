@@ -19,7 +19,7 @@
 
       <router-link class="login-form__reset-password" to="/reset-password">Passwort vergessen?</router-link>
       <LoginButton class="login-form__login-btn" type="submit">Login</LoginButton>
-      <router-link class="login-form__sign-up" to="/sign-up/enter-code">Mit 6-stelligen Code registrieren</router-link>
+      <router-link class="login-form__sign-up" to="/sign-up/code">Mit 6-stelligen Code registrieren</router-link>
     </form>
   </Page>
 </template>
@@ -27,18 +27,31 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { signIn } from '@/utils/auth'
+import { useUser } from '@/stores/user'
+import { signIn } from '@/utilities/auth'
 
 import FloatingLabelInput from '../../components/FloatingLabelInput.vue'
 import LoginButton from '../../components/LoginButton.vue'
+import { collection, getDoc, getDocs, getFirestore, query, where } from '@firebase/firestore'
+import { UserDB } from '@/model/user'
 
 const router = useRouter()
 
 const name = ref('')
 const password = ref('')
 
+const userStore = useUser()
+const db = getFirestore()
+
 function submit () {
-  signIn(name.value, password.value).then(() => {
+  signIn(name.value, password.value).then(async () => {
+    userStore.user = (await getDocs(
+      query(
+        collection(db, 'users'),
+        where('username', '==', name.value)
+      )
+    )).docs[0].data() as UserDB
+
     router.push('/')
   }).catch((err) => {
     console.error('Auth', err)
@@ -93,7 +106,6 @@ function logoClick () {
   min-height: calc(100% - 3rem);
   max-width: 25rem;
   margin: 0 auto 3rem;
-  padding: 0 1rem;
 
   & > * {
     flex: 0 0 auto;
@@ -116,7 +128,7 @@ function logoClick () {
 
   &__logo {
     max-width: 15rem;
-    width: calc(80%);
+    width: 60%;
     height: auto;
     margin: 2rem auto 4rem;
     user-select: none;

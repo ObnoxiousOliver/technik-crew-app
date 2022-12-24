@@ -1,5 +1,5 @@
 <template>
-  <button class="login-btn">
+  <button v-wave class="login-btn">
     Anmelden
   </button>
 </template>
@@ -12,16 +12,17 @@
   display: inline-block;
   border: none;
   font: inherit;
+  color: inherit;
 
   overflow: hidden;
   padding: .875rem 2rem;
   font-weight: 600;
 
-  background: #171717;
+  background: r.$bg-secondary;
   border-radius: r.$radius;
   user-select: none;
   cursor: pointer;
-  transition: .5s;
+  transition: .5s, box-shadow .2s;
 
   &::before {
     content: '';
@@ -30,16 +31,19 @@
     top: 0;
     height: 100%;
     width: 2.5rem;
-    border-left: #fff2 solid 1.25rem;
-    border-right: #fff2 solid .5rem;
-    transform: skew(-20deg);
-    transition: 1s cubic-bezier(0.19, 1, 0.22, 1);
+    opacity: 0.1;
+    border-left: r.$text-primary solid 1.25rem;
+    border-right: r.$text-primary solid .5rem;
+    transform: skew(-10deg);
+    transition: 1.5s cubic-bezier(0.19, 1, 0.22, 1);
   }
 
-  &:hover {
-    box-shadow: r.$glow, r.$accent 0 0 0 .1rem inset;
+  &:hover, &:focus-visible {
+    outline: none;
+    box-shadow: r.$focus;
 
     &::before {
+      transform: skew(-30deg);
       left: calc(100% + 3rem);
     }
   }

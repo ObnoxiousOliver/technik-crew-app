@@ -1,7 +1,7 @@
 <template>
   <Page>
     <template #title>
-      Passwort ändern
+      <i class="bi-key"/>Passwort ändern
     </template>
 
     <form class="reset-form" @submit.prevent="submit">

@@ -6,4 +6,5 @@ export interface TicketDB {
   lastname: string
   prefer_lastname: string
   gender: Gender
+  invalid?: boolean
 }

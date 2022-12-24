@@ -152,7 +152,6 @@ function log (...args) {
       background: rgba(r.$accent, 0.1);
       .cv-day-number {
         color: r.$accent;
-        text-shadow: r.$glow;
       }
     }
 

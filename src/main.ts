@@ -2,6 +2,8 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import RouterPage from './layout/RouterPage.vue'
 import AppButton from './components/AppButton.vue'
+import InputField from './components/InputField.vue'
+import UsernameDisplay from './components/UsernameDisplay.vue'
 import './registerServiceWorker'
 import router from './router'
 import 'bootstrap-icons/font/bootstrap-icons.scss'
@@ -37,6 +39,8 @@ const pinia = createPinia()
 createApp(App)
   .component('Page', RouterPage)
   .component('Btn', AppButton)
+  .component('InputField', InputField)
+  .component('Username', UsernameDisplay)
   // .use(vfmPlugin())
   .use(VWave)
   .use(pinia)

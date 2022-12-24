@@ -4,13 +4,30 @@
   }]">
     <input
       class="input__field"
-      :type="props.type"
+      :type="inputType"
       v-model="inputValue"
       @focus="focused = true"
       @blur="focused = false"
       :aria-label="props.label"
       v-bind="$attrs"
     >
+    <Transition name="input__show-hide-btn">
+      <button
+        v-wave
+        v-if="props.type == 'password' && float"
+        class="input__show-hide-btn"
+        @keydown.space="showPassword = true"
+        @keyup.space="showPassword = false"
+        @keydown.enter="showPassword = true"
+        @keyup.enter="showPassword = false"
+        @blur="showPassword = false"
+        @pointerdown="showPassword = true"
+        @pointerup="showPassword = false"
+        @pointerleave="showPassword = false"
+      >
+        <i class="bi-eye" />
+      </button>
+    </Transition>
     <div class="input__label" aria-hidden>
       {{ props.label }}
     </div>
@@ -33,23 +50,42 @@ const props = defineProps({
   modelValue: String
 })
 
+const inputType = computed(() => {
+  if (props.type === 'password') {
+    return showPassword.value ? 'text' : 'password'
+  }
+  return props.type
+})
+const showPassword = ref(false)
+
 const inputValue = ref(props.modelValue)
 watch(() => props.modelValue, val => { inputValue.value = val })
 watch(inputValue, val => emit('update:modelValue', val))
 
 const focused = ref(false)
-const float = computed(() => focused.value || inputValue.value?.trim().length > 0)
+const float = computed(() => focused.value || inputValue.value?.length > 0)
 </script>
 
 <style lang="scss" scoped>
 @use '../scss' as r;
 
 .input {
-  display: inline-block;
+  display: inline-flex;
   position: relative;
   background: r.$bg-secondary;
   border-radius: r.$radius;
   overflow: hidden;
+
+  transition: box-shadow .2s, opacity .2s;
+
+  &:focus-within {
+    outline: none;
+    box-shadow: r.$focus;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+  }
 
   &__field {
     background: none;
@@ -67,8 +103,11 @@ const float = computed(() => focused.value || inputValue.value?.trim().length > 
     &:-webkit-autofill,
     &:-webkit-autofill:hover,
     &:-webkit-autofill:focus {
-      & + .input__label {
+      & ~ .input__label {
         color: r.$text-primary;
+      }
+      & ~ .input__show-hide-btn {
+        display: none;
       }
     }
   }
@@ -81,13 +120,31 @@ const float = computed(() => focused.value || inputValue.value?.trim().length > 
     transform-origin: 0 100%;
     pointer-events: none;
     user-select: none;
-    transition: .5s cubic-bezier(0.19, 1, 0.22, 1);
+    transition: .07s, transform .5s cubic-bezier(0.19, 1, 0.22, 1);
+  }
+
+  &__show-hide-btn {
+    background: none;
+    font: inherit;
+    color: inherit;
+    border: none;
+    padding: 0 1rem;
+    cursor: pointer;
+
+    &-enter-active, &-leave-active {
+      transition: .1s;
+    }
+    &-enter-from, &-leave-to {
+      opacity: 0;
+    }
   }
 
   &--float {
-    .input__label {
-      transform: translateY(-.7rem)scale(0.75);
-      font-weight: 600;
+    .input{
+      &__label {
+        transform: translateY(-.7rem)scale(0.75);
+        font-weight: 600;
+      }
     }
   }
 }

@@ -14,14 +14,39 @@ const routes: Array<RouteRecordRaw> = [
     }
   },
   {
-    name: 'sign-up',
+    name: 'sign-up-code',
     alias: '/sign-up',
-    path: '/sign-up/enter-code',
+    path: '/sign-up/code/:code?',
     component: () => import('../views/auth/signUp/EnterCodeView.vue'),
     meta: {
       requiresNoAuth: true,
       title: 'Registrieren',
-      depth: 1
+      depth: 1,
+      defaultBackPath: '/login'
+    }
+  },
+  {
+    name: 'sign-up-email',
+    alias: '/sign-up',
+    path: '/sign-up/email',
+    component: () => import('../views/auth/signUp/EnterEmailView.vue'),
+    meta: {
+      requiresNoAuth: true,
+      title: 'Registrieren',
+      depth: 2,
+      defaultBackPath: '/sign-up/code'
+    }
+  },
+  {
+    name: 'sign-up-password',
+    alias: '/sign-up',
+    path: '/sign-up/password',
+    component: () => import('../views/auth/signUp/EnterPasswordView.vue'),
+    meta: {
+      requiresNoAuth: true,
+      title: 'Registrieren',
+      depth: 3,
+      defaultBackPath: '/sign-up/email'
     }
   },
 
