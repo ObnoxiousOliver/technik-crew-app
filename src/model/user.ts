@@ -1,16 +1,16 @@
 import { TicketDB } from './ticket'
 
 export enum Gender {
+  NonBinary = 'non-binary',
   Male = 'male',
-  Female = 'female',
-  NonBinary = 'non-binary'
+  Female = 'female'
 }
 
 export interface UserDB {
   username: string
   firstname: string
   lastname: string
-  prefer_lastname: string
+  prefer_lastname: boolean
   gender: Gender
 }
 
@@ -18,7 +18,7 @@ export class User implements UserDB {
   username: string
   firstname: string
   lastname: string
-  prefer_lastname: string
+  prefer_lastname: boolean
   gender: Gender
 
   constructor (options: Required<UserDB>) {

@@ -32,8 +32,10 @@ import { signIn } from '@/utilities/auth'
 
 import FloatingLabelInput from '../../components/FloatingLabelInput.vue'
 import LoginButton from '../../components/LoginButton.vue'
-import { collection, getDoc, getDocs, getFirestore, query, where } from '@firebase/firestore'
+import { collection, doc, getDoc, getDocs, getFirestore, query, where } from '@firebase/firestore'
 import { UserDB } from '@/model/user'
+import { getAuth } from '@firebase/auth'
+import { PermissionsDB } from '@/model/permissions'
 
 const router = useRouter()
 
@@ -45,13 +47,6 @@ const db = getFirestore()
 
 function submit () {
   signIn(name.value, password.value).then(async () => {
-    userStore.user = (await getDocs(
-      query(
-        collection(db, 'users'),
-        where('username', '==', name.value)
-      )
-    )).docs[0].data() as UserDB
-
     router.push('/')
   }).catch((err) => {
     console.error('Auth', err)

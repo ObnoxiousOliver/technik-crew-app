@@ -13,6 +13,7 @@ import { getAuth, onAuthStateChanged } from '@firebase/auth'
 import { createPinia } from 'pinia'
 import { onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { setStore } from './utilities/auth'
 
 const route = useRoute()
 const router = useRouter()
@@ -24,6 +25,8 @@ onMounted(() => {
         path: '/login',
         query: { redirect: route.fullPath }
       })
+    } else {
+      setStore()
     }
   })
 })
@@ -54,9 +57,22 @@ body {
   overflow: hidden;
 }
 
+#app {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  max-width: 30rem;
+  margin: 0 auto;
+}
+
 p {
   margin-bottom: 1rem;
   line-height: 1.5;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  margin: 1rem 0;
 }
 
 .text-secondary {
@@ -99,26 +115,36 @@ a {
   }
 }
 
+$transition: .5s cubic-bezier(0.19, 1, 0.22, 1);
 .slide-left {
   &-enter-active {
     z-index: 1;
-    transition: .5s cubic-bezier(0.19, 1, 0.22, 1);
+    transition: $transition;
   }
   &-enter-from {
-    transform: translateX(100vw);
+    transform: translateX(100%);
   }
   &-leave-active {
-    transition: .5s;
+    transition: $transition;
+  }
+  &-leave-to {
+    transform: translateX(-20%);
   }
 }
 
 .slide-right {
   &-leave-active {
     z-index: 1;
-    transition: .5s cubic-bezier(0.19, 1, 0.22, 1);
+    transition: $transition;
   }
   &-leave-to {
-    transform: translateX(100vw);
+    transform: translateX(100%);
+  }
+  &-enter-active {
+    transition: $transition;
+  }
+  &-enter-from {
+    transform: translateX(-20%);
   }
 }
 </style>

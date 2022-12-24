@@ -43,6 +43,10 @@ const props = defineProps({
 
   &__content {
     flex: 1 1 auto;
+
+    :deep(i) {
+      margin-right: 1rem;
+    }
   }
 }
 </style>

@@ -4,6 +4,8 @@ import RouterPage from './layout/RouterPage.vue'
 import AppButton from './components/AppButton.vue'
 import InputField from './components/InputField.vue'
 import UsernameDisplay from './components/UsernameDisplay.vue'
+import Dropdown from './components/DropdownSelection.vue'
+import ToggleSwitch from './components/ToggleSwitch.vue'
 import './registerServiceWorker'
 import router from './router'
 import 'bootstrap-icons/font/bootstrap-icons.scss'
@@ -40,6 +42,8 @@ createApp(App)
   .component('Page', RouterPage)
   .component('Btn', AppButton)
   .component('InputField', InputField)
+  .component('Dropdown', Dropdown)
+  .component('Toggle', ToggleSwitch)
   .component('Username', UsernameDisplay)
   // .use(vfmPlugin())
   .use(VWave)
