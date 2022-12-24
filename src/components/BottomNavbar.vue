@@ -8,6 +8,7 @@
 @use '../scss' as r;
 
 .bottom-nav {
+  z-index: 100;
   position: fixed;
   inset: auto 1rem 1rem;
   display: flex;

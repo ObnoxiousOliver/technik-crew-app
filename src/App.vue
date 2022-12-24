@@ -10,7 +10,8 @@
 
 <script lang="ts" setup>
 import { getAuth, onAuthStateChanged } from '@firebase/auth'
-import { onMounted } from 'vue'
+import { createPinia } from 'pinia'
+import { onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
@@ -27,6 +28,11 @@ onMounted(() => {
   })
 })
 
+const pinia = createPinia()
+
+watch(pinia.state, () => {
+  localStorage.setItem('store', pinia.state.value)
+})
 </script>
 
 <style lang="scss">
@@ -50,6 +56,11 @@ body {
 
 p {
   margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+.text-secondary {
+  color: r.$text-secondary;
 }
 
 :focus {
@@ -61,11 +72,30 @@ p {
 }
 
 a {
+  position: relative;
   color: r.$accent;
   transition: .2s;
 
   &:hover {
     color: lighten(r.$accent, 30);
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -.5rem;
+    border-radius: r.$radius;
+    transition: .2s;
+    pointer-events: none;
+  }
+
+  &:focus-visible {
+    color: r.$accent !important;
+    outline: none;
+
+    &::before {
+      box-shadow: r.$focus;
+    }
   }
 }
 

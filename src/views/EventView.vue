@@ -1,10 +1,18 @@
 <template>
   <UserPage>
     <template #title>
-      Termine
+      <i class="bi-calendar-week"/>Termine
     </template>
-    <EventCalendar :events="events" />
+    <EventCalendar :events="events" @needUpdate="updateEvents">
+      <template #btns>
+        <Btn @click="updateEvents" aria-label="Aktualisieren">
+          <i class="bi-arrow-clockwise"></i>
+        </Btn>
+      </template>
+    </EventCalendar>
     <!-- {{ events }} -->
+
+    <RouterLink to="/events/new">Add</RouterLink>
 
     <!-- <button @click="addEvent">Add</button> -->
   </UserPage>
@@ -13,7 +21,7 @@
 <script lang="ts" setup>
 import UserPage from '../layout/UserPage.vue'
 import EventCalendar from '../components/EventCalendar.vue'
-import { addDoc, collection, doc, getDocs, getFirestore, limit, onSnapshot, query, where } from '@firebase/firestore'
+import { collection, getDocs, getFirestore, query, where } from '@firebase/firestore'
 import { onMounted, ref } from 'vue'
 import { EventDB } from '@/model/event'
 
@@ -33,18 +41,5 @@ async function updateEvents () {
   querySnapshot.forEach(doc => {
     events.value.push(doc.data() as EventDB)
   })
-}
-
-async function addEvent () {
-  addDoc(collection(db, 'events'), {
-    id: Math.random().toString(),
-    name: 'New Event',
-    description: 'This is a new event',
-    wholeDay: true,
-    startDate: new Date().getTime(),
-    endDate: null
-  } as EventDB)
-
-  updateEvents()
 }
 </script>

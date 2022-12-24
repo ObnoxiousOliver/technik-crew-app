@@ -1,7 +1,7 @@
 <template>
   <Page>
     <template #title>
-      Einstellungen
+      <i class="bi-gear" />Einstellungen
     </template>
 
     <SettingsList>
@@ -22,8 +22,8 @@
 <script lang="ts" setup>
 import { getAuth, signOut } from '@firebase/auth'
 import { useRouter } from 'vue-router'
-import SettingsList from '../components/SettingsList.vue'
-import SettingsListItem from '../components/SettingsListItem.vue'
+import SettingsList from '../../components/SettingsList.vue'
+import SettingsListItem from '../../components/SettingsListItem.vue'
 
 const auth = getAuth()
 const router = useRouter()

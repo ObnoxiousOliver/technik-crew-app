@@ -47,7 +47,6 @@ const props = defineProps({
       height: .1rem;
       background: r.$accent;
       border-radius: .05rem;
-      box-shadow: r.$glow;
     }
   }
 }

@@ -4,7 +4,7 @@
       @submit.prevent="submit"
       class="login-form"
     >
-      <img @click.prevent="logoClick" ref="logo" class="login-form__logo" src="../assets/technik-crew-logo.svg" alt="Technik Crew Logo">
+      <img @click.prevent="logoClick" ref="logo" class="login-form__logo" src="../../assets/technik-crew-logo.svg" alt="Technik Crew Logo">
       <FloatingLabelInput
         label="Name"
         v-model="name"
@@ -19,51 +19,43 @@
 
       <router-link class="login-form__reset-password" to="/reset-password">Passwort vergessen?</router-link>
       <LoginButton class="login-form__login-btn" type="submit">Login</LoginButton>
+      <router-link class="login-form__sign-up" to="/sign-up/code">Mit 6-stelligen Code registrieren</router-link>
     </form>
   </Page>
 </template>
 
 <script lang="ts" setup>
-import { getAuth, onAuthStateChanged, signInWithEmailAndPassword } from '@firebase/auth'
-import { doc, getDoc, getFirestore } from '@firebase/firestore'
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import CryptoJS from 'crypto-js'
+import { useUser } from '@/stores/user'
+import { signIn } from '@/utilities/auth'
 
-import FloatingLabelInput from '../components/FloatingLabelInput.vue'
-import LoginButton from '../components/LoginButton.vue'
+import FloatingLabelInput from '../../components/FloatingLabelInput.vue'
+import LoginButton from '../../components/LoginButton.vue'
+import { collection, getDoc, getDocs, getFirestore, query, where } from '@firebase/firestore'
+import { UserDB } from '@/model/user'
 
 const router = useRouter()
-
-onMounted(() => {
-  onAuthStateChanged(getAuth(), (user) => {
-    if (user) {
-      router.replace('/dashboard')
-    }
-  })()
-})
-
-const db = getFirestore()
 
 const name = ref('')
 const password = ref('')
 
-async function submit () {
-  console.log('Logging in as', name.value)
+const userStore = useUser()
+const db = getFirestore()
 
-  const userDoc = await getDoc(doc(db, `user-mail/${name.value}`))
-  const encryptedEmail = userDoc.get('email')
+function submit () {
+  signIn(name.value, password.value).then(async () => {
+    userStore.user = (await getDocs(
+      query(
+        collection(db, 'users'),
+        where('username', '==', name.value)
+      )
+    )).docs[0].data() as UserDB
 
-  const key = CryptoJS.enc.Base64.parse(name.value)
-  const iv = CryptoJS.enc.Base64.parse('                   ')
-  const email = CryptoJS.AES.decrypt(encryptedEmail, key, { iv }).toString(CryptoJS.enc.Utf8)
-
-  signInWithEmailAndPassword(getAuth(), email, password.value)
-    .then(() => {
-      router.push('/')
-    }).catch((err) => {
-      console.error('Auth', err)
-    })
+    router.push('/')
+  }).catch((err) => {
+    console.error('Auth', err)
+  })
 }
 
 const logo = ref(null as null | HTMLImageElement)
@@ -100,6 +92,8 @@ function logoClick () {
 </script>
 
 <style lang="scss" scoped>
+@use '../../scss' as r;
+
 .login-page :deep(.page__scroller) {
   overflow-x: hidden;
 }
@@ -112,7 +106,6 @@ function logoClick () {
   min-height: calc(100% - 3rem);
   max-width: 25rem;
   margin: 0 auto 3rem;
-  padding: 0 1rem;
 
   & > * {
     flex: 0 0 auto;
@@ -120,12 +113,22 @@ function logoClick () {
 
   &__reset-password {
     margin: 1.5rem 0;
-    align-self: start;
+    align-self: flex-start;
+  }
+
+  &__sign-up {
+    text-align: center;
+    margin: 1.5em 0 0;
+    color: r.$text-secondary;
+
+    &:hover {
+      color: r.$text-primary;
+    }
   }
 
   &__logo {
     max-width: 15rem;
-    width: calc(80%);
+    width: 60%;
     height: auto;
     margin: 2rem auto 4rem;
     user-select: none;

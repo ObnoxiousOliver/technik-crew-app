@@ -1,27 +1,22 @@
 <template>
-  <button v-wave class="btn">
-    <slot />
-  </button>
+  <input class="input">
 </template>
 
 <style lang="scss" scoped>
 @use '../scss' as r;
 
-.btn {
-  position: relative;
+.input {
   display: inline-block;
   border: none;
   font: inherit;
   color: inherit;
 
-  padding: .875rem 2rem;
-  font-weight: 600;
+  padding: .875rem .5rem .875rem 1rem;
 
   background: r.$bg-secondary;
   border-radius: r.$radius;
-  cursor: pointer;
 
-  transition: background-color .2s, box-shadow .2s, opacity .2s;
+  transition: box-shadow .2s, opacity .2s;
 
   &:focus-visible {
     outline: none;
@@ -29,12 +24,17 @@
   }
 
   &:disabled {
-    cursor: default;
     opacity: 0.5;
   }
 
-  &:hover:not(:disabled) {
-    background: lighten(r.$bg-secondary, 5);
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  &[type=number] {
+    -moz-appearance: textfield;
   }
 }
 </style>
