@@ -36,7 +36,7 @@ import { encryptTicket, getTicket } from '@/utilities/auth'
 import { useTicket } from '@/stores/ticket'
 import { useRoute, useRouter } from 'vue-router'
 import { TicketDB } from '@/model/ticket'
-import { collection, doc, getCountFromServer, getDoc, getDocs, getFirestore, query, setDoc, where } from '@firebase/firestore'
+import { doc, getDoc, getFirestore } from '@firebase/firestore'
 import { logOnServer } from '@/utilities/log'
 
 const router = useRouter()

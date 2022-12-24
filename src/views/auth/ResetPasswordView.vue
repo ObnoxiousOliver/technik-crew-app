@@ -9,7 +9,7 @@
         <p>Bestätige die E-Mail Adresse deines Accounts, damir wir dir die E-Mail zum ändern deines Passworts senden können.</p>
         <p>Wenn du deine E-Mail nicht mehr kennst oder ändern willst wende dich an die Admins.</p>
         <p>
-          <RouterLink to="/admins">
+          <RouterLink to="/admin/who">
             Wer sind die Admins?
           </RouterLink>
         </p>

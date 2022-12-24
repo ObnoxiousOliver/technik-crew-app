@@ -1,8 +1,12 @@
+import { Permission } from '@/model/permissions'
+import { useUser } from '@/stores/user'
+import { setStore } from '@/utilities/auth'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import LoginView from '../views/auth/LoginView.vue'
 
 const routes: Array<RouteRecordRaw> = [
+  // Login
   {
     name: 'login',
     path: '/login',
@@ -13,6 +17,8 @@ const routes: Array<RouteRecordRaw> = [
       depth: 0
     }
   },
+
+  // Sign up
   {
     name: 'sign-up-code',
     alias: '/sign-up',
@@ -50,6 +56,7 @@ const routes: Array<RouteRecordRaw> = [
     }
   },
 
+  // User
   {
     path: '/',
     redirect: '/dashboard',
@@ -98,6 +105,7 @@ const routes: Array<RouteRecordRaw> = [
     ]
   },
 
+  // New event
   {
     name: 'new-event',
     path: '/events/new',
@@ -109,6 +117,8 @@ const routes: Array<RouteRecordRaw> = [
       defaultBackPath: '/events'
     }
   },
+
+  // Settings
   {
     name: 'settings',
     path: '/settings',
@@ -121,6 +131,7 @@ const routes: Array<RouteRecordRaw> = [
     }
   },
 
+  // Profile
   {
     name: 'profile',
     path: '/settings/profile',
@@ -133,6 +144,7 @@ const routes: Array<RouteRecordRaw> = [
     }
   },
 
+  // Reset password
   {
     name: 'reset-password',
     path: '/reset-password',
@@ -141,6 +153,57 @@ const routes: Array<RouteRecordRaw> = [
       title: 'Passwort zurücksetzen',
       depth: 100,
       defaultBackPath: '/settings'
+    }
+  },
+
+  // Who are the admins
+  {
+    name: 'who-are-the-admins',
+    path: '/admin/who',
+    component: () => import('../views/WhoAreTheAdminsView.vue'),
+    meta: {
+      title: 'Passwort zurücksetzen',
+      depth: 999,
+      defaultBackPath: '/'
+    }
+  },
+
+  // Admin
+  // Tickets
+  {
+    name: 'tickets',
+    path: '/admin/tickets',
+    component: () => import('../views/admin/tickets/TicketsView.vue'),
+    meta: {
+      requiresAuth: true,
+      requiresPermission: 'create_tickets' as Permission,
+      title: 'Tickets',
+      depth: 100,
+      defaultBackPath: '/settings'
+    }
+  },
+  {
+    name: 'ticket-detail',
+    path: '/admin/tickets/:code',
+    component: () => import('../views/admin/tickets/TicketDetailsView.vue'),
+    meta: {
+      requiresAuth: true,
+      requiresPermission: 'create_tickets' as Permission,
+      title: 'Ticket details',
+      depth: 101,
+      defaultBackPath: '/admin/tickets'
+    }
+  },
+  {
+    name: 'ticket-create',
+    path: '/admin/tickets/create',
+    component: () => import('../views/admin/tickets/TicketCreateView.vue'),
+    meta: {
+      requiresAuth: true,
+      requiresPermission: 'create_tickets' as Permission,
+      title: 'Ticket erstellen',
+      depth: 101,
+      defaultBackPath: '/admin/tickets'
     }
   }
 ]
@@ -183,6 +246,30 @@ router.beforeEach((to, from, next) => {
           console.log('[Router]', 'User not logged in')
         }
       })()
+    }
+  } else {
+    next()
+  }
+})
+
+router.beforeEach(async (to, from, next) => {
+  if (to.matched.some(record => record.meta.requiresPermission)) {
+    const permission = to.meta.requiresPermission as Permission
+    const user = useUser()
+
+    if (!user.user) {
+      await setStore()
+    }
+
+    if (user.permissions.is_admin) {
+      next()
+      console.log('[Router]', 'User is admin')
+    } else if (user.permissions[permission]) {
+      next()
+      console.log('[Router]', 'User has permission')
+    } else {
+      next(from)
+      console.log('[Router]', 'User has no permission')
     }
   } else {
     next()

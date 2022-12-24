@@ -116,6 +116,9 @@ const float = computed(() => focused.value || inputValue.value?.length > 0)
     position: absolute;
 
     color: r.$text-secondary;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 
     transform-origin: 0 100%;
     pointer-events: none;
@@ -143,6 +146,7 @@ const float = computed(() => focused.value || inputValue.value?.length > 0)
     .input{
       &__label {
         transform: translateY(-.7rem)scale(0.75);
+        margin-right: -30%;
         font-weight: 600;
       }
     }

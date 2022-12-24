@@ -5,32 +5,37 @@
     </template>
 
     <SettingsList>
-      <SettingsListItem to="/settings/profile">Profil</SettingsListItem>
-      <SettingsListItem to="/reset-password">Passwort zurücksetzen</SettingsListItem>
+      <SettingsListItem to="/settings/profile">
+        <i class="bi-person" />Profil
+      </SettingsListItem>
+      <SettingsListItem to="/reset-password">
+        <i class="bi-key" />Passwort zurücksetzen
+      </SettingsListItem>
+      <SettingsListItem to="/admin/tickets">
+        <i class="bi-ticket-perforated" />Tickets</SettingsListItem>
       <SettingsListItem
         :arrow="false"
         isButton
         danger
         @click="logout"
       >
-        Abmelden
+        <i class="bi-box-arrow-left" />Abmelden
       </SettingsListItem>
     </SettingsList>
   </Page>
 </template>
 
 <script lang="ts" setup>
-import { getAuth, signOut } from '@firebase/auth'
+import { signOut } from '@/utilities/auth'
 import { useRouter } from 'vue-router'
 import SettingsList from '../../components/SettingsList.vue'
 import SettingsListItem from '../../components/SettingsListItem.vue'
 
-const auth = getAuth()
 const router = useRouter()
 
 async function logout () {
   try {
-    await signOut(auth)
+    await signOut()
     router.push('/login')
   } catch (e) {
     console.error(e)

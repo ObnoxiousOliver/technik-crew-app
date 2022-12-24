@@ -53,12 +53,12 @@ const props = defineProps({
 const router = useRouter()
 const route = useRoute()
 function back () {
-  if (history.back) {
+  if (history.state.back) {
     router.back()
   } else if (route.meta.defaultBackPath) {
-    router.push(route.meta.defaultBackPath)
+    router.replace(route.meta.defaultBackPath)
   } else {
-    router.push('/')
+    router.replace('/')
   }
 }
 
@@ -80,7 +80,7 @@ function onScroll () {
 @use '../scss' as r;
 
 .page {
-  position: fixed;
+  position: absolute;
   inset: 0;
   overflow: hidden;
   background: r.$bg-primary;
@@ -110,7 +110,7 @@ function onScroll () {
     position: absolute;
     inset: 0;
     padding: 4rem 1.5rem 0;
-    overflow: auto;
+    overflow: hidden auto;
   }
 
   &__title {

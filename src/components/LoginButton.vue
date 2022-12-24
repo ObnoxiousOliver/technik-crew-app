@@ -1,5 +1,5 @@
 <template>
-  <button v-wave class="login-btn">
+  <button class="login-btn">
     Anmelden
   </button>
 </template>

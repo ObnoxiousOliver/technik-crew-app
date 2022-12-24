@@ -1,8 +1,11 @@
-import { TicketDB } from '@/model/ticket'
-import { User } from '@/model/user'
+import { PermissionsDB } from '@/model/permissions'
+import { Ticket, TicketDB } from '@/model/ticket'
+import { User, UserDB } from '@/model/user'
+import { useNewEventStore } from '@/stores/newEvent'
+import { useUser } from '@/stores/user'
 import CryptoJS from 'crypto-js'
-import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword } from 'firebase/auth'
-import { addDoc, collection, doc, getDoc, getFirestore, setDoc } from 'firebase/firestore'
+import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword, signOut as _signOut } from 'firebase/auth'
+import { addDoc, collection, doc, getDoc, getDocs, getFirestore, query, setDoc, where } from 'firebase/firestore'
 import { logOnServer } from './log'
 
 export async function signIn (name: string, password: string) {
@@ -17,7 +20,43 @@ export async function signIn (name: string, password: string) {
 
   await signInWithEmailAndPassword(getAuth(), email, password)
 
-  console.log(encryptEmail(email, name))
+  // console.log(encryptEmail(email, name))
+}
+
+export async function getUsername () {
+  const auth = getAuth()
+  if (auth.currentUser) {
+    return (await getDoc(doc(getFirestore(), 'usernames', auth.currentUser.uid))).get('username')
+  }
+  return null
+}
+
+export async function setStore () {
+  const db = getFirestore()
+  const auth = getAuth()
+  const userStore = useUser()
+
+  if (!auth.currentUser) return
+
+  const username = await getUsername()
+
+  userStore.user = new User((await getDocs(
+    query(
+      collection(db, 'users'),
+      where('username', '==', username)
+    )
+  )).docs[0].data() as UserDB)
+
+  userStore.permissions = (await getDoc(
+    doc(db, 'permissions', auth.currentUser.uid)
+  )).data() as PermissionsDB
+}
+
+export async function signOut () {
+  const auth = getAuth()
+  await _signOut(auth)
+  useUser().reset()
+  useNewEventStore().reset()
 }
 
 function encryptEmail (email: string, name: string) {
@@ -57,19 +96,44 @@ export async function createUserFromTicket (ticket: TicketDB, code: string, emai
 
     const uid = getAuth().currentUser?.uid
 
+    if (!uid) throw new Error('No UID')
+
     // Set User specific info
-    await setDoc(doc(db, `usernames/${uid}`), { username })
-    await setDoc(doc(db, `user-mail/${username}`), {
+    await setDoc(doc(db, 'usernames', uid), { username })
+    await setDoc(doc(db, 'user-mail', username), {
       email: encryptEmail(email, username)
     })
     await addDoc(collection(db, 'users'), User.fromTicket(ticket).toDB())
 
-    // Invalidate Ticket
-    await setDoc(doc(db, `tickets/${encryptTicket(code)}`), {
-      invalid: true
-    })
+    await invalidateTicket(code, username)
   } catch (err) {
     console.error('Create User', err)
     throw err
   }
+}
+
+export async function createTicket (code: string, ticket: Ticket) {
+  const db = getFirestore()
+  const ticketRef = encryptTicket(code)
+
+  try {
+    await setDoc(doc(db, 'tickets', ticketRef), ticket.toDB())
+  } catch (err) {
+    console.error(err)
+    logOnServer('Error in "createTicket": ' + err)
+  }
+}
+
+export async function invalidateTicket (code: string, username?: string) {
+  const db = getFirestore()
+  const ticketRef = encryptTicket(code)
+  let _username = username
+
+  if (!username) {
+    _username = (await getDoc(doc(db, 'tickets', ticketRef))).get('username')
+  }
+  await setDoc(doc(db, 'tickets', ticketRef), {
+    username: _username,
+    invalid: true
+  })
 }
