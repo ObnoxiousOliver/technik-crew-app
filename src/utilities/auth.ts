@@ -19,8 +19,6 @@ export async function signIn (name: string, password: string) {
   const email = decryptEmail(encryptedEmail, name)
 
   await signInWithEmailAndPassword(getAuth(), email, password)
-
-  // console.log(encryptEmail(email, name))
 }
 
 export async function getUsername () {
@@ -60,14 +58,12 @@ export async function signOut () {
 }
 
 function encryptEmail (email: string, name: string) {
-  const key = CryptoJS.enc.Base64.parse(name)
-  const iv = CryptoJS.enc.Base64.parse('                   ')
-  return CryptoJS.AES.encrypt(email, key, { iv }).toString()
+  const key = btoa(name)
+  return CryptoJS.AES.encrypt(email, key).toString()
 }
 function decryptEmail (encryptedEmail: string, name: string) {
-  const key = CryptoJS.enc.Base64.parse(name)
-  const iv = CryptoJS.enc.Base64.parse('                   ')
-  return CryptoJS.AES.decrypt(encryptedEmail, key, { iv }).toString(CryptoJS.enc.Utf8)
+  const key = btoa(name)
+  return CryptoJS.AES.decrypt(encryptedEmail, key).toString(CryptoJS.enc.Utf8)
 }
 
 export function encryptTicket (code: string) {
