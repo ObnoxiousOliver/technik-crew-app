@@ -6,6 +6,7 @@
         </Transition>
       </template>
   </RouterView>
+  <div id="layer"></div>
 </template>
 
 <script lang="ts" setup>
@@ -65,6 +66,13 @@ body {
   margin: 0 auto;
 }
 
+#layer {
+  position: absolute;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+}
+
 p {
   margin-bottom: 1rem;
   line-height: 1.5;
@@ -72,7 +80,7 @@ p {
 
 h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
-  margin: 1rem 0;
+  margin: 1.5rem 0 1rem;
 }
 
 .text-secondary {
@@ -85,6 +93,32 @@ h1, h2, h3, h4, h5, h6 {
 
 :focus-visible {
   outline: r.$accent solid 2px;
+}
+
+.table {
+  width: 100%;
+
+  td:not(:first-child), th:not(:first-child) {
+    text-align: right;
+  }
+
+  tr:not(:last-child):not(:first-child) {
+    td, th {
+      padding: .5rem 0;
+    }
+  }
+
+  tr:first-child {
+    th, td {
+      padding-bottom: .5rem;
+    }
+  }
+
+  tr:last-child {
+    th, td {
+      padding-top: .5rem;
+    }
+  }
 }
 
 a {
@@ -112,6 +146,48 @@ a {
     &::before {
       box-shadow: r.$focus;
     }
+  }
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1rem;
+
+  &__group {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+  }
+
+  &__inline-group {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
+
+    & > .input, & > .dropdown {
+      flex: 1 1 auto;
+      width: 0;
+    }
+  }
+
+  &__label {
+    flex: 1 1 auto;
+    width: 0;
+    overflow: hidden;
+  }
+
+  &__error {
+    color: r.$danger;
+    font-size: .8rem;
+    margin-top: -.8rem;
+    padding: 0 .2rem;
+  }
+
+  &__submit {
+    margin-bottom: 2rem;
   }
 }
 

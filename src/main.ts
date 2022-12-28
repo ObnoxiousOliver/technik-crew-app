@@ -6,10 +6,15 @@ import InputField from './components/InputField.vue'
 import UsernameDisplay from './components/UsernameDisplay.vue'
 import Dropdown from './components/DropdownSelection.vue'
 import ToggleSwitch from './components/ToggleSwitch.vue'
-import './registerServiceWorker'
+import ActionSheet from './components/ActionSheet.vue'
+import ActionSheetButton from './components/ActionSheetButton.vue'
+import Spinner from './components/LoadingSpinner.vue'
 import router from './router'
-import 'bootstrap-icons/font/bootstrap-icons.scss'
 import VWave from 'v-wave'
+import { FocusTrap } from 'focus-trap-vue'
+
+import 'bootstrap-icons/font/bootstrap-icons.scss'
+import './registerServiceWorker'
 // import { vfmPlugin } from 'vue-final-modal'
 
 // Import the functions you need from the SDKs you need
@@ -39,12 +44,16 @@ const pinia = createPinia()
 
 // Create and mount app
 createApp(App)
+  .component('FocusTrap', FocusTrap)
   .component('Page', RouterPage)
   .component('Btn', AppButton)
   .component('InputField', InputField)
   .component('Dropdown', Dropdown)
   .component('Toggle', ToggleSwitch)
   .component('Username', UsernameDisplay)
+  .component('ActionSheet', ActionSheet)
+  .component('ActionSheetButton', ActionSheetButton)
+  .component('Spinner', Spinner)
   // .use(vfmPlugin())
   .use(VWave)
   .use(pinia)

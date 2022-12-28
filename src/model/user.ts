@@ -45,13 +45,14 @@ export class User implements UserDB {
     prefer_lastname: boolean,
     gender: Gender
   }) {
-    return user.prefer_lastname
+    if (!user.firstname && !user.lastname) return 'Anonym'
+    return (user.prefer_lastname && user.lastname) || !user.firstname
       ? {
           [Gender.Male]: `Herr ${user.lastname}`, // Herr Doe
           [Gender.Female]: `Frau ${user.lastname}`, // Frau Doe
-          [Gender.NonBinary]: `${user.firstname?.[0]}. ${user.lastname}` // J. Doe
+          [Gender.NonBinary]: (user.firstname?.[0] ? `${user.firstname[0]}. ` : '') + user.lastname // J. Doe
         }[user.gender]
-      : `${user.firstname} ${user.lastname?.[0]}.` // John D.
+      : user.firstname + (user.lastname?.[0] ? ` ${user.lastname[0]}.` : '') // John D.
   }
 
   static fromTicket (ticket: TicketDB): User {
