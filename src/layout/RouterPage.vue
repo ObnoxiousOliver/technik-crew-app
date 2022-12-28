@@ -45,9 +45,8 @@ const scroller = ref(null as null | HTMLElement)
 const props = defineProps({
   navigation: {
     type: Boolean,
-    default: () => true
-  },
-  back: String
+    default: true
+  }
 })
 
 const router = useRouter()

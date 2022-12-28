@@ -63,7 +63,7 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('../views/UserView.vue'),
     meta: {
       requiresAuth: true,
-      depth: 10
+      depth: 9
     },
     children: [
       {
@@ -180,18 +180,6 @@ const routes: Array<RouteRecordRaw> = [
       title: 'Tickets',
       depth: 100,
       defaultBackPath: '/settings'
-    }
-  },
-  {
-    name: 'ticket-detail',
-    path: '/admin/tickets/:code',
-    component: () => import('../views/admin/tickets/TicketDetailsView.vue'),
-    meta: {
-      requiresAuth: true,
-      requiresPermission: 'create_tickets' as Permission,
-      title: 'Ticket details',
-      depth: 101,
-      defaultBackPath: '/admin/tickets'
     }
   },
   {

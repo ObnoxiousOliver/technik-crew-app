@@ -11,12 +11,9 @@
         <p>Nachdem du dein Profil erstellt hast, kannst du den Code nicht mehr einlösen.</p>
       </div>
       <div class="sign-up-code__error">{{ errorMsg }}</div>
-      <InputField
+      <CodeInput
         class="sign-up-code__code-input"
-        placeholder="XXXXXX"
-        type="number"
-        @input="codeInput"
-        v-model:value="inputValue"
+        v-model="code"
         :disabled="submitting"
         autocomplete="one-time-code"
       />
@@ -38,6 +35,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { TicketDB } from '@/model/ticket'
 import { doc, getDoc, getFirestore } from '@firebase/firestore'
 import { logOnServer } from '@/utilities/log'
+import CodeInput from '@/components/CodeInput.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -45,23 +43,14 @@ const route = useRoute()
 const ticketStore = useTicket()
 
 const errorMsg = ref('')
-const inputValue = ref(null)
-const code = ref('')
+const code = ref(route.params.code)
 
-function codeInput (e: InputEvent) {
-  if (e.target.value.length < 7) {
-    code.value = e.target.value.split('').filter(x => '0123456789'.includes(x)).join('').slice(0, 6)
-  }
-  e.target.value = code.value
-}
 watch(code, (val) => {
-  inputValue.value = val
   router.replace('/sign-up/code/' + val)
 })
 
 onMounted(() => {
   ticketStore.reset()
-  code.value = route.params.code.split('').filter(x => '0123456789'.includes(x)).join('').slice(0, 6)
 })
 
 const submitting = ref(false)
@@ -109,13 +98,6 @@ async function submit () {
 @use '../../../scss' as r;
 
 .sign-up-code {
-  &__code-input {
-    text-align: center;
-    letter-spacing: min(2rem, 5vw);
-    text-indent: min(2rem, 5vw);
-    font-size: 1.5rem;
-    padding: 1rem 0;
-  }
   &__form {
     display: flex;
     flex-flow: column nowrap;

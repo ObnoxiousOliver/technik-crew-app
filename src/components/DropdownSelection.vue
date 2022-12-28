@@ -29,7 +29,6 @@ watch(() => props.modelValue, (val) => {
 
 .dropdown {
   position: relative;
-  width: fit-content;
 
   i {
     display: block;
@@ -45,6 +44,7 @@ watch(() => props.modelValue, (val) => {
     border: none;
     font: inherit;
     color: inherit;
+    width: 100%;
 
     padding: .875rem 3rem .875rem 1rem;
 

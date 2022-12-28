@@ -36,5 +36,11 @@
   &:hover:not(:disabled) {
     background: lighten(r.$bg-secondary, 5);
   }
+
+  &--square {
+    padding: 0;
+    width: 3.125rem;
+    height: 3.125rem;
+  }
 }
 </style>
