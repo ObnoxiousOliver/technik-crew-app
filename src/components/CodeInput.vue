@@ -2,7 +2,8 @@
   <InputField
     class="code-input"
     placeholder="XXXXXX"
-    type="number"
+    type="text"
+    inputmode="numeric"
     @input="codeInput"
     v-model:value="inputValue"
   />

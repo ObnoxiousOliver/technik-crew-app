@@ -22,8 +22,6 @@ import { initializeApp } from 'firebase/app'
 import { getAuth } from 'firebase/auth'
 import { getFirestore } from 'firebase/firestore'
 import { createPinia } from 'pinia'
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -40,6 +38,7 @@ const app = initializeApp(firebaseConfig)
 getAuth(app)
 getFirestore(app)
 
+// Create a Pinia instance
 const pinia = createPinia()
 
 // Create and mount app

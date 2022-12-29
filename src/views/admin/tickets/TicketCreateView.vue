@@ -61,13 +61,13 @@
 import FloatingLabelInput from '@/components/FloatingLabelInput.vue'
 import CodeInput from '@/components/CodeInput.vue'
 import { Ticket } from '@/model/ticket'
-import { createTicket, encryptTicket } from '@/utilities/auth'
+import { encryptTicket } from '@/utilities/auth'
+import { createTicket } from '@/utilities/admin'
 import { doc, getDoc, getFirestore } from '@firebase/firestore'
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { back } from '@/router'
 
 const db = getFirestore()
-const router = useRouter()
 
 const code = ref('')
 const username = ref('')
@@ -148,7 +148,7 @@ async function submit () {
     gender: gender.value,
     prefer_lastname: preferLastname.value
   }))
-  router.push('/admin/tickets')
+  back()
 }
 </script>
 

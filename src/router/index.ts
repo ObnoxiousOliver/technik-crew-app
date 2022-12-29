@@ -193,6 +193,31 @@ const routes: Array<RouteRecordRaw> = [
       depth: 101,
       defaultBackPath: '/admin/tickets'
     }
+  },
+  // Users
+  {
+    name: 'users',
+    path: '/admin/users',
+    component: () => import('../views/admin/users/UsersView.vue'),
+    meta: {
+      requiresAuth: true,
+      requiresPermission: 'manage_users' as Permission,
+      title: 'Benutzer verwalten',
+      depth: 100,
+      defaultBackPath: '/settings'
+    }
+  },
+  {
+    name: 'user-manage',
+    path: '/admin/users/:username',
+    component: () => import('../views/admin/users/UserManageView.vue'),
+    meta: {
+      requiresAuth: true,
+      requiresPermission: 'manage_users' as Permission,
+      title: 'Benutzer verwalten',
+      depth: 101,
+      defaultBackPath: '/admin/users'
+    }
   }
 ]
 
@@ -249,10 +274,10 @@ router.beforeEach(async (to, from, next) => {
       await setStore()
     }
 
-    if (user.permissions.is_admin) {
+    if (user.permissions?.is_admin) {
       next()
       console.log('[Router]', 'User is admin')
-    } else if (user.permissions[permission]) {
+    } else if (user.permissions?.[permission]) {
       next()
       console.log('[Router]', 'User has permission')
     } else {
@@ -287,5 +312,16 @@ router.afterEach((to) => {
     document.title = 'Technik Crew'
   }
 })
+
+export function back () {
+  const route = router.currentRoute.value
+  if (history.state.back) {
+    router.back()
+  } else if (route.meta.defaultBackPath) {
+    router.replace(route.meta.defaultBackPath)
+  } else {
+    router.replace('/')
+  }
+}
 
 export default router

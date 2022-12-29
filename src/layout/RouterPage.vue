@@ -38,7 +38,7 @@
 
 <script lang="ts" setup>
 import { onBeforeUnmount, onMounted, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { back as _back } from '@/router'
 
 const scroller = ref(null as null | HTMLElement)
 
@@ -49,16 +49,8 @@ const props = defineProps({
   }
 })
 
-const router = useRouter()
-const route = useRoute()
 function back () {
-  if (history.state.back) {
-    router.back()
-  } else if (route.meta.defaultBackPath) {
-    router.replace(route.meta.defaultBackPath)
-  } else {
-    router.replace('/')
-  }
+  _back()
 }
 
 onMounted(() => {

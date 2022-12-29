@@ -1,10 +1,10 @@
 import { PermissionsDB } from '@/model/permissions'
-import { Ticket, TicketDB } from '@/model/ticket'
+import { TicketDB } from '@/model/ticket'
 import { User, UserDB } from '@/model/user'
 import { useNewEventStore } from '@/stores/newEvent'
 import { useUser } from '@/stores/user'
 import CryptoJS from 'crypto-js'
-import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword, signOut as _signOut } from 'firebase/auth'
+import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword, signOut as _signOut, updateEmail } from 'firebase/auth'
 import { addDoc, collection, doc, getDoc, getDocs, getFirestore, query, setDoc, where } from 'firebase/firestore'
 import { logOnServer } from './log'
 
@@ -13,7 +13,10 @@ export async function signIn (name: string, password: string) {
 
   console.log('Logging in as', name)
 
-  const userDoc = await getDoc(doc(db, `user-mail/${name}`))
+  const userDoc = await getDoc(doc(db, 'user-mail', name))
+  if (!userDoc.exists()) {
+    throw new Error('auth/user-not-found')
+  }
   const encryptedEmail = userDoc.get('email')
 
   const email = decryptEmail(encryptedEmail, name)
@@ -57,11 +60,11 @@ export async function signOut () {
   useNewEventStore().reset()
 }
 
-function encryptEmail (email: string, name: string) {
+export function encryptEmail (email: string, name: string) {
   const key = btoa(name)
   return CryptoJS.AES.encrypt(email, key).toString()
 }
-function decryptEmail (encryptedEmail: string, name: string) {
+export function decryptEmail (encryptedEmail: string, name: string) {
   const key = btoa(name)
   return CryptoJS.AES.decrypt(encryptedEmail, key).toString(CryptoJS.enc.Utf8)
 }
@@ -105,18 +108,6 @@ export async function createUserFromTicket (ticket: TicketDB, code: string, emai
   } catch (err) {
     console.error('Create User', err)
     throw err
-  }
-}
-
-export async function createTicket (code: string, ticket: Ticket) {
-  const db = getFirestore()
-  const ticketRef = encryptTicket(code)
-
-  try {
-    await setDoc(doc(db, 'tickets', ticketRef), ticket.toDB())
-  } catch (err) {
-    console.error(err)
-    logOnServer('Error in "createTicket": ' + err)
   }
 }
 
