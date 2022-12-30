@@ -1,3 +1,5 @@
+import { decryptEmail } from '@/utilities/auth'
+import { doc, getDoc, getFirestore } from 'firebase/firestore'
 import { TicketDB } from './ticket'
 
 export enum Gender {
@@ -21,12 +23,12 @@ export class User implements UserDB {
   prefer_lastname: boolean
   gender: Gender
 
-  constructor (options: Required<UserDB>) {
-    this.username = options.username
-    this.firstname = options.firstname
-    this.lastname = options.lastname
-    this.prefer_lastname = options.prefer_lastname
-    this.gender = options.gender
+  constructor (options: Partial<UserDB>) {
+    this.username = options.username ?? ''
+    this.firstname = options.firstname ?? ''
+    this.lastname = options.lastname ?? ''
+    this.prefer_lastname = options.prefer_lastname ?? false
+    this.gender = options.gender ?? Gender.NonBinary
   }
 
   toDB (): UserDB {
@@ -37,6 +39,16 @@ export class User implements UserDB {
       prefer_lastname: this.prefer_lastname,
       gender: this.gender
     }
+  }
+
+  private cachedEmail: string | undefined
+  async getEmail () {
+    if (!this.cachedEmail) {
+      const db = getFirestore()
+      const email = await getDoc(doc(db, 'user-mail', this.username))
+      this.cachedEmail = decryptEmail(email.get('email'), this.username)
+    }
+    return this.cachedEmail
   }
 
   static getDisplayName (user: {

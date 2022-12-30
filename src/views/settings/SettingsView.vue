@@ -6,13 +6,17 @@
 
     <SettingsList>
       <SettingsListItem to="/settings/profile">
-        <i class="bi-person" />Profil
+        <i class="bi-person" />Mein Profil
       </SettingsListItem>
       <SettingsListItem to="/reset-password">
         <i class="bi-key" />Passwort zurücksetzen
       </SettingsListItem>
       <SettingsListItem to="/admin/tickets">
-        <i class="bi-ticket-perforated" />Tickets</SettingsListItem>
+        <i class="bi-ticket-perforated" />Tickets
+      </SettingsListItem>
+      <SettingsListItem to="/admin/users">
+        <i class="bi-person-badge" />Benutzer verwalten
+      </SettingsListItem>
       <SettingsListItem
         :arrow="false"
         isButton

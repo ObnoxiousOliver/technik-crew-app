@@ -4,56 +4,53 @@
       Neues Ticket
     </template>
 
-    <form @submit.prevent="submit" class="form">
-      <div class="form__inline-group">
+    <FormContainer @submit.prevent="submit" class="form">
+      <div class="create-ticket__code-container">
         <CodeInput class="create-ticket__code-input" v-model="code" />
-        <Btn class="btn--square" type="button" @click="setRandomCode">
+        <Btn class="create-ticket__code-generate-btn" type="button" @click="setRandomCode">
           <i class="bi-arrow-counterclockwise" />
         </Btn>
       </div>
-      <div v-if="codeError" class="form__error">
-        {{ codeError }}
-      </div>
+      <FormInfo v-if="codeError">{{ codeError }}</FormInfo>
+
       <FloatingLabelInput label="Benutzername" v-model="username" />
-      <div v-if="usernameError" class="form__error">
-        {{ usernameError }}
-      </div>
-      <div class="form__group">
+      <FormInfo v-if="usernameError">{{ usernameError }}</FormInfo>
+
+      <FormGroup>
         <FloatingLabelInput label="Vorname" v-model="firstname" />
         <FloatingLabelInput label="Nachname" v-model="lastname" />
-      </div>
-      <div v-if="nameError" class="form__error">
-        {{ nameError }}
-      </div>
+      </FormGroup>
+      <FormInfo v-if="nameError">{{ nameError }}</FormInfo>
+
       <Dropdown id="gender" v-model="gender">
         <option value="">Geschlecht auswählen</option>
         <option value="non-binary">divers</option>
         <option value="male">männlich</option>
         <option value="female">weiblich</option>
       </Dropdown>
-      <div v-if="genderError" class="form__error">
-        {{ genderError }}
-      </div>
-      <div class="form__inline-group">
-        <label for="preferLastname" class="form__label">
+      <FormInfo v-if="genderError">{{ genderError }}</FormInfo>
+
+      <FormGroup inline>
+        <label for="preferLastname">
           Nur Nachname anzeigen:
         </label>
         <Toggle id="preferLastname" v-model="preferLastname" />
-      </div>
-      <div class="form__inline-group">
-        <div class="form__label">
+      </FormGroup>
+
+      <FormGroup inline>
+        <label>
           Anzeigename:
-        </div>
+        </label>
         <Username
           :firstname="firstname"
           :lastname="lastname"
           :gender="gender"
           :preferLastname="preferLastname"
         />
-      </div>
+      </FormGroup>
 
-      <Btn class="form__submit" @click="submit">Ticket erstellen</Btn>
-    </form>
+      <Btn @click="submit">Ticket erstellen</Btn>
+    </FormContainer>
   </Page>
 </template>
 
@@ -61,13 +58,13 @@
 import FloatingLabelInput from '@/components/FloatingLabelInput.vue'
 import CodeInput from '@/components/CodeInput.vue'
 import { Ticket } from '@/model/ticket'
-import { createTicket, encryptTicket } from '@/utilities/auth'
+import { encryptTicket } from '@/utilities/auth'
+import { createTicket } from '@/utilities/admin'
 import { doc, getDoc, getFirestore } from '@firebase/firestore'
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { back } from '@/router'
 
 const db = getFirestore()
-const router = useRouter()
 
 const code = ref('')
 const username = ref('')
@@ -148,24 +145,31 @@ async function submit () {
     gender: gender.value,
     prefer_lastname: preferLastname.value
   }))
-  router.push('/admin/tickets')
+  back()
 }
 </script>
 
 <style lang="scss" scoped>
 .create-ticket {
-  &__form {
+  &__code-container {
     display: flex;
-    flex-direction: column;
-    gap: 1rem;
   }
 
   &__code-input {
-    font-size: 1rem;
+    flex: 1 1 auto;
     text-align: left;
-    padding: .875rem .5rem .875rem 1.5rem;
+    padding-left: 1.5rem;
     letter-spacing: .5em;
     text-indent: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  &__code-generate-btn {
+    padding: 0;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    width: 5rem;
   }
 }
 </style>

@@ -149,48 +149,6 @@ a {
   }
 }
 
-.form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin-bottom: 1rem;
-
-  &__group {
-    display: flex;
-    flex-direction: column;
-    gap: .5rem;
-  }
-
-  &__inline-group {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 1rem;
-
-    & > .input, & > .dropdown {
-      flex: 1 1 auto;
-      width: 0;
-    }
-  }
-
-  &__label {
-    flex: 1 1 auto;
-    width: 0;
-    overflow: hidden;
-  }
-
-  &__error {
-    color: r.$danger;
-    font-size: .8rem;
-    margin-top: -.8rem;
-    padding: 0 .2rem;
-  }
-
-  &__submit {
-    margin-bottom: 2rem;
-  }
-}
-
 $transition: .5s cubic-bezier(0.19, 1, 0.22, 1);
 .slide-left {
   &-enter-active {
