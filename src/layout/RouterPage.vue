@@ -77,6 +77,7 @@ function onScroll () {
   background: r.$bg-primary;
   max-width: 30rem;
   margin: 0 auto;
+  will-change: transform;
 
   &--heading-hidden {
     .page {

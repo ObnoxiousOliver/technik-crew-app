@@ -9,6 +9,9 @@ import ToggleSwitch from './components/ToggleSwitch.vue'
 import ActionSheet from './components/ActionSheet.vue'
 import ActionSheetButton from './components/ActionSheetButton.vue'
 import Spinner from './components/LoadingSpinner.vue'
+import FormContainer from './components/FormContainer.vue'
+import FormInfo from './components/FormInfo.vue'
+import FormGroup from './components/FormGroup.vue'
 import router from './router'
 import VWave from 'v-wave'
 import { FocusTrap } from 'focus-trap-vue'
@@ -53,6 +56,9 @@ createApp(App)
   .component('ActionSheet', ActionSheet)
   .component('ActionSheetButton', ActionSheetButton)
   .component('Spinner', Spinner)
+  .component('FormContainer', FormContainer)
+  .component('FormInfo', FormInfo)
+  .component('FormGroup', FormGroup)
   // .use(vfmPlugin())
   .use(VWave)
   .use(pinia)

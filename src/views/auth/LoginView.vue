@@ -1,56 +1,74 @@
 <template>
   <Page class="login-page" :navigation="false">
-    <form
+    <img @click.prevent="logoClick" ref="logo" class="logo" src="../../assets/technik-crew-logo.svg" alt="Technik Crew Logo">
+    <FormContainer
       @submit.prevent="submit"
-      class="login-form"
+      class="form"
+      :disabled="submitting"
     >
-      <img @click.prevent="logoClick" ref="logo" class="login-form__logo" src="../../assets/technik-crew-logo.svg" alt="Technik Crew Logo">
-      <FloatingLabelInput
-        label="Name"
-        v-model="name"
-        autocomplete="username"
-      />
-      <FloatingLabelInput
-        label="Passwort"
-        v-model="password"
-        type="password"
-        autocomplete="current-password"
-      />
+      <FormGroup>
+        <FloatingLabelInput
+          label="Name oder Lehrerkürzel"
+          v-model="name"
+          autocomplete="username"
+        />
+        <FloatingLabelInput
+          label="Passwort"
+          v-model="password"
+          type="password"
+          autocomplete="current-password"
+        />
+      </FormGroup>
+      <FormInfo v-if="authError">
+        {{ authError }}
+      </FormInfo>
 
-      <router-link class="login-form__reset-password" to="/reset-password">Passwort vergessen?</router-link>
-      <LoginButton class="login-form__login-btn" type="submit">Login</LoginButton>
-      <router-link class="login-form__sign-up" to="/sign-up/code">Mit 6-stelligen Code registrieren</router-link>
-    </form>
+      <router-link class="reset-password" to="/reset-password">Passwort vergessen?</router-link>
+      <LoginButton class="login-btn" type="submit">Login</LoginButton>
+      <router-link class="sign-up" to="/sign-up/code">Mit 6-stelligen Code registrieren</router-link>
+    </FormContainer>
   </Page>
 </template>
 
 <script lang="ts" setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useUser } from '@/stores/user'
 import { signIn } from '@/utilities/auth'
 
 import FloatingLabelInput from '../../components/FloatingLabelInput.vue'
 import LoginButton from '../../components/LoginButton.vue'
-import { collection, doc, getDoc, getDocs, getFirestore, query, where } from '@firebase/firestore'
-import { UserDB } from '@/model/user'
-import { getAuth } from '@firebase/auth'
-import { PermissionsDB } from '@/model/permissions'
 
 const router = useRouter()
 
 const name = ref('')
 const password = ref('')
 
-const userStore = useUser()
-const db = getFirestore()
+const authError = ref('')
+const submitting = ref(false)
+async function submit () {
+  if (!name.value || !password.value) {
+    authError.value = 'Bitte gib einen Namen und ein Passwort ein'
+    return
+  } else {
+    authError.value = ''
+  }
 
-function submit () {
-  signIn(name.value, password.value).then(async () => {
+  submitting.value = true
+
+  try {
+    await signIn(name.value, password.value)
     router.push('/')
-  }).catch((err) => {
+  } catch (err) {
+    if (err.code === 'auth/user-not-found') {
+      authError.value = 'Dieser Benutzer existiert nicht'
+    } else if (err.code === 'auth/wrong-password') {
+      authError.value = 'Falsches Passwort'
+    } else {
+      authError.value = 'Ein Fehler ist aufgetreten: ' + err
+    }
     console.error('Auth', err)
-  })
+  }
+  submitting.value = false
 }
 
 const logo = ref(null as null | HTMLImageElement)
@@ -89,47 +107,30 @@ function logoClick () {
 <style lang="scss" scoped>
 @use '../../scss' as r;
 
-.login-page :deep(.page__scroller) {
-  overflow-x: hidden;
+.reset-password {
+  margin: 0 .2rem;
+  align-self: flex-start;
 }
 
-.login-form {
-  display: flex;
-  flex-flow: column nowrap;
-  justify-content: center;
-  gap: .5rem;
-  min-height: calc(100% - 3rem);
-  max-width: 25rem;
-  margin: 0 auto 3rem;
+.sign-up {
+  text-align: center;
+  margin: 1em 0 0;
+  color: r.$text-secondary;
 
-  & > * {
-    flex: 0 0 auto;
+  &:hover {
+    color: r.$text-primary;
   }
+}
 
-  &__reset-password {
-    margin: 1.5rem 0;
-    align-self: flex-start;
-  }
-
-  &__sign-up {
-    text-align: center;
-    margin: 1.5em 0 0;
-    color: r.$text-secondary;
-
-    &:hover {
-      color: r.$text-primary;
-    }
-  }
-
-  &__logo {
-    max-width: 15rem;
-    width: 60%;
-    height: auto;
-    margin: 2rem auto 4rem;
-    user-select: none;
-    touch-action: none;
-    transition: transform .2s;
-    transform-origin: center 71%;
-  }
+.logo {
+  display: block;
+  max-width: 15rem;
+  width: 50%;
+  height: auto;
+  margin: max(4rem, calc(25vh - 4rem)) auto;
+  user-select: none;
+  touch-action: none;
+  transition: transform .2s;
+  transform-origin: center 71%;
 }
 </style>

@@ -4,6 +4,7 @@ import { User, UserDB } from '@/model/user'
 import { useNewEventStore } from '@/stores/newEvent'
 import { useUser } from '@/stores/user'
 import CryptoJS from 'crypto-js'
+import { FirebaseError } from 'firebase/app'
 import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword, signOut as _signOut, updateEmail } from 'firebase/auth'
 import { addDoc, collection, doc, getDoc, getDocs, getFirestore, query, setDoc, where } from 'firebase/firestore'
 import { logOnServer } from './log'
@@ -15,7 +16,7 @@ export async function signIn (name: string, password: string) {
 
   const userDoc = await getDoc(doc(db, 'user-mail', name))
   if (!userDoc.exists()) {
-    throw new Error('auth/user-not-found')
+    throw new FirebaseError('auth/user-not-found', 'User not found')
   }
   const encryptedEmail = userDoc.get('email')
 

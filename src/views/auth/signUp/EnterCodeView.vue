@@ -4,26 +4,28 @@
       Code eingeben
     </template>
 
-    <form class="sign-up-code__form" @submit.prevent="submit">
-      <div>
-        <p>Hast du einen 6-stelligen Code von den Admins bekommen? Den kannst du hier eingeben und dein Profil erstellen.</p>
-        <p>Achtung! Du solltest den Code niemand anderen geben, da der Code nur für dich bestimmt ist.</p>
-        <p>Nachdem du dein Profil erstellt hast, kannst du den Code nicht mehr einlösen.</p>
-      </div>
-      <div class="sign-up-code__error">{{ errorMsg }}</div>
+    <p>Hast du einen 6-stelligen Code von den Admins bekommen? Den kannst du hier eingeben und dein Profil erstellen.</p>
+    <p>Achtung! Du solltest den Code niemand anderen geben, da der Code nur für dich bestimmt ist.</p>
+    <p>Nachdem du dein Profil erstellt hast, kannst du den Code nicht mehr einlösen.</p>
+    <FormContainer
+      class="form"
+      @submit.prevent="submit"
+      :disabled="submitting"
+    >
       <CodeInput
-        class="sign-up-code__code-input"
         v-model="code"
-        :disabled="submitting"
         autocomplete="one-time-code"
       />
+      <FormInfo v-if="codeError">
+        {{ codeError }}
+      </FormInfo>
       <Btn
-        :disabled="submitting"
+        class="form__submit"
         type="submit"
       >
         Einlösen
       </Btn>
-    </form>
+    </FormContainer>
   </Page>
 </template>
 
@@ -42,7 +44,7 @@ const route = useRoute()
 
 const ticketStore = useTicket()
 
-const errorMsg = ref('')
+const codeError = ref('')
 const code = ref(route.params.code)
 
 watch(code, (val) => {
@@ -56,7 +58,7 @@ onMounted(() => {
 const submitting = ref(false)
 async function submit () {
   if (code.value.length !== 6) {
-    errorMsg.value = 'Bitte einen 6-stelligen Code eingeben'
+    codeError.value = 'Bitte einen 6-stelligen Code eingeben'
     return
   }
 
@@ -64,21 +66,21 @@ async function submit () {
   const ticket: TicketDB | undefined = await getTicket(code.value)
 
   if (ticket?.invalid) {
-    errorMsg.value = 'Der Code wurde schon eingelöst'
+    codeError.value = 'Der Code wurde schon eingelöst'
   } else if (ticket) {
     try {
       // Check if user was already created with ticket
       const userExisits = (await getDoc(doc(getFirestore(), `user-mail/${ticket.username}`))).exists()
       if (userExisits) {
         logOnServer('Warning: Ticket is not invalidated: ' + encryptTicket(code.value))
-        errorMsg.value = 'Der Code wurde schon eingelöst'
+        codeError.value = 'Der Code wurde schon eingelöst'
         submitting.value = false
         return
       }
     } catch (err) {
       console.error(err)
       logOnServer('Error in "submit" on EnterCodeView.vue: ' + err)
-      errorMsg.value = 'Ups! Es ist ein fehler aufgetreten'
+      codeError.value = 'Ein Fehler ist aufgetreten: ' + err
       submitting.value = false
       return
     }
@@ -88,24 +90,8 @@ async function submit () {
 
     router.push('/sign-up/email')
   } else {
-    errorMsg.value = 'Ungültiger Code'
+    codeError.value = 'Ungültiger Code'
   }
   submitting.value = false
 }
 </script>
-
-<style lang="scss" scoped>
-@use '../../../scss' as r;
-
-.sign-up-code {
-  &__form {
-    display: flex;
-    flex-flow: column nowrap;
-    gap: 1rem;
-  }
-
-  &__error {
-    color: r.$danger;
-  }
-}
-</style>

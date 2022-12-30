@@ -51,6 +51,7 @@ watch(() => props.modelValue, (val) => {
 
 <style lang="scss" scoped>
 .code-input {
+  width: 100%;
   text-align: center;
   letter-spacing: 1em;
   text-indent: 1em;
