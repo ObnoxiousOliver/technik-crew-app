@@ -80,6 +80,10 @@ const float = computed(() => focused.value || inputValue.value?.length > 0)
 
   transition: box-shadow .2s, opacity .2s;
 
+  &.dark {
+    background: r.$bg-primary;
+  }
+
   &:focus-within {
     outline: none;
     box-shadow: r.$focus;

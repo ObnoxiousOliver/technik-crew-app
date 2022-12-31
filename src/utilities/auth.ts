@@ -6,7 +6,7 @@ import { useUser } from '@/stores/user'
 import CryptoJS from 'crypto-js'
 import { FirebaseError } from 'firebase/app'
 import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword, signOut as _signOut, updateEmail } from 'firebase/auth'
-import { addDoc, collection, doc, getDoc, getDocs, getFirestore, query, setDoc, where } from 'firebase/firestore'
+import { collection, doc, getDoc, getFirestore, setDoc } from 'firebase/firestore'
 import { logOnServer } from './log'
 
 export async function signIn (name: string, password: string) {
@@ -42,12 +42,7 @@ export async function setStore () {
 
   const username = await getUsername()
 
-  userStore.user = new User((await getDocs(
-    query(
-      collection(db, 'users'),
-      where('username', '==', username)
-    )
-  )).docs[0].data() as UserDB)
+  userStore.user = new User((await getDoc(doc(db, 'users', username))).data() as UserDB)
 
   userStore.permissions = (await getDoc(
     doc(db, 'permissions', auth.currentUser.uid)
@@ -103,7 +98,7 @@ export async function createUserFromTicket (ticket: TicketDB, code: string, emai
     await setDoc(doc(db, 'user-mail', username), {
       email: encryptEmail(email, username)
     })
-    await addDoc(collection(db, 'users'), User.fromTicket(ticket).toDB())
+    await setDoc(doc(db, 'users', username), User.fromTicket(ticket).toDB())
 
     await invalidateTicket(code, username)
   } catch (err) {

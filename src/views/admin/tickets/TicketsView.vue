@@ -9,7 +9,7 @@
     </RouterLink>
 
     <TicketBtn
-      v-for="(ticket, id) in tickets"
+      v-for="[id, ticket] in sortedTickets"
       :key="id"
       @click="showTicketId = id"
       :ticket="ticket"
@@ -17,7 +17,7 @@
     />
     <h3 v-if="!fetching">Eingelöste Tickets</h3>
     <TicketBtn
-      v-for="(ticket, id) in invalidTickets"
+      v-for="[id, ticket] in sortedInvalidTickets"
       :key="id"
       @click="showTicketId = id"
       :ticket="ticket"
@@ -90,7 +90,17 @@ import TicketBtn from '@/components/TicketBtn.vue'
 
 const db = getFirestore()
 const tickets = ref({} as { [key: string]: TicketDB })
+const sortedTickets = computed(() => {
+  return Object.entries(tickets.value).sort((a, b) => {
+    return a[1].username.localeCompare(b[1].username)
+  })
+})
 const invalidTickets = ref({} as { [key: string]: TicketDB })
+const sortedInvalidTickets = computed(() => {
+  return Object.entries(invalidTickets.value).sort((a, b) => {
+    return a[1].username.localeCompare(b[1].username)
+  })
+})
 
 const showTicketId = ref<string>()
 const showTicketSheet = computed({

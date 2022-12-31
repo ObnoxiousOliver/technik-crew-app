@@ -1,5 +1,6 @@
 <template>
-  <form
+  <component
+    :is="props.notAForm ? 'div' : 'form'"
     :class="['form', {
       'form--fill-page': props.fillPage,
       'form--disabled': props.disabled
@@ -14,13 +15,14 @@
     <Transition name="form__spinner">
       <Spinner v-if="props.disabled" class="form__spinner" />
     </Transition>
-  </form>
+  </component>
 </template>
 
 <script lang="ts" setup>
 const props = defineProps<{
   disabled?: boolean,
-  fillPage?: boolean
+  fillPage?: boolean,
+  notAForm?: boolean
 }>()
 </script>
 

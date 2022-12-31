@@ -10,23 +10,37 @@
 </template>
 
 <script lang="ts" setup>
-import { getAuth, onAuthStateChanged } from '@firebase/auth'
+import { deleteUser, getAuth, onAuthStateChanged } from '@firebase/auth'
+import { doc, getDoc, getFirestore } from '@firebase/firestore'
 import { createPinia } from 'pinia'
 import { onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { setStore } from './utilities/auth'
+import { setStore, signOut } from './utilities/auth'
 
 const route = useRoute()
 const router = useRouter()
 
+const db = getFirestore()
+const auth = getAuth()
+
 onMounted(() => {
-  onAuthStateChanged(getAuth(), (user) => {
+  onAuthStateChanged(auth, async (user) => {
     if (!user && route.meta.requireAuth) {
       router.push({
         path: '/login',
         query: { redirect: route.fullPath }
       })
-    } else {
+    }
+    if (user) {
+      if (!(await getDoc(doc(db, 'usernames', user.uid))).exists()) {
+        router.push('/')
+        // Delete user if user doesn't exist in database
+        await deleteUser(user)
+        console.log('[Auth]', 'Deleted user', user.uid)
+        await signOut()
+        return
+      }
+
       setStore()
     }
   })
@@ -95,8 +109,17 @@ h1, h2, h3, h4, h5, h6 {
   outline: r.$accent solid 2px;
 }
 
+.danger {
+  color: r.$danger;
+}
+.success {
+  color: r.$success;
+}
+
 .table {
   width: 100%;
+  word-break: break-word;
+  hyphens: auto;
 
   td:not(:first-child), th:not(:first-child) {
     text-align: right;

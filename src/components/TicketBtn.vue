@@ -1,5 +1,5 @@
 <template>
-  <button v-wave class="ticket-btn">
+  <Btn class="ticket-btn">
     <div class="ticket-btn__code">
       {{ props.code }}
     </div>
@@ -7,7 +7,7 @@
       {{ props.ticket.username }}
     </div>
     <i class="bi-three-dots-vertical"></i>
-  </button>
+  </Btn>
 </template>
 
 <script lang="ts" setup>
@@ -25,12 +25,8 @@ const props = defineProps<{
 .ticket-btn {
   display: flex;
   width: 100%;
-  background: r.$bg-secondary;
-  border: none;
-  font: inherit;
-  color: inherit;
+  font-weight: normal;
   text-align: left;
-  border-radius: r.$radius;
   gap: 1rem;
   overflow: hidden;
   align-items: center;

@@ -4,31 +4,51 @@
       Neues Ticket
     </template>
 
-    <FormContainer @submit.prevent="submit" class="form">
+    <FormContainer :disabled="submitting" @submit.prevent="submit" class="form">
       <div class="create-ticket__code-container">
-        <CodeInput class="create-ticket__code-input" v-model="code" />
+        <CodeInput
+          class="create-ticket__code-input"
+          autocomplete="off"
+          v-model="code"
+        />
         <Btn class="create-ticket__code-generate-btn" type="button" @click="setRandomCode">
           <i class="bi-arrow-counterclockwise" />
         </Btn>
       </div>
-      <FormInfo v-if="codeError">{{ codeError }}</FormInfo>
+      <FormInfo :show="codeError">{{ codeError }}</FormInfo>
 
-      <FloatingLabelInput label="Benutzername" v-model="username" />
-      <FormInfo v-if="usernameError">{{ usernameError }}</FormInfo>
+      <FloatingLabelInput
+        label="vorname.nachname oder Lehrerkürzel"
+        autocomplete="off"
+        autocapitalize="none"
+        v-model="username"
+      />
+      <FormInfo :show="usernameError">{{ usernameError }}</FormInfo>
 
       <FormGroup>
-        <FloatingLabelInput label="Vorname" v-model="firstname" />
-        <FloatingLabelInput label="Nachname" v-model="lastname" />
+        <FloatingLabelInput
+          label="Vorname"
+          autocomplete="off"
+          v-model="firstname"
+        />
+        <FloatingLabelInput
+          label="Nachname"
+          autocomplete="off"
+          v-model="lastname"
+        />
       </FormGroup>
-      <FormInfo v-if="nameError">{{ nameError }}</FormInfo>
+      <FormInfo :show="nameError">{{ nameError }}</FormInfo>
 
-      <Dropdown id="gender" v-model="gender">
+      <Dropdown
+        id="gender"
+        v-model="gender"
+      >
         <option value="">Geschlecht auswählen</option>
         <option value="non-binary">divers</option>
         <option value="male">männlich</option>
         <option value="female">weiblich</option>
       </Dropdown>
-      <FormInfo v-if="genderError">{{ genderError }}</FormInfo>
+      <FormInfo :show="genderError">{{ genderError }}</FormInfo>
 
       <FormGroup inline>
         <label for="preferLastname">
@@ -49,7 +69,7 @@
         />
       </FormGroup>
 
-      <Btn @click="submit">Ticket erstellen</Btn>
+      <Btn type="submit">Ticket erstellen</Btn>
     </FormContainer>
   </Page>
 </template>
@@ -77,7 +97,6 @@ function generateCode () {
   const nums = new Array(6).fill(0)
   nums.forEach((_, i) => {
     let num = Math.floor(Math.random() * 10)
-    console.log(num, nums[i - 1])
     while (nums[i - 1] === num) {
       num = Math.floor(Math.random() * 10)
     }
@@ -97,12 +116,17 @@ async function setRandomCode () {
 async function checkCode (code) {
   return (await getDoc(doc(db, 'tickets', encryptTicket(code)))).exists()
 }
+async function checkUsername (username) {
+  return (await getDoc(doc(db, 'users', username))).exists()
+}
 
 const codeError = ref('')
 const usernameError = ref('')
 const nameError = ref('')
 const genderError = ref('')
+const submitting = ref(false)
 async function submit () {
+  submitting.value = true
   let formInvalid = false
 
   if (code.value.length !== 6) {
@@ -119,7 +143,19 @@ async function submit () {
     usernameError.value = 'Der Benutzername darf nicht leer sein'
     formInvalid = true
   } else {
-    usernameError.value = ''
+    const forbiddenChars = Array.from(username.value.trim())
+      .filter((val) => !'abcdefghijklmnopqrstuvwxyz.'.includes(val))
+      .filter((val, i, arr) => arr.indexOf(val) === i)
+
+    if (forbiddenChars.length > 0) {
+      usernameError.value = `Der Benutzername enthält ungültige Zeichen: ${forbiddenChars.join(', ')}; (erlaubt: a-z, .)`
+      formInvalid = true
+    } else if (await checkUsername(username.value)) {
+      usernameError.value = 'Dieser Benutzername ist bereits vergeben'
+      formInvalid = true
+    } else {
+      usernameError.value = ''
+    }
   }
 
   if (!firstname.value.trim() || !lastname.value.trim()) {
@@ -136,7 +172,10 @@ async function submit () {
     genderError.value = ''
   }
 
-  if (formInvalid) return
+  if (formInvalid) {
+    submitting.value = false
+    return
+  }
 
   await createTicket(code.value, new Ticket({
     username: username.value.trim(),
@@ -145,6 +184,7 @@ async function submit () {
     gender: gender.value,
     prefer_lastname: preferLastname.value
   }))
+  submitting.value = false
   back()
 }
 </script>

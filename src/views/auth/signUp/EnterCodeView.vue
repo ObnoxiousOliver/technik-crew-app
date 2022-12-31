@@ -16,7 +16,7 @@
         v-model="code"
         autocomplete="one-time-code"
       />
-      <FormInfo v-if="codeError">
+      <FormInfo :show="codeError">
         {{ codeError }}
       </FormInfo>
       <Btn

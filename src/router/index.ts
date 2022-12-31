@@ -3,14 +3,13 @@ import { useUser } from '@/stores/user'
 import { setStore } from '@/utilities/auth'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
-import LoginView from '../views/auth/LoginView.vue'
 
 const routes: Array<RouteRecordRaw> = [
   // Login
   {
     name: 'login',
     path: '/login',
-    component: LoginView,
+    component: () => import('../views/auth/LoginView.vue'),
     meta: {
       requiresNoAuth: true,
       title: 'Anmelden',
@@ -315,6 +314,7 @@ router.afterEach((to) => {
 
 export function back () {
   const route = router.currentRoute.value
+  console.log('[Router]', 'Back', history.state.back, route.meta.defaultBackPath)
   if (history.state.back) {
     router.back()
   } else if (route.meta.defaultBackPath) {

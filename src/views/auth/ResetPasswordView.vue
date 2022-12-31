@@ -20,11 +20,11 @@
         label="E-Mail"
         v-model="email"
       />
-      <FormInfo v-if="authError">
+      <FormInfo :show="authError">
         {{ authError }}
       </FormInfo>
       <Btn type="submit" class="form__submit">Senden</Btn>
-      <FormInfo type="success" v-if="success">
+      <FormInfo :show="success" type="success">
         <i class="bi-check" /> E-Mail wurde gesendet
       </FormInfo>
     </FormContainer>
