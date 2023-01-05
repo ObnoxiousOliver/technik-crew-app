@@ -8,7 +8,7 @@
     >
       <FormGroup>
         <FloatingLabelInput
-          label="Name oder Lehrerkürzel"
+          label="vorname.nachname oder Lehrerkürzel"
           v-model="name"
           autocomplete="username"
         />
@@ -19,7 +19,7 @@
           autocomplete="current-password"
         />
       </FormGroup>
-      <FormInfo v-if="authError">
+      <FormInfo :show="authError">
         {{ authError }}
       </FormInfo>
 
@@ -49,10 +49,7 @@ async function submit () {
   if (!name.value || !password.value) {
     authError.value = 'Bitte gib einen Namen und ein Passwort ein'
     return
-  } else {
-    authError.value = ''
   }
-
   submitting.value = true
 
   try {

@@ -33,10 +33,16 @@
       </h2>
       <slot />
     </main>
+    <AddButton
+      class="page__add-btn"
+      v-if="props.addBtn"
+      @click="props.addBtn"
+    />
   </div>
 </template>
 
 <script lang="ts" setup>
+import AddButton from '@/components/AddButton.vue'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { back as _back } from '@/router'
 
@@ -46,6 +52,10 @@ const props = defineProps({
   navigation: {
     type: Boolean,
     default: true
+  },
+  addBtn: {
+    type: Function,
+    default: undefined
   }
 })
 
@@ -168,6 +178,12 @@ function onScroll () {
     padding-left: 1.5rem;
     height: 100%;
     width: 3rem;
+  }
+
+  &__add-btn {
+    position: absolute;
+    bottom: 1.5rem;
+    right: 1.5rem;
   }
 }
 </style>

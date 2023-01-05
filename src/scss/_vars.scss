@@ -6,6 +6,7 @@ $success: #89ff44;
 // $bg-stroke: #afafaf;
 // $text-primary: #2a2a2a;
 // $text-secondary: #949494;
+
 $bg-primary: #000000;
 $bg-secondary: #171717;
 $bg-stroke: #282828;
@@ -14,3 +15,4 @@ $text-secondary: #636363;
 
 $radius: .75rem;
 $focus: $accent 0 0 0 1px inset, rgba($accent, .1) 0 0 0 .4rem;
+$focus-danger: $danger 0 0 0 1px inset, rgba($danger, .1) 0 0 0 .4rem;

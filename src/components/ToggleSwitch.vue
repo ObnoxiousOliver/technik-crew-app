@@ -1,18 +1,36 @@
 <template>
-  <input class="toggle-switch" type="checkbox" v-model="value" v-bind="$attrs" />
+  <input
+    class="toggle-switch"
+    type="checkbox"
+    v-model="value"
+    v-bind="$attrs"
+    ref="input"
+  />
 </template>
 
 <script lang="ts" setup>
 import { ref, watch } from 'vue'
 
+const input = ref<HTMLInputElement>()
+
 const props = defineProps({
-  modelValue: Boolean
+  modelValue: {
+    type: Boolean,
+    default: undefined
+  }
 })
 const emit = defineEmits(['update:modelValue'])
 
 const value = ref(props.modelValue)
 watch(value, (newValue) => {
-  emit('update:modelValue', newValue)
+  if (newValue !== props.modelValue) {
+    emit('update:modelValue', newValue)
+  }
+  setTimeout(() => {
+    if (props.modelValue !== undefined) {
+      value.value = props.modelValue
+    }
+  })
 })
 watch(() => props.modelValue, (val) => {
   value.value = val
@@ -56,7 +74,7 @@ watch(() => props.modelValue, (val) => {
     opacity: 0.5;
   }
 
-  &:active::before {
+  &:not(:disabled):active::before {
     width: 1.5rem;
   }
 
@@ -64,7 +82,7 @@ watch(() => props.modelValue, (val) => {
     background: r.$text-primary;
     color: r.$bg-primary;
 
-    &:active::before {
+    &:not(:disabled):active::before {
       width: 1.5rem;
       transform: translateX(1rem);
     }

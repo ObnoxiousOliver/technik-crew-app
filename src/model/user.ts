@@ -1,6 +1,7 @@
 import { decryptEmail } from '@/utilities/auth'
-import { doc, getDoc, getFirestore } from 'firebase/firestore'
+import { collection, doc, getDoc, getDocs, getFirestore, query, setDoc, where } from 'firebase/firestore'
 import { TicketDB } from './ticket'
+import { PermissionsDB, Permission } from './permissions'
 
 export enum Gender {
   NonBinary = 'non-binary',
@@ -14,6 +15,7 @@ export interface UserDB {
   lastname: string
   prefer_lastname: boolean
   gender: Gender
+  is_admin?: boolean
 }
 
 export class User implements UserDB {
@@ -22,13 +24,15 @@ export class User implements UserDB {
   lastname: string
   prefer_lastname: boolean
   gender: Gender
+  is_admin?: boolean | undefined
 
-  constructor (options: Partial<UserDB>) {
-    this.username = options.username ?? ''
-    this.firstname = options.firstname ?? ''
-    this.lastname = options.lastname ?? ''
-    this.prefer_lastname = options.prefer_lastname ?? false
-    this.gender = options.gender ?? Gender.NonBinary
+  constructor (options?: Partial<UserDB>) {
+    this.username = options?.username ?? ''
+    this.firstname = options?.firstname ?? ''
+    this.lastname = options?.lastname ?? ''
+    this.prefer_lastname = options?.prefer_lastname ?? false
+    this.gender = options?.gender ?? Gender.NonBinary
+    this.is_admin = options?.is_admin ?? false
   }
 
   toDB (): UserDB {
@@ -37,11 +41,12 @@ export class User implements UserDB {
       firstname: this.firstname,
       lastname: this.lastname,
       prefer_lastname: this.prefer_lastname,
-      gender: this.gender
+      gender: this.gender,
+      is_admin: this.is_admin
     }
   }
 
-  private cachedEmail: string | undefined
+  cachedEmail: string | undefined
   async getEmail () {
     if (!this.cachedEmail) {
       const db = getFirestore()
@@ -49,6 +54,68 @@ export class User implements UserDB {
       this.cachedEmail = decryptEmail(email.get('email'), this.username)
     }
     return this.cachedEmail
+  }
+
+  cachedPermissions: PermissionsDB | undefined
+  async getPermissions () {
+    if (!this.cachedPermissions) {
+      const db = getFirestore()
+      const uid = await this.getUid()
+
+      const permissionsDoc = await getDoc(doc(db, 'permissions', uid))
+      const permissions = permissionsDoc.data() ?? {}
+      console.log(
+        Object.values(Permission).forEach(permission => {
+          permissions[permission] = permissions[permission] ?? false
+        })
+      )
+      this.cachedPermissions = permissions
+    }
+    return Object.assign({}, this.cachedPermissions)
+  }
+
+  async setPermissions (changes: PermissionsDB) {
+    const db = getFirestore()
+    const uid = await this.getUid()
+
+    if (this.cachedPermissions) {
+      this.cachedPermissions = {
+        ...this.cachedPermissions,
+        ...changes
+      }
+    }
+
+    await setDoc(doc(db, 'permissions', uid), changes, { merge: true })
+  }
+
+  async setAdmin (isAdmin: boolean) {
+    await this.setPermissions({
+      [Permission.IsAdmin]: isAdmin
+    })
+
+    this.is_admin = isAdmin
+
+    this.setUserDB()
+  }
+
+  async setUserDB () {
+    const db = getFirestore()
+
+    await setDoc(doc(db, 'users', this.username), this.toDB(), { merge: true })
+  }
+
+  private cachedUid: string | undefined
+  async getUid () {
+    if (!this.cachedUid) {
+      const db = getFirestore()
+      this.cachedUid = (await getDocs(
+        query(
+          collection(db, 'usernames'),
+          where('username', '==', this.username)
+        )
+      )).docs[0].id
+    }
+    return this.cachedUid
   }
 
   static getDisplayName (user: {

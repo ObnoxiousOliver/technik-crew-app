@@ -8,7 +8,6 @@
 @use '../scss' as r;
 
 .btn {
-  position: relative;
   display: inline-block;
   border: none;
   font: inherit;
@@ -41,6 +40,19 @@
     padding: 0;
     width: 3.125rem;
     height: 3.125rem;
+  }
+
+  &--danger {
+    background: rgba(r.$danger, .2);
+    color: lighten(r.$danger, 5);
+
+    &:hover:not(:disabled) {
+      background: rgba(r.$danger, .3);
+    }
+
+    &:focus-visible {
+      box-shadow: r.$focus-danger;
+    }
   }
 }
 </style>

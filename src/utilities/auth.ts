@@ -1,12 +1,12 @@
-import { PermissionsDB } from '@/model/permissions'
+import { getDefaultPermissions, PermissionsDB } from '@/model/permissions'
 import { TicketDB } from '@/model/ticket'
 import { User, UserDB } from '@/model/user'
 import { useNewEventStore } from '@/stores/newEvent'
 import { useUser } from '@/stores/user'
 import CryptoJS from 'crypto-js'
 import { FirebaseError } from 'firebase/app'
-import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword, signOut as _signOut, updateEmail } from 'firebase/auth'
-import { addDoc, collection, doc, getDoc, getDocs, getFirestore, query, setDoc, where } from 'firebase/firestore'
+import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword, signOut as _signOut, updateEmail, updatePassword } from 'firebase/auth'
+import { collection, doc, getDoc, getFirestore, setDoc } from 'firebase/firestore'
 import { logOnServer } from './log'
 
 export async function signIn (name: string, password: string) {
@@ -23,6 +23,8 @@ export async function signIn (name: string, password: string) {
   const email = decryptEmail(encryptedEmail, name)
 
   await signInWithEmailAndPassword(getAuth(), email, password)
+
+  await setStore()
 }
 
 export async function getUsername () {
@@ -31,6 +33,29 @@ export async function getUsername () {
     return (await getDoc(doc(getFirestore(), 'usernames', auth.currentUser.uid))).get('username')
   }
   return null
+}
+
+export async function changeEmail (newEmail: string) {
+  const auth = getAuth()
+  if (!auth.currentUser) return
+
+  const db = getFirestore()
+  const username = await getUsername()
+
+  try {
+    await updateEmail(auth.currentUser, newEmail)
+    if (auth.currentUser.email !== newEmail) {
+      throw new FirebaseError('auth/email-already-in-use', 'Email already in use')
+    } else {
+      await setDoc(doc(db, 'user-mail', username), {
+        email: encryptEmail(auth.currentUser.email, username)
+      })
+    }
+    console.log('Email changed to', auth.currentUser.email)
+  } catch (err) {
+    console.error(err)
+    throw err
+  }
 }
 
 export async function setStore () {
@@ -42,16 +67,11 @@ export async function setStore () {
 
   const username = await getUsername()
 
-  userStore.user = new User((await getDocs(
-    query(
-      collection(db, 'users'),
-      where('username', '==', username)
-    )
-  )).docs[0].data() as UserDB)
+  userStore.user = new User((await getDoc(doc(db, 'users', username))).data() as UserDB)
 
   userStore.permissions = (await getDoc(
     doc(db, 'permissions', auth.currentUser.uid)
-  )).data() as PermissionsDB
+  )).data() ?? getDefaultPermissions()
 }
 
 export async function signOut () {
@@ -103,9 +123,10 @@ export async function createUserFromTicket (ticket: TicketDB, code: string, emai
     await setDoc(doc(db, 'user-mail', username), {
       email: encryptEmail(email, username)
     })
-    await addDoc(collection(db, 'users'), User.fromTicket(ticket).toDB())
+    await setDoc(doc(db, 'users', username), User.fromTicket(ticket).toDB())
 
     await invalidateTicket(code, username)
+    await setStore()
   } catch (err) {
     console.error('Create User', err)
     throw err

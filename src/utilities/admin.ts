@@ -1,5 +1,6 @@
 import { Ticket } from '@/model/ticket'
-import { doc, getFirestore, setDoc } from 'firebase/firestore'
+import { User } from '@/model/user'
+import { deleteDoc, doc, getFirestore, setDoc } from 'firebase/firestore'
 import { encryptTicket } from './auth'
 import { logOnServer } from './log'
 
@@ -13,4 +14,15 @@ export async function createTicket (code: string, ticket: Ticket) {
     console.error(err)
     logOnServer('Error in "createTicket": ' + err)
   }
+}
+
+export async function deleteUser (user: User) {
+  const db = getFirestore()
+  const uid = await user.getUid()
+  const username = user.username
+
+  await deleteDoc(doc(db, 'users', username))
+  await deleteDoc(doc(db, 'user-mail', username))
+  await deleteDoc(doc(db, 'permissions', uid))
+  await deleteDoc(doc(db, 'usernames', uid))
 }

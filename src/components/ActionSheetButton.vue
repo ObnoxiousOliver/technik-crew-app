@@ -18,8 +18,12 @@
   width: 100%;
   text-align: left;
 
+  &:disabled {
+    opacity: 0.5;
+  }
+
   :deep(i) {
-    margin-right: .5rem;
+    margin-right: 1rem;
   }
 
   &.danger {

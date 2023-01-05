@@ -3,14 +3,13 @@ import { useUser } from '@/stores/user'
 import { setStore } from '@/utilities/auth'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
-import LoginView from '../views/auth/LoginView.vue'
 
 const routes: Array<RouteRecordRaw> = [
   // Login
   {
     name: 'login',
     path: '/login',
-    component: LoginView,
+    component: () => import('../views/auth/LoginView.vue'),
     meta: {
       requiresNoAuth: true,
       title: 'Anmelden',
@@ -135,12 +134,34 @@ const routes: Array<RouteRecordRaw> = [
   {
     name: 'profile',
     path: '/settings/profile',
-    component: () => import('../views/settings/ProfileView.vue'),
+    component: () => import('../views/settings/profile/ProfileView.vue'),
     meta: {
       requiresAuth: true,
       title: 'Profil',
       depth: 100,
       defaultBackPath: '/settings'
+    }
+  },
+  {
+    name: 'profile-edit',
+    path: '/settings/profile/edit',
+    component: () => import('../views/settings/profile/ProfileEditView.vue'),
+    meta: {
+      requiresAuth: true,
+      title: 'Profil bearbeiten',
+      depth: 101,
+      defaultBackPath: '/settings/profile'
+    }
+  },
+  {
+    name: 'profile-email',
+    path: '/settings/profile/email',
+    component: () => import('../views/settings/profile/ProfileEmailView.vue'),
+    meta: {
+      requiresAuth: true,
+      title: 'E-Mail Adresse ändern',
+      depth: 101,
+      defaultBackPath: '/settings/profile'
     }
   },
 
@@ -151,7 +172,7 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('../views/auth/ResetPasswordView.vue'),
     meta: {
       title: 'Passwort zurücksetzen',
-      depth: 100,
+      depth: 1000,
       defaultBackPath: '/settings'
     }
   },
@@ -163,7 +184,7 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('../views/WhoAreTheAdminsView.vue'),
     meta: {
       title: 'Passwort zurücksetzen',
-      depth: 999,
+      depth: 1001,
       defaultBackPath: '/'
     }
   },
@@ -232,8 +253,13 @@ router.beforeEach((to, from, next) => {
       next()
       console.log('[Router]', 'User logged in')
     } else {
-      onAuthStateChanged(getAuth(), (user) => {
+      onAuthStateChanged(getAuth(), async (user) => {
         if (user) {
+          try {
+            await setStore()
+          } catch (err) {
+            console.error(err)
+          }
           next()
           console.log('[Router]', 'User logged in')
         } else {
@@ -315,6 +341,7 @@ router.afterEach((to) => {
 
 export function back () {
   const route = router.currentRoute.value
+  console.log('[Router]', 'Back', history.state.back, route.meta.defaultBackPath)
   if (history.state.back) {
     router.back()
   } else if (route.meta.defaultBackPath) {
