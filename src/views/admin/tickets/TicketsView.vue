@@ -1,12 +1,8 @@
 <template>
-  <Page>
+  <Page :addBtn="() => router.push('/admin/tickets/create')">
     <template #title>
       <i class="bi-ticket-perforated" />Tickets
     </template>
-
-    <RouterLink to="/admin/tickets/create">
-      Ticket erstellen
-    </RouterLink>
 
     <TicketBtn
       v-for="[id, ticket] in sortedTickets"
@@ -15,7 +11,11 @@
       :ticket="ticket"
       :code="id"
     />
-    <h3 v-if="!fetching">Eingelöste Tickets</h3>
+    <SettingsList>
+      <SettingsListDivider v-if="!fetching">
+        Eingelöste Tickets
+      </SettingsListDivider>
+    </SettingsList>
     <TicketBtn
       v-for="[id, ticket] in sortedInvalidTickets"
       :key="id"
@@ -82,12 +82,16 @@
 </template>
 
 <script lang="ts" setup>
+import TicketBtn from '@/components/TicketBtn.vue'
+import SettingsList from '@/components/SettingsList.vue'
+import SettingsListDivider from '@/components/SettingsListDivider.vue'
 import { TicketDB } from '@/model/ticket'
 import { encryptTicket, invalidateTicket } from '@/utilities/auth'
 import { collection, deleteDoc, doc, getDocs, getFirestore } from '@firebase/firestore'
 import { computed, onMounted, ref } from 'vue'
-import TicketBtn from '@/components/TicketBtn.vue'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const db = getFirestore()
 const tickets = ref({} as { [key: string]: TicketDB })
 const sortedTickets = computed(() => {

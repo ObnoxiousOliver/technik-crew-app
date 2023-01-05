@@ -5,42 +5,55 @@
     </template>
 
     <SettingsList>
-      <SettingsListItem to="/settings/profile">
+      <SettingsListLink to="/settings/profile">
         <i class="bi-person" />Mein Profil
-      </SettingsListItem>
-      <SettingsListItem to="/reset-password">
-        <i class="bi-key" />Passwort zurücksetzen
-      </SettingsListItem>
-      <SettingsListItem to="/admin/tickets">
+      </SettingsListLink>
+
+      <SettingsListDivider v-if="manageTickets || manageUsers">
+        Admin
+      </SettingsListDivider>
+
+      <SettingsListLink to="/admin/tickets" v-if="manageTickets">
         <i class="bi-ticket-perforated" />Tickets
-      </SettingsListItem>
-      <SettingsListItem to="/admin/users">
+      </SettingsListLink>
+      <SettingsListLink to="/admin/users" v-if="manageUsers">
         <i class="bi-person-badge" />Benutzer verwalten
-      </SettingsListItem>
-      <SettingsListItem
+      </SettingsListLink>
+
+      <SettingsListDivider />
+
+      <SettingsListLink
         :arrow="false"
         isButton
         danger
         @click="logout"
       >
         <i class="bi-box-arrow-left" />Abmelden
-      </SettingsListItem>
+      </SettingsListLink>
     </SettingsList>
   </Page>
 </template>
 
 <script lang="ts" setup>
+import { useUser } from '@/stores/user'
 import { signOut } from '@/utilities/auth'
 import { useRouter } from 'vue-router'
 import SettingsList from '../../components/SettingsList.vue'
-import SettingsListItem from '../../components/SettingsListItem.vue'
+import SettingsListLink from '../../components/SettingsListLink.vue'
+import SettingsListOption from '../../components/SettingsListOption.vue'
+import SettingsListDivider from '../../components/SettingsListDivider.vue'
+import { computed } from 'vue'
+import { Permission } from '@/model/permissions'
 
 const router = useRouter()
+const user = useUser()
+const manageTickets = computed(() => user.permissions[Permission.IsAdmin] || user.permissions[Permission.ManageTickets])
+const manageUsers = computed(() => user.permissions[Permission.IsAdmin] || user.permissions[Permission.ManageUsers])
 
 async function logout () {
   try {
-    await signOut()
     router.push('/login')
+    await signOut()
   } catch (e) {
     console.error(e)
   }

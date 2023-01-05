@@ -16,7 +16,7 @@ const props = defineProps({
     type: String,
     default: 'error'
   },
-  show: Object
+  show: undefined
 })
 </script>
 

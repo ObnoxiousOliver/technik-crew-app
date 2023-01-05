@@ -46,7 +46,7 @@ export class User implements UserDB {
     }
   }
 
-  private cachedEmail: string | undefined
+  cachedEmail: string | undefined
   async getEmail () {
     if (!this.cachedEmail) {
       const db = getFirestore()
@@ -56,16 +56,22 @@ export class User implements UserDB {
     return this.cachedEmail
   }
 
-  private cachedPermissions: PermissionsDB | undefined
+  cachedPermissions: PermissionsDB | undefined
   async getPermissions () {
     if (!this.cachedPermissions) {
       const db = getFirestore()
       const uid = await this.getUid()
 
-      const permissions = await getDoc(doc(db, 'permissions', uid))
-      this.cachedPermissions = permissions.data() ?? {}
+      const permissionsDoc = await getDoc(doc(db, 'permissions', uid))
+      const permissions = permissionsDoc.data() ?? {}
+      console.log(
+        Object.values(Permission).forEach(permission => {
+          permissions[permission] = permissions[permission] ?? false
+        })
+      )
+      this.cachedPermissions = permissions
     }
-    return this.cachedPermissions
+    return Object.assign({}, this.cachedPermissions)
   }
 
   async setPermissions (changes: PermissionsDB) {

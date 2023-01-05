@@ -14,6 +14,14 @@ export interface PermissionInfo {
   icon: string
 }
 
+export function getDefaultPermissions (): PermissionsDB {
+  const permissions: PermissionsDB = {}
+  Object.values(Permission).forEach((permission) => {
+    permissions[permission] = false
+  })
+  return permissions
+}
+
 export const permissionInfo = {
   [Permission.IsAdmin]: {
     name: 'Admin',

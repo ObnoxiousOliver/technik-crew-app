@@ -56,8 +56,6 @@ const props = defineProps<{
   }
 
   &__admin {
-    flex: 1 1 auto;
-    width: 0;
     min-width: 1rem;
     overflow: hidden;
     text-overflow: ellipsis;

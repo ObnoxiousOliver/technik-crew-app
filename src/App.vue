@@ -38,10 +38,7 @@ onMounted(() => {
         await deleteUser(user)
         console.log('[Auth]', 'Deleted user', user.uid)
         await signOut()
-        return
       }
-
-      setStore()
     }
   })
 })
