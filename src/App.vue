@@ -61,6 +61,9 @@ watch(pinia.state, () => {
   -webkit-tap-highlight-color: transparent;
 }
 
+:root, body {
+  }
+
 body {
   background: r.$bg-primary;
   color: r.$text-primary;
@@ -71,7 +74,9 @@ body {
 
 #app {
   position: fixed;
-  inset: 0;
+
+  inset: 0 0 env(keyboard-inset-height) 0;
+
   overflow: hidden;
   max-width: 30rem;
   margin: 0 auto;

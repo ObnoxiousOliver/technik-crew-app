@@ -1,20 +1,33 @@
 export interface HistoryStateDB<T> {
   author: string
+  description: string | null
   date: number
+  type: string
   content: T
 }
 
 export class HistoryState<T> implements HistoryStateDB<T> {
   author: string
+  description: string | null
   date: number
+  type: string
   content: T
 
-  constructor (author: string, date: number, content: T) {
-    this.author = author
-    this.date = date
-    this.content = content
+  constructor (options: Partial<HistoryStateDB<T>> = {}) {
+    this.author = options.author ?? 'Anonym'
+    this.description = options.description ?? null
+    this.date = options.date ?? Date.now()
+    this.content = options.content ?? ({} as T)
+    this.type = options.type ?? 'unknown'
+  }
+
+  toDB (): HistoryStateDB<T> {
+    return {
+      author: this.author,
+      description: this.description,
+      date: this.date,
+      type: this.type,
+      content: this.content
+    }
   }
 }
-
-export type HistoryDB<T> = HistoryStateDB<T>
-export type History<T> = HistoryState<T>

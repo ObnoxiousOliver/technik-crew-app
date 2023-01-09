@@ -104,7 +104,7 @@ const routes: Array<RouteRecordRaw> = [
     ]
   },
 
-  // New event
+  // Event
   {
     name: 'new-event',
     path: '/events/new',
@@ -114,6 +114,19 @@ const routes: Array<RouteRecordRaw> = [
       title: 'Neuer Termin',
       depth: 10,
       defaultBackPath: '/events'
+    }
+  },
+
+  // Equipment
+  {
+    name: 'equipment-add',
+    path: '/equipment/add',
+    component: () => import('../views/EquipmentAddView.vue'),
+    meta: {
+      requiresAuth: true,
+      title: 'Neues Equipment',
+      depth: 10,
+      defaultBackPath: '/equipment'
     }
   },
 
@@ -339,15 +352,13 @@ router.afterEach((to) => {
   }
 })
 
-export function back () {
+export function back (fallbackPath?: string) {
   const route = router.currentRoute.value
   console.log('[Router]', 'Back', history.state.back, route.meta.defaultBackPath)
   if (history.state.back) {
     router.back()
-  } else if (route.meta.defaultBackPath) {
-    router.replace(route.meta.defaultBackPath)
   } else {
-    router.replace('/')
+    router.replace(fallbackPath ?? route.meta.defaultBackPath ?? '/')
   }
 }
 

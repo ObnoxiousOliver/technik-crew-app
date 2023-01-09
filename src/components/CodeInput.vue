@@ -1,11 +1,12 @@
 <template>
-  <InputField
+  <input
     class="code-input"
+    ref="input"
     placeholder="XXXXXX"
     type="text"
     inputmode="numeric"
     @input="codeInput"
-    v-model:value="inputValue"
+    :value="code"
   />
 </template>
 
@@ -24,7 +25,7 @@ const code = computed({
   }
 })
 const _code = ref()
-const inputValue = ref(codeInput.value)
+const input = ref(null)
 
 onMounted(() => {
   code.value = props.modelValue
@@ -35,13 +36,13 @@ function codeInput (e: InputEvent) {
     e.target.value = code.value
     return
   }
-  if (e.target.value.length < 7) {
+  if (e.target.value.length <= 6) {
     code.value = e.target.value
   }
   e.target.value = code.value
 }
 watch(code, (val) => {
-  inputValue.value = val
+  input.value = val
   emit('update:modelValue', val)
 })
 watch(() => props.modelValue, (val) => {
@@ -50,12 +51,32 @@ watch(() => props.modelValue, (val) => {
 </script>
 
 <style lang="scss" scoped>
+@use '../scss' as r;
+
 .code-input {
   width: 100%;
+  height: 4rem;
+
+  border: none;
+  font: inherit;
+  color: inherit;
+  background: r.$bg-secondary;
+  border-radius: r.$radius;
+
   text-align: center;
   letter-spacing: 1em;
   text-indent: 1em;
   font-size: 1.5rem;
-  padding: 1rem 0;
+
+  transition: box-shadow .2s;
+
+  &::placeholder {
+    color: r.$text-secondary;
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: r.$focus;
+  }
 }
 </style>

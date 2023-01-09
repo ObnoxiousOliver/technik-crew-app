@@ -22,8 +22,8 @@ import './registerServiceWorker'
 
 // Import the functions you need from the SDKs you need
 import { initializeApp } from 'firebase/app'
-import { getAuth, onAuthStateChanged } from 'firebase/auth'
-import { doc, getDoc, getFirestore } from 'firebase/firestore'
+import { getAuth } from 'firebase/auth'
+import { getFirestore } from 'firebase/firestore'
 import { createPinia } from 'pinia'
 
 // Your web app's Firebase configuration
@@ -60,7 +60,15 @@ createApp(App)
   .component('FormInfo', FormInfo)
   .component('FormGroup', FormGroup)
   // .use(vfmPlugin())
-  .use(VWave)
+  .use(VWave, {
+    duration: 0.5
+  })
   .use(pinia)
   .use(router)
   .mount('#app')
+
+// Configure Virtualkeyboard
+if ('virtualKeyboard' in navigator) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (navigator.virtualKeyboard as any).overlaysContent = true
+}

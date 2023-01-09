@@ -7,7 +7,7 @@
 <style lang="scss" scoped>
 @use '../scss' as r;
 
-.btn {
+:where(.btn) {
   display: inline-block;
   border: none;
   font: inherit;
@@ -36,13 +36,13 @@
     background: lighten(r.$bg-secondary, 5);
   }
 
-  &--square {
+  &.btn--square {
     padding: 0;
     width: 3.125rem;
     height: 3.125rem;
   }
 
-  &--danger {
+  &.btn--danger {
     background: rgba(r.$danger, .2);
     color: lighten(r.$danger, 5);
 

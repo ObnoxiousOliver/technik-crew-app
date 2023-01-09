@@ -1,45 +1,36 @@
 <template>
-  <UserPage>
+  <UserPage
+    :addBtn="true"
+    @addBtn="router.push('/equipment/add')"
+    :search="true"
+  >
     <template #title>
       <i class="bi-speaker"/>Equipment
     </template>
-
-    {{ equipment }}
-
-    <button @click="addEquipment">Add</button>
 
   </UserPage>
 </template>
 
 <script lang="ts" setup>
-import { addDoc, collection, getDocs, getFirestore, query } from '@firebase/firestore'
-import { onMounted, ref } from 'vue'
+import { onActivated, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import UserPage from '../layout/UserPage.vue'
-import { Equipment, EquipmentDB } from '../model/equipment'
+import { Equipment } from '../model/equipment'
 
-const db = getFirestore()
+const router = useRouter()
 
 const equipment = ref([])
+const history = ref({})
 
-async function addEquipment () {
-  await addDoc(collection(db, 'equipment'), new Equipment({
-    name: 'Some Eq'
-  }).toDB())
-
-  updateEquipment()
-}
-
-onMounted(() => {
+onActivated(() => {
   updateEquipment()
 })
 
 async function updateEquipment () {
-  const querySnapshot = await getDocs(query(collection(db, 'equipment')))
+  equipment.value = await Equipment.get()
 
-  equipment.value = []
-
-  querySnapshot.forEach(doc => {
-    equipment.value.push(doc.data() as EquipmentDB)
-  })
+  for (const eq of equipment.value) {
+    history.value[eq.id] = await eq.getHistory()
+  }
 }
 </script>

@@ -11,8 +11,8 @@
       :ticket="ticket"
       :code="id"
     />
-    <SettingsList>
-      <SettingsListDivider v-if="!fetching">
+    <SettingsList v-if="!fetching">
+      <SettingsListDivider>
         Eingelöste Tickets
       </SettingsListDivider>
     </SettingsList>
