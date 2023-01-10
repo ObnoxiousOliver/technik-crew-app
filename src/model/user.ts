@@ -85,22 +85,22 @@ export class User implements UserDB {
       }
     }
 
+    if (changes[Permission.IsAdmin] !== undefined) {
+      await this.setAdmin(changes[Permission.IsAdmin])
+    }
+
     await setDoc(doc(db, 'permissions', uid), changes, { merge: true })
   }
 
-  async setAdmin (isAdmin: boolean) {
-    await this.setPermissions({
-      [Permission.IsAdmin]: isAdmin
-    })
-
+  private async setAdmin (isAdmin: boolean) {
     this.is_admin = isAdmin
 
-    this.setUserDB()
+    await this.setUserDB()
   }
 
   async setUserDB () {
     const db = getFirestore()
-
+    console.log(this.toDB())
     await setDoc(doc(db, 'users', this.username), this.toDB(), { merge: true })
   }
 

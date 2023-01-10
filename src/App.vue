@@ -35,7 +35,7 @@ onMounted(() => {
       if (!(await getDoc(doc(db, 'usernames', user.uid))).exists()) {
         router.push('/')
         // Delete user if user doesn't exist in database
-        await deleteUser(user)
+        await deleteUser(user).catch(err => console.error(err))
         console.log('[Auth]', 'Deleted user', user.uid)
         await signOut()
       }

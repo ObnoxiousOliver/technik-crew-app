@@ -72,20 +72,33 @@ export class Location {
     })
   }
 
-  static async get (id?: string) {
+  private static cachedLocations: {
+    // eslint-disable-next-line no-use-before-define
+    [id: string]: Location
+  } = {}
+
+  static async get (id?: string, useCache = true) {
     const db = getFirestore()
     if (id) {
+      if (useCache && this.cachedLocations[id]) {
+        return this.cachedLocations[id]
+      }
+
       const docSnap = await getDoc(doc(db, 'locations', id))
       if (docSnap.exists()) {
-        return new Location(id, docSnap.data() as LocationDB)
-      } else {
-        return null
+        this.cachedLocations[id] = new Location(id, docSnap.data() as LocationDB)
       }
+      return this.cachedLocations[id]
     } else {
+      if (useCache && Object.keys(this.cachedLocations).length > 0) {
+        return Object.values(this.cachedLocations)
+      }
+
       const querySnapshot = await getDocs(collection(db, 'locations'))
       const locations: Location[] = []
       querySnapshot.forEach((doc) => {
-        locations.push(new Location(doc.id, doc.data() as LocationDB))
+        this.cachedLocations[doc.id] = new Location(doc.id, doc.data() as LocationDB)
+        locations.push(this.cachedLocations[doc.id])
       })
       return locations
     }

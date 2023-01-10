@@ -9,9 +9,51 @@ export interface NoteDB {
   author: string
 }
 
+export type EquipmentType = 'computer' | 'cable' | 'instrument' | 'speaker' | 'light' | 'mixer' | 'microphone' | 'other'
+
+export const EquipmentTypeInfo: {
+  [key in EquipmentType]: {
+    icon: string,
+    name: string
+  }
+} = {
+  computer: {
+    icon: 'bi-laptop',
+    name: 'Computer'
+  },
+  cable: {
+    icon: 'bi-plug',
+    name: 'Kabel'
+  },
+  instrument: {
+    icon: 'bi-music-note',
+    name: 'Instrument'
+  },
+  speaker: {
+    icon: 'bi-speaker',
+    name: 'Lautsprecher'
+  },
+  light: {
+    icon: 'bi-lightbulb',
+    name: 'Licht'
+  },
+  mixer: {
+    icon: 'bi-sliders2-vertical',
+    name: 'Mischpult'
+  },
+  microphone: {
+    icon: 'bi-mic',
+    name: 'Mikrofon'
+  },
+  other: {
+    icon: 'bi-question-circle',
+    name: 'Sonstiges'
+  }
+}
+
 export interface EquipmentDB {
   name: string
-  type: string | null
+  type: EquipmentType | null
   description: string
   location: string | null
   group: string | null
@@ -195,7 +237,7 @@ export class Equipment {
     })
   }
 
-  async setType (type: string | null) {
+  async setType (type: EquipmentType | null) {
     if (!this.id) {
       throw new Error('Cannot get history on an equipment without an id')
     }
@@ -257,6 +299,23 @@ export class Equipment {
         ? `Gruppe geändert -> ${group}`
         : 'Gruppe entfernt'
     })
+  }
+
+  async renameGroup (newGroup: string) {
+    if (!this.id) {
+      throw new Error('Cannot get history on an equipment without an id')
+    }
+    if (!this.group) {
+      throw new Error('Cannot rename group on an equipment without a group')
+    }
+    if (newGroup === '') {
+      throw new Error('Cannot rename group to an empty string')
+    }
+    if (newGroup === this.group) return
+
+    for (const eq of await Equipment.getFromGroup(this.group)) {
+      await eq.setGroup(newGroup)
+    }
   }
 
   async setHidden (hidden: boolean) {
@@ -334,12 +393,13 @@ export class Equipment {
     return querySnapshot.docs.map(x => new Equipment(x.id, x.data() as EquipmentDB))
   }
 
-  static async getGroups () {
-    const db = getFirestore()
-    const querySnapshot = await getDocs(query(collection(db, 'equipment'), where('group', '!=', null)))
-
-    return querySnapshot.docs
-      .map(x => x.data().group as string)
-      .filter((value, index, self) => self.indexOf(value) === index)
+  static getGroups (equipment: Equipment[]) {
+    const groups: string[] = []
+    for (const eq of equipment) {
+      if (eq.group && !groups.includes(eq.group)) {
+        groups.push(eq.group)
+      }
+    }
+    return groups
   }
 }

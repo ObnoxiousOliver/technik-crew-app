@@ -32,26 +32,21 @@
           <InputField
             class="user-page__search__input__field"
             placeholder="Suchen..."
+            inputmode="search"
+            @keydown.enter="submit()"
             @keydown.esc="expandSearch(false)"
+            @focus="submitted = false"
+            @blur="blur"
+            @keydown.tab="dontBlur = true"
             ref="searchInputRef"
             v-model="searchInput"
           >
             <template #before>
               <i class="bi-search" />
             </template>
-            {{ searchInput }}
             <template #after>
               <Btn
-                @click="() => {
-                  if (searchInput) {
-                    searchInput = ''
-                    if (searchInputRef) {
-                      searchInputRef.focus()
-                    }
-                  } else {
-                    expandSearch(false)
-                  }
-                }"
+                @click="closeClick()"
                 class="user-page__search__input__close-btn"
                 aria-label="Suche schließen"
               >
@@ -62,20 +57,51 @@
         </div>
       </div>
     </Transition>
-    <div class="user-page__scroller">
-      <slot />
-    </div>
+    <SearchMenu
+      class="user-page__search-menu"
+      :show="searchExpanded && !submitted"
+      :query="searchInput"
+      @pointerdown="dontBlur = true"
+      :items="[
+        ...(searchRecents?.map(x => ({
+          name: x,
+          type: 'recent'
+        })) ?? []),
+        ...(searchSuggestions?.map(x => ({
+          name: x,
+          type: 'suggestion'
+        })) ?? [])
+      ]"
+      @selectItem="submit"
+      @applyItem="(q) => {
+        searchInput = q
+        searchInputRef.focus()
+      }"
+    />
+    <Transition name="user-page__scroller">
+      <KeepAlive>
+        <div
+          v-if="!searchExpanded || submitted"
+          class="user-page__scroller"
+        >
+          <slot />
+        </div>
+      </KeepAlive>
+    </Transition>
   </div>
 </template>
 
 <script lang="ts" setup>
+import SearchMenu from '@/components/SearchMenu.vue'
 import { back } from '@/router'
 import { onActivated, onDeactivated, ref, watch } from 'vue'
 import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router'
 
-const props = defineProps({
+defineProps({
   addBtn: Boolean,
-  search: Boolean
+  search: Boolean,
+  searchRecents: Array,
+  searchSuggestions: Array
 })
 
 const emit = defineEmits(['search', 'addBtn'])
@@ -90,18 +116,49 @@ const searchBtnLeft = ref(0)
 const searchExpanded = ref(false)
 
 const searchInput = ref()
-watch(searchInput, (value) => {
-  emit('search', {
-    type: 'search',
-    value
-  })
-})
+const submitted = ref(false)
+function submit (val?: string) {
+  if (val) {
+    searchInput.value = val
+  }
+
+  if (!searchInput.value) {
+    expandSearch(false)
+    return
+  }
+
+  setTimeout(() => {
+    submitted.value = true
+    searchInputRef.value?.blur()
+
+    emit('search', searchInput.value)
+  }, 0)
+}
+
+const dontBlur = ref(false)
+function blur () {
+  if (dontBlur.value) {
+    dontBlur.value = false
+    return
+  }
+  if (!searchInput.value) {
+    expandSearch(false)
+  }
+}
+
+function closeClick () {
+  if (searchInput.value) {
+    searchInput.value = ''
+    if (searchInputRef.value) {
+      searchInputRef.value.focus()
+    }
+  } else {
+    expandSearch(false)
+  }
+}
 
 watch(searchExpanded, (value) => {
-  emit('search', {
-    type: 'expanded',
-    value
-  })
+  emit('searchOpen', value)
 })
 
 onBeforeRouteUpdate((to) => {
@@ -259,13 +316,21 @@ function expandSearch (value?: boolean, push = true) {
     }
   }
 
+  &__search-menu {
+    position: absolute;
+    inset: 0 0 auto 0;
+    max-height: 100vh;
+    padding: 4rem 1.5rem 5rem;
+  }
+
   &__title {
     z-index: 1;
     position: relative;
     display: flex;
     align-items: center;
     height: 4rem;
-    margin: 0;
+    margin: 0 -1.5rem;
+    padding: 1.5rem;
     background: r.$bg-primary;
     font-size: 1rem;
     font-weight: normal;
@@ -314,6 +379,18 @@ function expandSearch (value?: boolean, push = true) {
     inset: 0;
     padding: 4rem 1.5rem 5rem;
     overflow: auto;
+
+    &-enter-active {
+      transition: .3s .1s;
+    }
+    &-leave-active {
+      transition: .3s;
+    }
+
+    &-enter-from,
+    &-leave-to {
+      opacity: 0;
+    }
   }
 }
 </style>
