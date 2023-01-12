@@ -12,6 +12,7 @@ import Spinner from './components/LoadingSpinner.vue'
 import FormContainer from './components/FormContainer.vue'
 import FormInfo from './components/FormInfo.vue'
 import FormGroup from './components/FormGroup.vue'
+import TextBox from './components/TextBox.vue'
 import router from './router'
 import VWave from 'v-wave'
 import { FocusTrap } from 'focus-trap-vue'
@@ -59,6 +60,7 @@ createApp(App)
   .component('FormContainer', FormContainer)
   .component('FormInfo', FormInfo)
   .component('FormGroup', FormGroup)
+  .component('Textbox', TextBox)
   // .use(vfmPlugin())
   .use(VWave, {
     duration: 0.5

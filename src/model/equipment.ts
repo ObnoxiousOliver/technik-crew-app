@@ -141,9 +141,23 @@ export class Equipment {
       }).toDB())
   }
 
-  async getNotes (id?: string) {
+  private static cachedNotes: {
+    [id: string]: {
+      [id: string]: NoteDB
+    }
+  }
+
+  async getNotes (id?: string, useCache = true) {
     if (!this.id) {
       throw new Error('Cannot get notes on an equipment without an id')
+    }
+
+    if (useCache && Equipment.cachedNotes && Equipment.cachedNotes[this.id]) {
+      if (id) {
+        return Equipment.cachedNotes[this.id][id]
+      } else {
+        return Equipment.cachedNotes[this.id]
+      }
     }
 
     const db = getFirestore()
@@ -349,17 +363,27 @@ export class Equipment {
     return equipment
   }
 
-  static async get (id?: string, onlyHidden: boolean| null = false) {
+  private static cachedEquipment: {
+    // eslint-disable-next-line no-use-before-define
+    [id: string]: Equipment
+  } = {}
+
+  static async get (id?: string, onlyHidden: boolean| null = false, useCache = false) {
     const db = getFirestore()
 
     if (id) {
+      if (useCache && this.cachedEquipment[id]) {
+        return this.cachedEquipment[id]
+      }
+
       const docSnap = await getDoc(doc(db, 'equipment', id))
 
       if (!docSnap.exists()) {
         throw new Error('Equipment not found')
       }
 
-      return new Equipment(id, docSnap.data() as EquipmentDB)
+      this.cachedEquipment[id] = new Equipment(id, docSnap.data() as EquipmentDB)
+      return this.cachedEquipment[id]
     } else {
       let querySnapshot: QuerySnapshot<DocumentData>
       if (onlyHidden === null) {
@@ -368,7 +392,11 @@ export class Equipment {
         querySnapshot = await getDocs(query(collection(db, 'equipment'), where('is_hidden', '==', onlyHidden)))
       }
 
-      return querySnapshot.docs.map(x => new Equipment(x.id, x.data() as EquipmentDB))
+      this.cachedEquipment = {}
+      querySnapshot.docs.forEach(x => {
+        this.cachedEquipment[x.id] = new Equipment(x.id, x.data() as EquipmentDB)
+      })
+      return Object.values(this.cachedEquipment)
     }
   }
 

@@ -75,7 +75,7 @@ body {
 #app {
   position: fixed;
 
-  inset: 0 0 env(keyboard-inset-height) 0;
+  inset: 0 0 env(keyboard-inset-height, 0) 0;
 
   overflow: hidden;
   max-width: 30rem;

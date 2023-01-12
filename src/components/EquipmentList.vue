@@ -38,7 +38,7 @@
             :key="eq.id"
             class="equipment-list__sub-list__item"
           >
-            <EquipmentListButton inGroup :equipment="eq" />
+            <EquipmentListButton inGroup :equipment="eq" @eqClick="router.push('/equipment/' + eq.id)" />
           </li>
         </ul>
       </Transition>
@@ -50,6 +50,9 @@
 import EquipmentListButton from '@/components/EquipmentListButton.vue'
 import { Equipment } from '@/model/equipment'
 import { computed, ref } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const props = defineProps<{
   equipment?: Equipment[]
@@ -105,6 +108,8 @@ function itemClick (item: {
     } else {
       expandedGroups.value.push(item.name)
     }
+  } else {
+    router.push('/equipment/' + item.equipment.id)
   }
 }
 </script>

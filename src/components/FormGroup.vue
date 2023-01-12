@@ -28,7 +28,7 @@ const props = defineProps<{
       width: 0;
     }
 
-    :deep(label), & > :deep(.btn) {
+    :deep(label), & > :deep(.btn), & > :deep(.fill-width) {
       flex: 1 1 auto;
       width: 0;
       overflow: hidden;

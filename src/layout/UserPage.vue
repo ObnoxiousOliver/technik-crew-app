@@ -79,14 +79,12 @@
       }"
     />
     <Transition name="user-page__scroller">
-      <KeepAlive>
-        <div
-          v-if="!searchExpanded || submitted"
-          class="user-page__scroller"
-        >
-          <slot />
-        </div>
-      </KeepAlive>
+      <div
+        v-show="!searchExpanded || submitted"
+        class="user-page__scroller"
+      >
+        <slot />
+      </div>
     </Transition>
   </div>
 </template>
@@ -104,7 +102,7 @@ defineProps({
   searchSuggestions: Array
 })
 
-const emit = defineEmits(['search', 'addBtn'])
+const emit = defineEmits(['search', 'searchOpen', 'addBtn'])
 
 const router = useRouter()
 const route = useRoute()
@@ -162,7 +160,7 @@ watch(searchExpanded, (value) => {
 })
 
 onBeforeRouteUpdate((to) => {
-  console.log(to)
+  // console.log(to)
   if (!to.query.search) {
     expandSearch(false, false)
   }

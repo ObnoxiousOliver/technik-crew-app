@@ -129,6 +129,17 @@ const routes: Array<RouteRecordRaw> = [
       defaultBackPath: '/equipment'
     }
   },
+  {
+    name: 'equipment-details',
+    path: '/equipment/:id',
+    component: () => import('../views/EquipmentDetailsView.vue'),
+    meta: {
+      requiresAuth: true,
+      title: 'Equipment Details',
+      depth: 10,
+      defaultBackPath: '/equipment'
+    }
+  },
 
   // Settings
   {
@@ -354,7 +365,7 @@ router.afterEach((to) => {
 
 export function back (fallbackPath?: string) {
   const route = router.currentRoute.value
-  console.log('[Router]', 'Back', history.state.back, route.meta.defaultBackPath)
+  console.log('[Router]', 'Back', history.state.back, fallbackPath, route.meta.defaultBackPath)
   if (history.state.back) {
     router.back()
   } else {

@@ -118,6 +118,23 @@ export class User implements UserDB {
     return this.cachedUid
   }
 
+  private static cashedUsers: {
+    // eslint-disable-next-line no-use-before-define
+    [username: string]: User
+  } = {}
+
+  static async fromUsername (username: string, useCache = true): Promise<User | undefined> {
+    if (useCache && !this.cashedUsers[username]) {
+      const db = getFirestore()
+
+      const userDoc = await getDoc(doc(db, 'users', username))
+      if (!userDoc.exists()) return undefined
+      const user = userDoc.data() as UserDB
+      this.cashedUsers[username] = new User(user)
+    }
+    return this.cashedUsers[username]
+  }
+
   static getDisplayName (user: {
     firstname: string,
     lastname: string,

@@ -1,7 +1,7 @@
 <template>
   <Page>
     <template #title>
-      <i class="bi-pen" />Profil bearbeiten
+      <i class="bi-pencil-square" />Profil bearbeiten
     </template>
 
     <FormContainer @submit.prevent="submit" :disabled="submitting">
