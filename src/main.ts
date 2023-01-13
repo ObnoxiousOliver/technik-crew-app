@@ -12,6 +12,7 @@ import Spinner from './components/LoadingSpinner.vue'
 import FormContainer from './components/FormContainer.vue'
 import FormInfo from './components/FormInfo.vue'
 import FormGroup from './components/FormGroup.vue'
+import TextBox from './components/TextBox.vue'
 import router from './router'
 import VWave from 'v-wave'
 import { FocusTrap } from 'focus-trap-vue'
@@ -22,8 +23,8 @@ import './registerServiceWorker'
 
 // Import the functions you need from the SDKs you need
 import { initializeApp } from 'firebase/app'
-import { getAuth, onAuthStateChanged } from 'firebase/auth'
-import { doc, getDoc, getFirestore } from 'firebase/firestore'
+import { getAuth } from 'firebase/auth'
+import { getFirestore } from 'firebase/firestore'
 import { createPinia } from 'pinia'
 
 // Your web app's Firebase configuration
@@ -59,8 +60,17 @@ createApp(App)
   .component('FormContainer', FormContainer)
   .component('FormInfo', FormInfo)
   .component('FormGroup', FormGroup)
+  .component('Textbox', TextBox)
   // .use(vfmPlugin())
-  .use(VWave)
+  .use(VWave, {
+    duration: 0.5
+  })
   .use(pinia)
   .use(router)
   .mount('#app')
+
+// Configure Virtualkeyboard
+if ('virtualKeyboard' in navigator) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (navigator.virtualKeyboard as any).overlaysContent = true
+}

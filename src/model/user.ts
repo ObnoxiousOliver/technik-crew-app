@@ -85,22 +85,22 @@ export class User implements UserDB {
       }
     }
 
+    if (changes[Permission.IsAdmin] !== undefined) {
+      await this.setAdmin(changes[Permission.IsAdmin])
+    }
+
     await setDoc(doc(db, 'permissions', uid), changes, { merge: true })
   }
 
-  async setAdmin (isAdmin: boolean) {
-    await this.setPermissions({
-      [Permission.IsAdmin]: isAdmin
-    })
-
+  private async setAdmin (isAdmin: boolean) {
     this.is_admin = isAdmin
 
-    this.setUserDB()
+    await this.setUserDB()
   }
 
   async setUserDB () {
     const db = getFirestore()
-
+    console.log(this.toDB())
     await setDoc(doc(db, 'users', this.username), this.toDB(), { merge: true })
   }
 
@@ -116,6 +116,23 @@ export class User implements UserDB {
       )).docs[0].id
     }
     return this.cachedUid
+  }
+
+  private static cashedUsers: {
+    // eslint-disable-next-line no-use-before-define
+    [username: string]: User
+  } = {}
+
+  static async fromUsername (username: string, useCache = true): Promise<User | undefined> {
+    if (useCache && !this.cashedUsers[username]) {
+      const db = getFirestore()
+
+      const userDoc = await getDoc(doc(db, 'users', username))
+      if (!userDoc.exists()) return undefined
+      const user = userDoc.data() as UserDB
+      this.cashedUsers[username] = new User(user)
+    }
+    return this.cashedUsers[username]
   }
 
   static getDisplayName (user: {

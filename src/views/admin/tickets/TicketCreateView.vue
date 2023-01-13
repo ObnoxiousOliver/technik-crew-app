@@ -197,19 +197,20 @@ async function submit () {
 
   &__code-input {
     flex: 1 1 auto;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
     text-align: left;
     padding-left: 1.5rem;
     letter-spacing: .5em;
     text-indent: 0;
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
   }
 
   &__code-generate-btn {
+    flex: 0 0 auto;
     padding: 0;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
-    width: 5rem;
+    width: 4rem;
   }
 }
 </style>

@@ -24,7 +24,7 @@
       </a>
     </div>
     <Btn @click="router.push('/settings/profile/edit')" class="user-badge__edit btn--square">
-      <i class="bi bi-pen" />
+      <i class="bi-pencil-square" />
     </Btn>
   </div>
 </template>

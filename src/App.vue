@@ -1,21 +1,45 @@
 <template>
-  <RouterView class="router" v-slot="{ Component }">
+  <RouterView :class="['router', {
+    'router--has-navbar': route.meta.showNavbar,
+  }]" v-slot="{ Component }">
       <template v-if="Component">
         <Transition :name="route.meta.transitionName">
           <component :is="Component"></component>
         </Transition>
       </template>
   </RouterView>
+
+  <Transition name="mask">
+    <div v-if="route.meta.showNavbar" class="mask" />
+  </Transition>
+  <Transition name="navbar">
+    <Navbar v-if="route.meta.showNavbar" :buttons="[
+      { to: { name: 'wiki' }, icon: 'compass' },
+      { to: { name: 'events' }, icon: 'calendar-week' },
+      { to: { name: 'dashboard' }, icon: 'house-door' },
+      { to: { name: 'equipment' }, icon: 'speaker' },
+      { to: { name: 'settings' }, icon: 'gear' },
+    ]">
+      <NavBtn to="/wiki" icon="compass" />
+      <NavBtn to="/events" icon="calendar-week" />
+      <NavBtn to="/dashboard" icon="house-door" />
+      <NavBtn to="/equipment" icon="speaker" />
+      <NavBtn to="/settings" icon="gear" />
+    </Navbar>
+  </Transition>
+
   <div id="layer"></div>
 </template>
 
 <script lang="ts" setup>
+import Navbar from './components/BottomNavbar.vue'
+import NavBtn from './components/BottomNavBtn.vue'
 import { deleteUser, getAuth, onAuthStateChanged } from '@firebase/auth'
 import { doc, getDoc, getFirestore } from '@firebase/firestore'
 import { createPinia } from 'pinia'
 import { onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { setStore, signOut } from './utilities/auth'
+import { signOut } from './utilities/auth'
 
 const route = useRoute()
 const router = useRouter()
@@ -35,7 +59,7 @@ onMounted(() => {
       if (!(await getDoc(doc(db, 'usernames', user.uid))).exists()) {
         router.push('/')
         // Delete user if user doesn't exist in database
-        await deleteUser(user)
+        await deleteUser(user).catch(err => console.error(err))
         console.log('[Auth]', 'Deleted user', user.uid)
         await signOut()
       }
@@ -61,6 +85,9 @@ watch(pinia.state, () => {
   -webkit-tap-highlight-color: transparent;
 }
 
+:root, body {
+}
+
 body {
   background: r.$bg-primary;
   color: r.$text-primary;
@@ -71,7 +98,9 @@ body {
 
 #app {
   position: fixed;
-  inset: 0;
+
+  inset: 0 0 env(keyboard-inset-height, 0) 0;
+
   overflow: hidden;
   max-width: 30rem;
   margin: 0 auto;
@@ -169,7 +198,50 @@ a {
   }
 }
 
+.scroller-padding {
+  padding: 0 1.5rem 1rem;
+}
+
+.router {
+  &--has-navbar {
+    .scroller-padding {
+      padding-bottom: 5rem;
+    }
+  }
+}
+
 $transition: .5s cubic-bezier(0.19, 1, 0.22, 1);
+.mask {
+  z-index: 99;
+  position: absolute;
+  inset: auto 0 0;
+  height: 5rem;
+  background: linear-gradient(transparent, rgba(r.$bg-primary, 0.3), rgba(r.$bg-primary, 0.66), rgba(r.$bg-primary, 0.9), r.$bg-primary);
+  pointer-events: none;
+
+  &-enter-active,
+  &-leave-active {
+    transition: $transition;
+  }
+
+  &-enter-from,
+  &-leave-to {
+    opacity: 0;
+  }
+}
+
+.navbar {
+  &-enter-active,
+  &-leave-active {
+    transition: $transition;
+  }
+
+  &-enter-from,
+  &-leave-to {
+    transform: translateY(5rem);
+  }
+}
+
 .slide-left {
   &-enter-active {
     z-index: 1;
@@ -199,6 +271,36 @@ $transition: .5s cubic-bezier(0.19, 1, 0.22, 1);
   }
   &-enter-from {
     transform: translateX(-20%);
+  }
+}
+.linear-slide-left {
+  &-enter-active {
+    z-index: 1;
+    transition: $transition;
+  }
+  &-enter-from {
+    transform: translateX(100%);
+  }
+  &-leave-active {
+    transition: $transition;
+  }
+  &-leave-to {
+    transform: translateX(-100%);
+  }
+}
+.linear-slide-right {
+  &-enter-active {
+    z-index: 1;
+    transition: $transition;
+  }
+  &-enter-from {
+    transform: translateX(-100%);
+  }
+  &-leave-active {
+    transition: $transition;
+  }
+  &-leave-to {
+    transform: translateX(100%);
   }
 }
 </style>

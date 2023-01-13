@@ -2,7 +2,8 @@
   <div
     :class="['page', {
       'page--heading-hidden': navigation && !headingVisible,
-      'page--no-navigation': !navigation
+      'page--no-navigation': !navigation,
+      'page--has-add-btn': props.addBtn,
     }]"
   >
     <nav v-if="props.navigation" class="page__navigation">
@@ -21,7 +22,7 @@
         <slot name="title" />
       </span>
     </nav>
-    <main ref="scroller" class="page__scroller">
+    <main ref="scroller" class="page__scroller scroller-padding">
       <h2
         v-if="$slots.title"
         class="page__title"
@@ -108,10 +109,16 @@ function onScroll () {
     }
   }
 
+  &--has-add-btn {
+    .page__scroller {
+      padding-bottom: 6rem;
+    }
+  }
+
   &__scroller {
     position: absolute;
     inset: 0;
-    padding: 4rem 1.5rem 0;
+    padding-top: 4rem;
     overflow: hidden auto;
   }
 
@@ -129,11 +136,12 @@ function onScroll () {
       transform-origin: 0 0;
       transition: transform .5s;
       transition-timing-function: cubic-bezier(0.19, 1, 0.22, 1);
+
+      & > :deep(i) {
+        margin-right: .5em;
+      }
     }
 
-    :deep(i) {
-      margin-right: .5em;
-    }
   }
 
   &__navigation {

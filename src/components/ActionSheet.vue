@@ -21,7 +21,7 @@
         >
           <FocusTrap >
             <div>
-              <h2 class="action-sheet__title">
+              <h2 v-if="$slots.title" class="action-sheet__title">
                 <slot name="title" />
               </h2>
               <div

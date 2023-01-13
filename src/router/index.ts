@@ -55,56 +55,34 @@ const routes: Array<RouteRecordRaw> = [
     }
   },
 
-  // User
+  // Dashboard
   {
-    path: '/',
-    redirect: '/dashboard',
-    component: () => import('../views/UserView.vue'),
+    name: 'dashboard',
+    path: '/dashboard',
+    alias: '/',
+    component: () => import('../views/DashboardView.vue'),
     meta: {
       requiresAuth: true,
-      depth: 9
-    },
-    children: [
-      {
-        name: 'dashboard',
-        path: '/dashboard',
-        component: () => import('../views/DashboardView.vue'),
-        meta: {
-          requiresAuth: true,
-          title: 'Dashboard'
-        }
-      },
-      {
-        name: 'events',
-        path: '/events',
-        component: () => import('../views/EventView.vue'),
-        meta: {
-          requiresAuth: true,
-          title: 'Termine'
-        }
-      },
-      {
-        name: 'equipment',
-        path: '/equipment',
-        component: () => import('../views/EquipmentView.vue'),
-        meta: {
-          requiresAuth: true,
-          title: 'Equipment'
-        }
-      },
-      {
-        name: 'wiki',
-        path: '/wiki',
-        component: () => import('../views/DashboardView.vue'),
-        meta: {
-          requiresAuth: true,
-          title: 'Wiki'
-        }
-      }
-    ]
+      title: 'Dashboard',
+      showNavbar: true,
+      depth: 7,
+      linearTransition: true
+    }
   },
 
-  // New event
+  // Event
+  {
+    name: 'events',
+    path: '/events',
+    component: () => import('../views/EventView.vue'),
+    meta: {
+      requiresAuth: true,
+      title: 'Termine',
+      showNavbar: true,
+      depth: 6,
+      linearTransition: true
+    }
+  },
   {
     name: 'new-event',
     path: '/events/new',
@@ -113,7 +91,60 @@ const routes: Array<RouteRecordRaw> = [
       requriesAuth: true,
       title: 'Neuer Termin',
       depth: 10,
-      defaultBackPath: '/events'
+      defaultBackPath: '/events',
+      showNavbar: true
+    }
+  },
+
+  // Equipment
+  {
+    name: 'equipment',
+    path: '/equipment',
+    component: () => import('../views/EquipmentView.vue'),
+    meta: {
+      requiresAuth: true,
+      title: 'Equipment',
+      showNavbar: true,
+      depth: 8,
+      linearTransition: true
+    }
+  },
+  {
+    name: 'equipment-add',
+    path: '/equipment/add',
+    component: () => import('../views/EquipmentAddView.vue'),
+    meta: {
+      requiresAuth: true,
+      title: 'Neues Equipment',
+      depth: 10,
+      defaultBackPath: '/equipment',
+      showNavbar: true
+    }
+  },
+  {
+    name: 'equipment-details',
+    path: '/equipment/:id',
+    component: () => import('../views/EquipmentDetailsView.vue'),
+    meta: {
+      requiresAuth: true,
+      title: 'Equipment Details',
+      depth: 10,
+      defaultBackPath: '/equipment',
+      showNavbar: true
+    }
+  },
+
+  // Wiki
+  {
+    name: 'wiki',
+    path: '/wiki',
+    component: () => import('../views/DashboardView.vue'),
+    meta: {
+      requiresAuth: true,
+      title: 'Wiki',
+      showNavbar: true,
+      depth: 5,
+      linearTransition: true
     }
   },
 
@@ -316,14 +347,18 @@ router.beforeEach(async (to, from, next) => {
 })
 
 router.beforeEach((to, from) => {
-  let transitionName: string | undefined = to.meta.transition as string | undefined
+  let transitionName = to.meta.transition as string | undefined
+
+  const toDepth: number = to.meta.depth as number ?? to.path.split('/').length
+  const fromDepth: number = from.meta.depth as number ?? to.path.split('/').length
+  const depthDiff = fromDepth - toDepth
 
   if (!transitionName) {
-    const toDepth: number = to.meta.depth as number ?? to.path.split('/').length
-    const fromDepth: number = from.meta.depth as number ?? to.path.split('/').length
-    const depthDiff = fromDepth - toDepth
-
     transitionName = depthDiff <= 0 ? 'slide-left' : 'slide-right'
+  }
+
+  if (from.meta.linearTransition && to.meta.linearTransition) {
+    transitionName = depthDiff <= 0 ? 'linear-slide-left' : 'linear-slide-right'
   }
 
   if (transitionName) {
@@ -339,15 +374,13 @@ router.afterEach((to) => {
   }
 })
 
-export function back () {
+export function back (fallbackPath?: string) {
   const route = router.currentRoute.value
-  console.log('[Router]', 'Back', history.state.back, route.meta.defaultBackPath)
+  console.log('[Router]', 'Back', history.state.back, fallbackPath, route.meta.defaultBackPath)
   if (history.state.back) {
     router.back()
-  } else if (route.meta.defaultBackPath) {
-    router.replace(route.meta.defaultBackPath)
   } else {
-    router.replace('/')
+    router.replace(fallbackPath ?? route.meta.defaultBackPath ?? '/')
   }
 }
 

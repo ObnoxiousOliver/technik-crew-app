@@ -1,45 +1,50 @@
 <template>
-  <UserPage>
+  <UserPage
+    :addBtn="true"
+    @addBtn="router.push('/equipment/add')"
+    :search="true"
+    @search="search"
+    @searchOpen="inSearchMenu = $event"
+    :searchRecents="[
+    ]"
+  >
     <template #title>
       <i class="bi-speaker"/>Equipment
     </template>
 
-    {{ equipment }}
-
-    <button @click="addEquipment">Add</button>
-
+    <EquipmentList :equipment="equipment" />
   </UserPage>
 </template>
 
 <script lang="ts" setup>
-import { addDoc, collection, getDocs, getFirestore, query } from '@firebase/firestore'
-import { onMounted, ref } from 'vue'
+import { onActivated, onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import UserPage from '../layout/UserPage.vue'
-import { Equipment, EquipmentDB } from '../model/equipment'
-
-const db = getFirestore()
+import EquipmentList from '../components/EquipmentList.vue'
+import { Equipment } from '../model/equipment'
+const router = useRouter()
 
 const equipment = ref([])
 
-async function addEquipment () {
-  await addDoc(collection(db, 'equipment'), new Equipment({
-    name: 'Some Eq'
-  }).toDB())
-
-  updateEquipment()
+const searchQuery = ref('')
+const inSearchMenu = ref(false)
+function search (e: {
+  type: string,
+  value: string
+}) {
+  if (e.type === 'search') {
+    searchQuery.value = e.value
+  } else if (e.type === 'open-close') {
+    inSearchMenu.value = e.value
+  }
 }
 
 onMounted(() => {
   updateEquipment()
+  console.log(equipment.value)
 })
 
 async function updateEquipment () {
-  const querySnapshot = await getDocs(query(collection(db, 'equipment')))
-
-  equipment.value = []
-
-  querySnapshot.forEach(doc => {
-    equipment.value.push(doc.data() as EquipmentDB)
-  })
+  equipment.value = await Equipment.get()
 }
 </script>
