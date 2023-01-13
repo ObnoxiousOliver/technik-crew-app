@@ -1,7 +1,6 @@
 <template>
-  <RouterLink class="nav-btn" v-wave>
+  <RouterLink class="nav-btn">
     <i :class="`nav-btn__icon bi-${props.icon}`" />
-    <i :class="`nav-btn__icon-fill bi-${props.icon}-fill`" />
   </RouterLink>
 </template>
 
@@ -21,33 +20,5 @@ const props = defineProps({
   display: grid;
   place-items: center;
   color: inherit;
-
-  &__icon {
-    display: block;
-  }
-  &__icon-fill {
-    display: none;
-  }
-
-  &.router-link-active {
-    .nav-btn {
-      &__icon {
-        display: none;
-      }
-      &__icon-fill {
-        display: block;
-      }
-    }
-
-    &::after {
-      content: '';
-      position: absolute;
-      bottom: .5rem;
-      width: 1.3rem;
-      height: .1rem;
-      background: r.$accent;
-      border-radius: .05rem;
-    }
-  }
 }
 </style>

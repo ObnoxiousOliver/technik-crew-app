@@ -1,92 +1,94 @@
 <template>
-  <div :class="['user-page', {
-    'user-page--search-expanded': searchExpanded,
-    'user-page--has-add-btn': addBtn,
-    'user-page--has-search-btn': search
-  }]" ref="page" :style="{
-    '--search-btn-left': searchBtnLeft
-  }">
-    <h2 class="user-page__title">
-      <div class="user-page__title__content">
-        <slot name="title" />
-      </div>
-      <Transition name="user-page__title__buttons">
-        <div v-if="!searchExpanded" class="user-page__title__buttons">
-          <Btn
-            class="user-page__title__buttons__search-btn"
-            ref="searchBtnRef"
-            v-if="search"
-            @click="expandSearch(true)"
-          >
-            <i class="bi-search" />
-          </Btn>
-          <Btn v-if="addBtn" @click="$emit('addBtn', $event)">
-            <i class="bi-plus-lg" />
-          </Btn>
+  <Page :navigation="false">
+    <div :class="['user-page', {
+      'user-page--search-expanded': searchExpanded,
+      'user-page--has-add-btn': addBtn,
+      'user-page--has-search-btn': search
+    }]" ref="page" :style="{
+      '--search-btn-left': searchBtnLeft
+    }">
+      <h2 class="user-page__title">
+        <div class="user-page__title__content">
+          <slot name="title" />
+        </div>
+        <Transition name="user-page__title__buttons">
+          <div v-if="!searchExpanded" class="user-page__title__buttons">
+            <Btn
+              class="user-page__title__buttons__search-btn"
+              ref="searchBtnRef"
+              v-if="search"
+              @click="expandSearch(true)"
+            >
+              <i class="bi-search" />
+            </Btn>
+            <Btn v-if="addBtn" @click="$emit('addBtn', $event)">
+              <i class="bi-plus-lg" />
+            </Btn>
+          </div>
+        </Transition>
+      </h2>
+      <Transition name="user-page__search">
+        <div v-if="searchExpanded" class="user-page__search">
+          <div class="user-page__search__input" >
+            <InputField
+              class="user-page__search__input__field"
+              placeholder="Suchen..."
+              inputmode="search"
+              @keydown.enter="submit()"
+              @keydown.esc="expandSearch(false)"
+              @focus="submitted = false"
+              @blur="blur"
+              @keydown.tab="dontBlur = true"
+              ref="searchInputRef"
+              v-model="searchInput"
+            >
+              <template #before>
+                <i class="bi-search" />
+              </template>
+              <template #after>
+                <Btn
+                  @click="closeClick()"
+                  class="user-page__search__input__close-btn"
+                  aria-label="Suche schließen"
+                >
+                  <i class="bi-plus-lg" />
+                </Btn>
+              </template>
+            </InputField>
+          </div>
         </div>
       </Transition>
-    </h2>
-    <Transition name="user-page__search">
-      <div v-if="searchExpanded" class="user-page__search">
-        <div class="user-page__search__input" >
-          <InputField
-            class="user-page__search__input__field"
-            placeholder="Suchen..."
-            inputmode="search"
-            @keydown.enter="submit()"
-            @keydown.esc="expandSearch(false)"
-            @focus="submitted = false"
-            @blur="blur"
-            @keydown.tab="dontBlur = true"
-            ref="searchInputRef"
-            v-model="searchInput"
-          >
-            <template #before>
-              <i class="bi-search" />
-            </template>
-            <template #after>
-              <Btn
-                @click="closeClick()"
-                class="user-page__search__input__close-btn"
-                aria-label="Suche schließen"
-              >
-                <i class="bi-plus-lg" />
-              </Btn>
-            </template>
-          </InputField>
+      <SearchMenu
+        class="user-page__search-menu scroller-padding"
+        :show="searchExpanded && !submitted"
+        :query="searchInput"
+        @pointerdown="dontBlur = true"
+        :items="[
+          ...(searchRecents?.map(x => ({
+            name: x,
+            type: 'recent'
+          })) ?? []),
+          ...(searchSuggestions?.map(x => ({
+            name: x,
+            type: 'suggestion'
+          })) ?? [])
+        ]"
+        @selectItem="submit"
+        @applyItem="(q) => {
+          searchInput = q
+          searchInputRef.focus()
+        }"
+      />
+      <Transition name="user-page__scroller">
+        <div
+          v-show="!searchExpanded || submitted"
+          class="user-page__scroller scroller-padding"
+        >
+          <slot />
         </div>
-      </div>
-    </Transition>
-    <SearchMenu
-      class="user-page__search-menu"
-      :show="searchExpanded && !submitted"
-      :query="searchInput"
-      @pointerdown="dontBlur = true"
-      :items="[
-        ...(searchRecents?.map(x => ({
-          name: x,
-          type: 'recent'
-        })) ?? []),
-        ...(searchSuggestions?.map(x => ({
-          name: x,
-          type: 'suggestion'
-        })) ?? [])
-      ]"
-      @selectItem="submit"
-      @applyItem="(q) => {
-        searchInput = q
-        searchInputRef.focus()
-      }"
-    />
-    <Transition name="user-page__scroller">
-      <div
-        v-show="!searchExpanded || submitted"
-        class="user-page__scroller"
-      >
-        <slot />
-      </div>
-    </Transition>
-  </div>
+      </Transition>
+    </div>
+  </Page>
 </template>
 
 <script lang="ts" setup>
@@ -318,7 +320,7 @@ function expandSearch (value?: boolean, push = true) {
     position: absolute;
     inset: 0 0 auto 0;
     max-height: 100vh;
-    padding: 4rem 1.5rem 5rem;
+    padding: 4rem 1.5rem 1rem;
   }
 
   &__title {
@@ -375,8 +377,13 @@ function expandSearch (value?: boolean, push = true) {
   &__scroller {
     position: absolute;
     inset: 0;
-    padding: 4rem 1.5rem 5rem;
+    padding-top: 4rem;
     overflow: auto;
+    margin-bottom: -1rem;
+
+    .router--has-navbar & {
+      margin-bottom: -5rem;
+    }
 
     &-enter-active {
       transition: .3s .1s;

@@ -17,7 +17,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onActivated, ref } from 'vue'
+import { onActivated, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import UserPage from '../layout/UserPage.vue'
 import EquipmentList from '../components/EquipmentList.vue'
@@ -39,8 +39,9 @@ function search (e: {
   }
 }
 
-onActivated(() => {
+onMounted(() => {
   updateEquipment()
+  console.log(equipment.value)
 })
 
 async function updateEquipment () {

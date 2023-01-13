@@ -22,7 +22,7 @@
         <slot name="title" />
       </span>
     </nav>
-    <main ref="scroller" class="page__scroller">
+    <main ref="scroller" class="page__scroller scroller-padding">
       <h2
         v-if="$slots.title"
         class="page__title"
@@ -118,7 +118,7 @@ function onScroll () {
   &__scroller {
     position: absolute;
     inset: 0;
-    padding: 4rem 1.5rem 0;
+    padding-top: 4rem;
     overflow: hidden auto;
   }
 
