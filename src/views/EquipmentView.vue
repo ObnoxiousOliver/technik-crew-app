@@ -17,7 +17,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onActivated, onMounted, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import UserPage from '../layout/UserPage.vue'
 import EquipmentList from '../components/EquipmentList.vue'

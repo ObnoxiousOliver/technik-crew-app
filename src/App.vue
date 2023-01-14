@@ -9,10 +9,10 @@
       </template>
   </RouterView>
 
-  <Transition name="mask">
+  <Transition name="mask" v-if="!keyboardOpen">
     <div v-if="route.meta.showNavbar" class="mask" />
   </Transition>
-  <Transition name="navbar">
+  <Transition name="navbar" v-if="!keyboardOpen">
     <Navbar v-if="route.meta.showNavbar" :buttons="[
       { to: { name: 'wiki' }, icon: 'compass' },
       { to: { name: 'events' }, icon: 'calendar-week' },
@@ -37,15 +37,28 @@ import NavBtn from './components/BottomNavBtn.vue'
 import { deleteUser, getAuth, onAuthStateChanged } from '@firebase/auth'
 import { doc, getDoc, getFirestore } from '@firebase/firestore'
 import { createPinia } from 'pinia'
-import { onMounted, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { signOut } from './utilities/auth'
+import { Keyboard } from '@capacitor/keyboard'
+import { Capacitor } from '@capacitor/core'
 
 const route = useRoute()
 const router = useRouter()
 
 const db = getFirestore()
 const auth = getAuth()
+
+const keyboardOpen = ref(false)
+
+if (Capacitor.getPlatform() !== 'web') {
+  Keyboard.addListener('keyboardWillShow', () => {
+    keyboardOpen.value = true
+  })
+  Keyboard.addListener('keyboardWillHide', () => {
+    keyboardOpen.value = false
+  })
+}
 
 onMounted(() => {
   onAuthStateChanged(auth, async (user) => {
@@ -99,7 +112,11 @@ body {
 #app {
   position: fixed;
 
-  inset: 0 0 env(keyboard-inset-height, 0) 0;
+  // inset: 0 0 env(keyboard-inset-height, 0) 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 
   overflow: hidden;
   max-width: 30rem;

@@ -16,18 +16,14 @@ import TextBox from './components/TextBox.vue'
 import router from './router'
 import VWave from 'v-wave'
 import { FocusTrap } from 'focus-trap-vue'
-
-import 'bootstrap-icons/font/bootstrap-icons.scss'
-import './registerServiceWorker'
-// import { vfmPlugin } from 'vue-final-modal'
-
-// Import the functions you need from the SDKs you need
 import { initializeApp } from 'firebase/app'
 import { getAuth } from 'firebase/auth'
 import { getFirestore } from 'firebase/firestore'
 import { createPinia } from 'pinia'
+import 'bootstrap-icons/font/bootstrap-icons.scss'
+import './registerServiceWorker'
 
-// Your web app's Firebase configuration
+// #region Initialize Firebase
 const firebaseConfig = {
   apiKey: 'AIzaSyDKTBOLLL7-L_OFFnQ1cJtyqwG2iAQn_UA',
   authDomain: 'leibniz-technik-crew.firebaseapp.com',
@@ -36,16 +32,16 @@ const firebaseConfig = {
   messagingSenderId: '942452136166',
   appId: '1:942452136166:web:e87215a8a6ae2620f4c327'
 }
-
-// Initialize Firebase
 const app = initializeApp(firebaseConfig)
 getAuth(app)
 getFirestore(app)
+// #endregion
 
-// Create a Pinia instance
+// #region Create a Pinia instance
 const pinia = createPinia()
+// #endregion
 
-// Create and mount app
+// #region Create and mount app
 createApp(App)
   .component('FocusTrap', FocusTrap)
   .component('Page', RouterPage)
@@ -68,9 +64,11 @@ createApp(App)
   .use(pinia)
   .use(router)
   .mount('#app')
+// #endregion
 
-// Configure Virtualkeyboard
+// #region Configure Virtualkeyboard
 if ('virtualKeyboard' in navigator) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (navigator.virtualKeyboard as any).overlaysContent = true
 }
+// #endregion

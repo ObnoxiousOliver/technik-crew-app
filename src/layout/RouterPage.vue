@@ -98,7 +98,7 @@ function onScroll () {
       }
       &__title > div {
         opacity: 0;
-        transform: translate(1.5rem, -2.6rem)scale((2/3));
+        transform: translate(1.5rem, -2.6rem)scale(2 / 3);
       }
     }
   }
