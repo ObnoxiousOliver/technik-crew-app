@@ -106,6 +106,7 @@ function onScroll () {
   &--no-navigation {
     .page__scroller {
       padding-top: 0;
+      scroll-padding-top: 0;
     }
   }
 
@@ -119,6 +120,7 @@ function onScroll () {
     position: absolute;
     inset: 0;
     padding-top: 4rem;
+    scroll-padding-top: 4rem;
     overflow: hidden auto;
   }
 

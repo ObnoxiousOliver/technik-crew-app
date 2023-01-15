@@ -27,12 +27,16 @@ export async function signIn (name: string, password: string) {
   await setStore()
 }
 
+let cachedUsername: string | null = null
 export async function getUsername () {
   const auth = getAuth()
   if (auth.currentUser) {
-    return (await getDoc(doc(getFirestore(), 'usernames', auth.currentUser.uid))).get('username')
+    if (!cachedUsername) {
+      cachedUsername = (await getDoc(doc(getFirestore(), 'usernames', auth.currentUser.uid))).get('username')
+    }
+    return cachedUsername as string
   }
-  return null
+  return ''
 }
 
 export async function changeEmail (newEmail: string) {
@@ -58,7 +62,7 @@ export async function changeEmail (newEmail: string) {
   }
 }
 
-export async function setStore () {
+export async function setStoreFromServer () {
   const db = getFirestore()
   const auth = getAuth()
   const userStore = useUser()
@@ -72,6 +76,31 @@ export async function setStore () {
   userStore.permissions = (await getDoc(
     doc(db, 'permissions', auth.currentUser.uid)
   )).data() ?? getDefaultPermissions()
+
+  localStorage.setItem('last_user', JSON.stringify({
+    username,
+    user: userStore.user.toDB(),
+    permissions: userStore.permissions
+  }))
+}
+
+export function setStore () {
+  let lastUser = null
+  try {
+    lastUser = JSON.parse(localStorage.getItem('last_user') ?? 'null') as {
+      username: string
+      user: UserDB
+      permissions: PermissionsDB
+    }
+  } catch {}
+  if (lastUser) {
+    const { username, user, permissions } = lastUser
+    const userStore = useUser()
+    userStore.user = new User(user)
+    userStore.permissions = permissions as PermissionsDB
+    cachedUsername = username
+  }
+  setStoreFromServer()
 }
 
 export async function signOut () {

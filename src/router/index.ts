@@ -2,7 +2,7 @@ import { Permission } from '@/model/permissions'
 import { useUser } from '@/stores/user'
 import { setStore } from '@/utilities/auth'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
-import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
+import { createRouter, createWebHistory, RouteLocationNormalized, RouteRecordRaw } from 'vue-router'
 
 const routes: Array<RouteRecordRaw> = [
   // Login
@@ -278,44 +278,33 @@ const router = createRouter({
   routes
 })
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
+  console.log(localStorage.getItem('last_auth'))
+
   if (to.matched.some(record => record.meta.requiresAuth)) {
     if (getAuth().currentUser) {
       next()
       console.log('[Router]', 'User logged in')
+    } else if (localStorage.getItem('last_auth') === 'true') {
+      next()
+      console.log('[Router]', 'User logged in')
     } else {
-      onAuthStateChanged(getAuth(), async (user) => {
-        if (user) {
-          try {
-            await setStore()
-          } catch (err) {
-            console.error(err)
-          }
-          next()
-          console.log('[Router]', 'User logged in')
-        } else {
-          next({
-            path: '/login',
-            query: { redirect: to.fullPath }
-          })
-          console.log('[Router]', 'User not logged in')
-        }
-      })()
+      next({
+        path: '/login',
+        query: { redirect: to.fullPath }
+      })
+      console.log('[Router]', 'User not logged in')
     }
   } else if (to.matched.some(record => record.meta.requiresNoAuth)) {
     if (getAuth().currentUser) {
-      next('/')
+      next(from)
+      console.log('[Router]', 'User logged in')
+    } else if (localStorage.getItem('last_auth') === 'true') {
+      next(from)
       console.log('[Router]', 'User logged in')
     } else {
-      onAuthStateChanged(getAuth(), (user) => {
-        if (user) {
-          next('/')
-          console.log('[Router]', 'User logged in')
-        } else {
-          next()
-          console.log('[Router]', 'User not logged in')
-        }
-      })()
+      next()
+      console.log('[Router]', 'User not logged in')
     }
   } else {
     next()

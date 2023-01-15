@@ -14,11 +14,11 @@
   </Transition>
   <Transition name="navbar">
     <Navbar v-if="route.meta.showNavbar" :buttons="[
-      { to: { name: 'wiki' }, icon: 'compass' },
-      { to: { name: 'events' }, icon: 'calendar-week' },
-      { to: { name: 'dashboard' }, icon: 'house-door' },
-      { to: { name: 'equipment' }, icon: 'speaker' },
-      { to: { name: 'settings' }, icon: 'gear' },
+      { to: '/wiki', icon: 'compass' },
+      { to: '/events', icon: 'calendar-week' },
+      { to: '/dashboard', icon: 'house-door' },
+      { to: '/equipment', icon: 'speaker' },
+      { to: '/settings', icon: 'gear' },
     ]">
       <NavBtn to="/wiki" icon="compass" />
       <NavBtn to="/events" icon="calendar-week" />
@@ -39,7 +39,7 @@ import { doc, getDoc, getFirestore } from '@firebase/firestore'
 import { createPinia } from 'pinia'
 import { onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { signOut } from './utilities/auth'
+import { setStore, signOut } from './utilities/auth'
 
 const route = useRoute()
 const router = useRouter()
@@ -49,13 +49,20 @@ const auth = getAuth()
 
 onMounted(() => {
   onAuthStateChanged(auth, async (user) => {
-    if (!user && route.meta.requireAuth) {
-      router.push({
-        path: '/login',
-        query: { redirect: route.fullPath }
-      })
+    if (!user) {
+      localStorage.removeItem('last_auth')
+      localStorage.removeItem('last_user')
+
+      if (route.meta.requiresAuth) {
+        router.replace({
+          path: '/login',
+          query: { redirect: route.fullPath }
+        })
+      }
     }
     if (user) {
+      localStorage.setItem('last_auth', 'true')
+      setStore()
       if (!(await getDoc(doc(db, 'usernames', user.uid))).exists()) {
         router.push('/')
         // Delete user if user doesn't exist in database
@@ -200,12 +207,15 @@ a {
 
 .scroller-padding {
   padding: 0 1.5rem 1rem;
+  scroll-padding: 0 1.5rem 1rem;
+  scroll-behavior: smooth;
 }
 
 .router {
   &--has-navbar {
     .scroller-padding {
       padding-bottom: 5rem;
+      scroll-padding-bottom: 5rem;
     }
   }
 }

@@ -9,11 +9,10 @@
     }"
   >
     <BottomNavBtn
-      v-for="(btn, i) in buttons"
+      v-for="btn in buttons"
       :key="btn.to"
       :icon="btn.icon"
       :to="btn.to"
-      @click="click(i)"
     />
     <div class="bottom-nav__filled-icons__mask" />
     <div class="bottom-nav__filled-icons">
@@ -29,8 +28,8 @@
 </template>
 
 <script lang="ts" setup>
-import { onBeforeUnmount, onMounted, ref } from 'vue'
-import { onBeforeRouteUpdate, useRoute } from 'vue-router'
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import BottomNavBtn from './BottomNavBtn.vue'
 
 const props = defineProps({
@@ -38,14 +37,13 @@ const props = defineProps({
 })
 
 const route = useRoute()
-onBeforeRouteUpdate(() => {
-  active.value = props.buttons?.findIndex(btn => btn.to.name === route.name)
-})
+watch(route, setActiveButton)
 
 const active = ref(0)
-active.value = props.buttons?.findIndex(btn => btn.to.name === route.name)
-function click (index: number) {
-  active.value = index
+setActiveButton()
+
+function setActiveButton () {
+  active.value = props.buttons.findIndex(btn => route.path.startsWith(btn.to))
 }
 
 const nav = ref<HTMLElement>()

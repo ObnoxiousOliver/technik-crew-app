@@ -1,12 +1,21 @@
 <template>
-  <RouterLink class="nav-btn">
-    <i :class="`nav-btn__icon bi-${props.icon}`" />
+  <RouterLink :to="to" ref="root" class="nav-btn">
+    <i :class="`nav-btn__icon bi-${icon}`" />
   </RouterLink>
 </template>
 
 <script lang="ts" setup>
-const props = defineProps({
-  icon: String
+import { ref } from 'vue'
+
+defineProps({
+  icon: String,
+  to: [Object, String]
+})
+
+const root = ref<HTMLElement>()
+
+defineExpose({
+  root
 })
 </script>
 
