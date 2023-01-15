@@ -1,6 +1,6 @@
 <template>
   <RouterView :class="['router', {
-    'router--has-navbar': route.meta.showNavbar,
+    'router--has-navbar': showNavbar,
   }]" v-slot="{ Component }">
       <template v-if="Component">
         <Transition :name="route.meta.transitionName">
@@ -10,22 +10,16 @@
   </RouterView>
 
   <Transition name="mask">
-    <div v-if="route.meta.showNavbar" class="mask" />
+    <div v-if="showNavbar" class="mask" />
   </Transition>
   <Transition name="navbar">
-    <Navbar v-if="route.meta.showNavbar" :buttons="[
-      { to: '/wiki', icon: 'compass' },
-      { to: '/events', icon: 'calendar-week' },
-      { to: '/dashboard', icon: 'house-door' },
-      { to: '/equipment', icon: 'speaker' },
-      { to: '/settings', icon: 'gear' },
-    ]">
-      <NavBtn to="/wiki" icon="compass" />
-      <NavBtn to="/events" icon="calendar-week" />
-      <NavBtn to="/dashboard" icon="house-door" />
-      <NavBtn to="/equipment" icon="speaker" />
-      <NavBtn to="/settings" icon="gear" />
-    </Navbar>
+    <Navbar v-if="showNavbar" :buttons="[
+      { to: 'wiki', icon: 'compass' },
+      { to: 'events', icon: 'calendar-week' },
+      { to: 'dashboard', icon: 'house-door' },
+      { to: 'equipment', icon: 'speaker' },
+      { to: 'settings', icon: 'gear' },
+    ]" />
   </Transition>
 
   <div id="layer"></div>
@@ -33,16 +27,17 @@
 
 <script lang="ts" setup>
 import Navbar from './components/BottomNavbar.vue'
-import NavBtn from './components/BottomNavBtn.vue'
 import { deleteUser, getAuth, onAuthStateChanged } from '@firebase/auth'
 import { doc, getDoc, getFirestore } from '@firebase/firestore'
 import { createPinia } from 'pinia'
-import { onMounted, watch } from 'vue'
+import { computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { setStore, signOut } from './utilities/auth'
 
 const route = useRoute()
 const router = useRouter()
+
+const showNavbar = computed(() => ['dashboard', 'wiki', 'events', 'equipment', 'settings'].includes(route.meta.root))
 
 const db = getFirestore()
 const auth = getAuth()

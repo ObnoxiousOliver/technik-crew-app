@@ -1,22 +1,27 @@
 <template>
-  <RouterLink :to="to" ref="root" class="nav-btn">
+  <button @click="click" class="nav-btn">
     <i :class="`nav-btn__icon bi-${icon}`" />
-  </RouterLink>
+  </button>
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { getLastPageOfRoot } from '@/router'
+import { useRoute, useRouter } from 'vue-router'
 
-defineProps({
+const route = useRoute()
+const router = useRouter()
+const props = defineProps({
   icon: String,
-  to: [Object, String]
+  to: String
 })
 
-const root = ref<HTMLElement>()
-
-defineExpose({
-  root
-})
+function click () {
+  if (route.meta.root === props.to) {
+    router.replace({ name: props.to })
+  } else {
+    router.push(getLastPageOfRoot(props.to))
+  }
+}
 </script>
 
 <style lang="scss" scoped>
@@ -26,8 +31,9 @@ defineExpose({
   width: 0;
   flex: 1 1 auto;
   position: relative;
-  display: grid;
-  place-items: center;
+  font: inherit;
+  border: none;
+  background: none;
   color: inherit;
 }
 </style>

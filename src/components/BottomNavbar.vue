@@ -43,7 +43,7 @@ const active = ref(0)
 setActiveButton()
 
 function setActiveButton () {
-  active.value = props.buttons.findIndex(btn => route.path.startsWith(btn.to))
+  active.value = props.buttons.findIndex(btn => route.meta.root === btn.to)
 }
 
 const nav = ref<HTMLElement>()
@@ -102,6 +102,7 @@ onMounted(() => {
     &__mask {
       position: absolute;
       height: 100%;
+      pointer-events: none;
       width: calc(100% / var(--total));
 
       transform: translateX(calc(var(--active, 0) * 100%));
