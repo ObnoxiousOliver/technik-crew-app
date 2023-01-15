@@ -1,5 +1,8 @@
 # Using Android gitignore template: https://github.com/github/gitignore/blob/HEAD/Android.gitignore
 
+capacitor.settings.gradle
+cordova.variables.gradle
+
 # Built application files
 *.apk
 *.aar

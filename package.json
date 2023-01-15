@@ -6,7 +6,10 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "start": "vue-cli-service serve"
+    "dev": "vue-cli-service serve",
+    "android:serve": "ionic cap run android -l --external",
+    "android:build": "ionic cap build android",
+    "android:open": "ionic cap open android"
   },
   "dependencies": {
     "@capacitor/android": "4.6.1",
