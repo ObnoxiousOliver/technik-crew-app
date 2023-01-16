@@ -1,6 +1,6 @@
 <template>
   <RouterView :class="['router', {
-    'router--has-navbar': route.meta.showNavbar,
+    'router--has-navbar': showNavbar,
   }]" v-slot="{ Component }">
       <template v-if="Component">
         <Transition :name="route.meta.transitionName">
@@ -9,23 +9,17 @@
       </template>
   </RouterView>
 
-  <Transition name="mask" v-if="!keyboardOpen">
-    <div v-if="route.meta.showNavbar" class="mask" />
+  <Transition name="mask">
+    <div v-if="showNavbar" class="mask" />
   </Transition>
-  <Transition name="navbar" v-if="!keyboardOpen">
-    <Navbar v-if="route.meta.showNavbar" :buttons="[
-      { to: { name: 'wiki' }, icon: 'compass' },
-      { to: { name: 'events' }, icon: 'calendar-week' },
-      { to: { name: 'dashboard' }, icon: 'house-door' },
-      { to: { name: 'equipment' }, icon: 'speaker' },
-      { to: { name: 'settings' }, icon: 'gear' },
-    ]">
-      <NavBtn to="/wiki" icon="compass" />
-      <NavBtn to="/events" icon="calendar-week" />
-      <NavBtn to="/dashboard" icon="house-door" />
-      <NavBtn to="/equipment" icon="speaker" />
-      <NavBtn to="/settings" icon="gear" />
-    </Navbar>
+  <Transition name="navbar">
+    <Navbar v-if="showNavbar" :buttons="[
+      { to: 'wiki', icon: 'compass' },
+      { to: 'events', icon: 'calendar-week' },
+      { to: 'dashboard', icon: 'house-door' },
+      { to: 'equipment', icon: 'speaker' },
+      { to: 'settings', icon: 'gear' },
+    ]" />
   </Transition>
 
   <div id="layer"></div>
@@ -33,18 +27,17 @@
 
 <script lang="ts" setup>
 import Navbar from './components/BottomNavbar.vue'
-import NavBtn from './components/BottomNavBtn.vue'
 import { deleteUser, getAuth, onAuthStateChanged } from '@firebase/auth'
 import { doc, getDoc, getFirestore } from '@firebase/firestore'
 import { createPinia } from 'pinia'
-import { onMounted, ref, watch } from 'vue'
+import { computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { signOut } from './utilities/auth'
-import { Keyboard } from '@capacitor/keyboard'
-import { Capacitor } from '@capacitor/core'
+import { setStore, signOut } from './utilities/auth'
 
 const route = useRoute()
 const router = useRouter()
+
+const showNavbar = computed(() => ['dashboard', 'wiki', 'events', 'equipment', 'settings'].includes(route.meta.root))
 
 const db = getFirestore()
 const auth = getAuth()
@@ -62,13 +55,20 @@ if (Capacitor.getPlatform() !== 'web') {
 
 onMounted(() => {
   onAuthStateChanged(auth, async (user) => {
-    if (!user && route.meta.requireAuth) {
-      router.push({
-        path: '/login',
-        query: { redirect: route.fullPath }
-      })
+    if (!user) {
+      localStorage.removeItem('last_auth')
+      localStorage.removeItem('last_user')
+
+      if (route.meta.requiresAuth) {
+        router.replace({
+          path: '/login',
+          query: { redirect: route.fullPath }
+        })
+      }
     }
     if (user) {
+      localStorage.setItem('last_auth', 'true')
+      setStore()
       if (!(await getDoc(doc(db, 'usernames', user.uid))).exists()) {
         router.push('/')
         // Delete user if user doesn't exist in database
@@ -217,12 +217,15 @@ a {
 
 .scroller-padding {
   padding: 0 1.5rem 1rem;
+  scroll-padding: 0 1.5rem 1rem;
+  scroll-behavior: smooth;
 }
 
 .router {
   &--has-navbar {
     .scroller-padding {
       padding-bottom: 5rem;
+      scroll-padding-bottom: 5rem;
     }
   }
 }
