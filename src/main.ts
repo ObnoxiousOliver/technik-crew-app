@@ -22,6 +22,8 @@ import { getFirestore } from 'firebase/firestore'
 import { createPinia } from 'pinia'
 import 'bootstrap-icons/font/bootstrap-icons.scss'
 import './registerServiceWorker'
+import './main'
+import { platform } from './utilities/platform'
 
 // #region Initialize Firebase
 const firebaseConfig = {
@@ -36,6 +38,8 @@ const app = initializeApp(firebaseConfig)
 getAuth(app)
 getFirestore(app)
 // #endregion
+
+console.log(platform())
 
 // #region Create a Pinia instance
 const pinia = createPinia()
