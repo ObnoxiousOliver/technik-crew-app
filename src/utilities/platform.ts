@@ -7,7 +7,7 @@ declare global {
   }
 }
 
-export function platform () {
+export function getPlatform () {
   const electronPlatform = window.electron
     ? ({
         darwin: 'mac',

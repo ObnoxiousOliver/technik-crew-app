@@ -11,17 +11,20 @@ protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { secure: true, standard: true } }
 ])
 
+let mainWindow: BrowserWindow | null
 async function createWindow () {
   // Create the browser window.
   const win = new BrowserWindow({
     width: 800,
     height: 600,
+    minWidth: 350,
+    minHeight: 500,
     backgroundColor: '#000000',
     titleBarStyle: 'hidden',
     titleBarOverlay: {
       color: '#000000',
       symbolColor: '#ffffff',
-      height: 30
+      height: 40
     },
     webPreferences: {
       // Use pluginOptions.nodeIntegration, leave this alone
@@ -33,6 +36,8 @@ async function createWindow () {
       preload: path.join(__dirname, 'preload.js')
     }
   })
+
+  mainWindow = win
 
   win.setMenuBarVisibility(false)
 
@@ -79,6 +84,10 @@ app.on('ready', async () => {
 
   ipcMain.on('platform', (event) => {
     event.returnValue = process.platform
+  })
+
+  ipcMain.on('get-zoom-factor', (event) => {
+    event.returnValue = mainWindow && mainWindow.webContents.getZoomFactor()
   })
 })
 
