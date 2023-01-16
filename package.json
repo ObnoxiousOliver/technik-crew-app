@@ -3,14 +3,19 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "start": "vue-cli-service serve",
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "dev": "vue-cli-service serve",
-    "android:serve": "ionic cap run android -l --external",
     "android:build": "ionic cap build android",
-    "android:open": "ionic cap open android"
+    "android:open": "ionic cap open android",
+    "android:serve": "ionic cap run android -l --external",
+    "electron:build": "vue-cli-service electron:build",
+    "electron:serve": "vue-cli-service electron:serve",
+    "postinstall": "electron-builder install-app-deps",
+    "postuninstall": "electron-builder install-app-deps"
   },
+  "main": "electron/background.js",
   "dependencies": {
     "@capacitor/android": "4.6.1",
     "@capacitor/app": "4.1.1",
@@ -33,8 +38,9 @@
   },
   "devDependencies": {
     "@capacitor/cli": "4.6.1",
-    "@types/node": "^18.11.10",
     "@types/crypto-js": "^4.1.1",
+    "@types/electron-devtools-installer": "^2.2.0",
+    "@types/node": "^18.11.10",
     "@typescript-eslint/eslint-plugin": "^5.45.0",
     "@typescript-eslint/parser": "^5.45.0",
     "@vue/cli-plugin-babel": "^5.0.8",
@@ -45,6 +51,8 @@
     "@vue/cli-service": "^5.0.8",
     "@vue/eslint-config-standard": "^8.0.1",
     "@vue/eslint-config-typescript": "^11.0.2",
+    "electron": "^22.0.2",
+    "electron-devtools-installer": "^3.1.0",
     "eslint": "^8.28.0",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-node": "^11.1.0",
@@ -52,6 +60,8 @@
     "eslint-plugin-vue": "^9.8.0",
     "sass": "^1.56.1",
     "sass-loader": "^13.2.0",
-    "typescript": "^4.9.3"
+    "ts-loader": "~8.2.0",
+    "typescript": "^4.9.3",
+    "vue-cli-plugin-electron-builder": "~2.1.1"
   }
 }
