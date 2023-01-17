@@ -1,6 +1,7 @@
 import { Permission } from '@/model/permissions'
 import { useUser } from '@/stores/user'
 import { setStore } from '@/utilities/auth'
+import { useBreakpoint } from '@/utilities/breakpoint'
 import { getAuth } from 'firebase/auth'
 import { createRouter as _createRouter, createWebHistory, RouteComponent, RouteLocationNormalized, RouteMeta, RouteRecordRaw, RouteRecordRedirectOption, RouterOptions } from 'vue-router'
 
@@ -62,8 +63,10 @@ export function compileRoutes (routes: AbstractRoute[]): RouteRecordRaw[] | null
 
       if (requiresAuth === undefined) {
         compiledRoute.meta.requiresAuth = parent?.meta?.requiresAuth ?? null
+        compiledRoute.meta.requiresNoAuth = parent?.meta?.requiresNoAuth ?? null
       } else {
-        compiledRoute.meta.requiresAuth = requiresAuth
+        compiledRoute.meta.requiresAuth = requiresAuth === true
+        compiledRoute.meta.requiresNoAuth = requiresAuth === false
       }
       if (alias) {
         compiledRoute.alias = alias
@@ -148,14 +151,24 @@ export function createRouter (routes: AbstractRoute[], options: Partial<RouterOp
 
   // Set transition name
   router.beforeEach((to, from) => {
-    if (to.meta.root !== from.meta.root) {
+    let rootTranstion = to.meta.root !== from.meta.root
+
+    if (to.meta.noRootTransition || from.meta.noRootTransition) {
+      rootTranstion = false
+    }
+
+    if (rootTranstion) {
       const fromDepth = routes.findIndex(route => route.name === from.meta.root)
       const toDepth = routes.findIndex(route => route.name === to.meta.root)
 
-      if (toDepth > fromDepth) {
-        to.meta.transitionName = 'linear-slide-left'
+      if (['xs', 'sm'].includes(useBreakpoint().value)) {
+        if (toDepth > fromDepth) {
+          to.meta.transitionName = 'linear-slide-left'
+        } else {
+          to.meta.transitionName = 'linear-slide-right'
+        }
       } else {
-        to.meta.transitionName = 'linear-slide-right'
+        to.meta.transitionName = 'desktop-root-slide'
       }
     } else {
       const fromDepth = from.meta.depth ?? 0

@@ -17,7 +17,11 @@ const { router, back, getLastPageOfRoot } = createRouter([
         name: 'reset-password',
         path: '/reset-password',
         component: () => import('../views/auth/ResetPasswordView.vue'),
-        requiresAuth: null
+        requiresAuth: null,
+        depth: Infinity,
+        meta: {
+          noRootTransition: true
+        }
       },
 
       // Sign up
@@ -204,7 +208,11 @@ const { router, back, getLastPageOfRoot } = createRouter([
     name: '404',
     path: '/:pathMatch(.*)*',
     component: () => import('../views/NotFoundView.vue'),
-    backPath: null
+    depth: Infinity,
+    backPath: null,
+    meta: {
+      noRootTransition: true
+    }
   }
 ])
 
