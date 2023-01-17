@@ -319,17 +319,18 @@ $transition: .5s cubic-bezier(0.19, 1, 0.22, 1);
 
 .desktop-root-slide {
   &-enter-active {
-    // transition: $transition;
+    transition: $transition;
   }
   &-leave-active {
-    // transition: $transition;
+    transition: $transition;
   }
 
   &-enter-from {
-    // opacity: 0;
+    opacity: 0;
+    transform: translateY(10%);
   }
   &-leave-to {
-    // opacity: 0;
+    opacity: 0;
   }
 }
 </style>
