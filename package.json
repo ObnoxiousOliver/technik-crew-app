@@ -23,6 +23,8 @@
     "@capacitor/haptics": "4.1.0",
     "@capacitor/keyboard": "4.1.0",
     "@capacitor/status-bar": "4.1.1",
+    "@tiptap/starter-kit": "^2.0.0-beta.209",
+    "@tiptap/vue-3": "^2.0.0-beta.209",
     "bootstrap-icons": "^1.10.2",
     "core-js": "^3.8.3",
     "crypto-js": "^4.1.1",

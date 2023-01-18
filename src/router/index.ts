@@ -55,7 +55,7 @@ const { router, back, getLastPageOfRoot } = createRouter([
   {
     title: 'Wiki',
     name: 'wiki',
-    component: () => import('../views/DashboardView.vue'),
+    component: () => import('../views/WikiView.vue'),
     requiresAuth: true,
     meta: {
       showNavbar: true
