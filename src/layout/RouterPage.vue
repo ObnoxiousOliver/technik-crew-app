@@ -68,11 +68,19 @@ const props = defineProps({
   buttons: {
     type: Array,
     default: () => []
+  },
+  beforeBack: {
+    type: Function,
+    default: undefined
   }
 })
 
 function back () {
-  _back()
+  if (props.beforeBack) {
+    props.beforeBack(_back)
+  } else {
+    _back()
+  }
 }
 
 onMounted(() => {

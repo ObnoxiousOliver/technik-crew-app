@@ -145,16 +145,16 @@ body {
   scroll-behavior: smooth;
 }
 
-::-webkit-scrollbar {
-  width: 1rem;
-  height: 1rem;
-}
-::-webkit-scrollbar-thumb {
-  background: r.$text-secondary;
-  border-radius: .5rem;
-  border: transparent solid .45rem;
-  background-clip: padding-box;
-}
+// ::-webkit-scrollbar {
+//   width: 1rem;
+//   height: 1rem;
+// }
+// ::-webkit-scrollbar-thumb {
+//   background: r.$text-secondary;
+//   border-radius: .5rem;
+//   border: transparent solid .45rem;
+//   background-clip: padding-box;
+// }
 
 .window-content {
   flex: 1 1 auto;

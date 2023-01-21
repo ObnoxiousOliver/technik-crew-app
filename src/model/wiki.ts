@@ -1,6 +1,6 @@
 import { useUser } from '@/stores/user'
 import { JSONContent } from '@tiptap/vue-3'
-import { addDoc, collection, doc, getDoc, getDocs, getFirestore, query } from 'firebase/firestore'
+import { addDoc, collection, doc, getDoc, getDocs, getFirestore, query, setDoc } from 'firebase/firestore'
 import { HistoryState } from './history'
 
 export interface WikiPageDB {
@@ -70,6 +70,24 @@ export class WikiPage {
     const db = getFirestore()
     const querySnapshot = await getDocs(query(collection(db, 'wiki', this.id, 'history')))
     return querySnapshot.docs.map(x => new HistoryState<unknown>(x.data()))
+  }
+
+  async setContent (content: JSONContent) {
+    this.page.content = content
+    await this.save()
+  }
+
+  async save () {
+    if (!this.id) {
+      throw new Error('Cannot save a wiki page without an id')
+    }
+
+    const db = getFirestore()
+    await setDoc(doc(db, 'wiki', this.id), this.toDB())
+
+    await this.recordHistory({
+      description: 'Seite gespeichert'
+    })
   }
 
   static async create (options: Partial<WikiPageDB>): Promise<WikiPage> {
