@@ -59,7 +59,29 @@ const { router, back, getLastPageOfRoot } = createRouter([
     requiresAuth: true,
     meta: {
       showNavbar: true
-    }
+    },
+
+    children: [
+      {
+        name: 'wiki-page',
+        pathName: '/:id',
+        component: () => import('../views/WikiPageView.vue'),
+
+        children: [
+          {
+            name: 'wiki-page-edit',
+            pathName: '/edit',
+            component: () => import('../views/WikiPageEditView.vue')
+          }
+        ]
+      },
+      {
+        title: 'Neue Seite',
+        name: 'wiki-page-new',
+        pathName: '/new',
+        component: () => import('../views/WikiPageNewView.vue')
+      }
+    ]
   },
 
   // Event

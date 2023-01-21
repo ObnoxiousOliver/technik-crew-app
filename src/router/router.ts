@@ -49,7 +49,7 @@ export function compileRoutes (routes: AbstractRoute[]): RouteRecordRaw[] | null
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const compiledRoute: any = {
         name,
-        path: path ?? ((parentPath ?? '') + '/' + (pathName ?? name)),
+        path: path ?? ((parentPath ?? '') + ((pathName ?? name).startsWith('/') ? '' : '/') + (pathName ?? name)),
         component,
         meta: {
           title: title ?? parent?.meta?.title ?? undefined,
@@ -77,7 +77,7 @@ export function compileRoutes (routes: AbstractRoute[]): RouteRecordRaw[] | null
 
       compiledRoutes.push(compiledRoute)
       if (children) {
-        compiledRoutes.push(...getRoutes(children, route.path, compiledRoute))
+        compiledRoutes.push(...getRoutes(children, compiledRoute.path, compiledRoute))
       }
     }
 
@@ -86,12 +86,20 @@ export function compileRoutes (routes: AbstractRoute[]): RouteRecordRaw[] | null
 }
 
 export function createRouter (routes: AbstractRoute[], options: Partial<RouterOptions> = {}) {
+  const compiledRoutes = compileRoutes(routes)
   const router = _createRouter({
     history: options.history ?? createWebHistory(process.env.BASE_URL),
-    routes: compileRoutes(routes) ?? []
+    routes: compiledRoutes ?? []
   })
 
-  console.log('[Router]', 'Routes compiled', router.getRoutes())
+  console.group('[Router]', 'compiled routes')
+  console.table(compiledRoutes?.map(route => ({
+    name: route.name,
+    path: route.path,
+    meta: '>>>',
+    ...route.meta
+  })))
+  console.groupEnd()
 
   router.beforeEach(async (to, from, next) => {
     if (to.matched.some(record => record.meta.requiresAuth)) {
@@ -162,7 +170,7 @@ export function createRouter (routes: AbstractRoute[], options: Partial<RouterOp
       const toDepth = routes.findIndex(route => route.name === to.meta.root)
 
       if (['xs', 'sm'].includes(useBreakpoint().value)) {
-        if (toDepth > fromDepth) {
+        if (toDepth >= fromDepth) {
           to.meta.transitionName = 'linear-slide-left'
         } else {
           to.meta.transitionName = 'linear-slide-right'
@@ -173,7 +181,7 @@ export function createRouter (routes: AbstractRoute[], options: Partial<RouterOp
     } else {
       const fromDepth = from.meta.depth ?? 0
       const toDepth = to.meta.depth ?? 0
-      if (toDepth > fromDepth) {
+      if (toDepth >= fromDepth) {
         to.meta.transitionName = 'slide-left'
       } else {
         to.meta.transitionName = 'slide-right'
@@ -211,6 +219,7 @@ export function createRouter (routes: AbstractRoute[], options: Partial<RouterOp
     }
     const backPath = fallbackPath ?? metaBackPath ?? '/'
 
+    console.log('[Router]', 'Back to', backPath)
     if (history.state?.back === backPath || metaBackPath === null) {
       router.back()
     } else {

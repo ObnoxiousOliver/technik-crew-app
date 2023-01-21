@@ -39,11 +39,11 @@
       }]"
       v-slot="{ Component }"
     >
-        <template v-if="Component">
-          <Transition :name="route.meta.transitionName">
-            <component :is="Component" />
-          </Transition>
-        </template>
+      <template v-if="Component">
+        <Transition :name="route.meta.transitionName">
+          <component :is="Component" />
+        </Transition>
+      </template>
     </RouterView>
   </div>
 

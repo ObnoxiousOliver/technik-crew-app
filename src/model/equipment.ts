@@ -235,7 +235,7 @@ export class Equipment {
 
     const db = getFirestore()
     const querySnapshot = await getDocs(query(collection(db, 'equipment', this.id, 'history')))
-    return querySnapshot.docs.map(x => new HistoryState<EquipmentDB>(x.data()))
+    return querySnapshot.docs.map(x => new HistoryState<unknown>(x.data()))
   }
 
   async setName (name: string) {

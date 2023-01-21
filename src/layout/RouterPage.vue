@@ -7,20 +7,33 @@
     }]"
   >
     <nav v-if="props.navigation" class="page__navigation">
-      <button
+      <Btn
+        class="page__back-btn"
         @click="back"
         aria-label="Zurück"
-        class="page__back-btn"
-        v-wave
       >
         <i class="bi-arrow-left" />
-      </button>
+      </Btn>
       <span
         v-if="$slots.title"
         class="page__navigation__title"
       >
         <slot name="title" />
       </span>
+      <Btn
+        v-for="(button, i) in buttons"
+        :key="i"
+        @click="button.onClick"
+      >
+        <i :class="button.icon" />
+      </Btn>
+      <Btn
+        class="page__add-btn"
+        v-if="props.addBtn"
+        @click="props.addBtn"
+      >
+        <i class="bi-plus-lg" />
+      </Btn>
     </nav>
     <main ref="scroller" class="page__scroller scroller-padding">
       <h2
@@ -34,16 +47,10 @@
       </h2>
       <slot />
     </main>
-    <AddButton
-      class="page__add-btn"
-      v-if="props.addBtn"
-      @click="props.addBtn"
-    />
   </div>
 </template>
 
 <script lang="ts" setup>
-import AddButton from '@/components/AddButton.vue'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { back as _back } from '@/router'
 
@@ -57,6 +64,10 @@ const props = defineProps({
   addBtn: {
     type: Function,
     default: undefined
+  },
+  buttons: {
+    type: Array,
+    default: () => []
   }
 })
 
@@ -97,7 +108,7 @@ function onScroll () {
       }
       &__title > div {
         opacity: 0;
-        transform: translate(1.5rem, -2.6rem)scale(.6666666667);
+        transform: translate(2rem, -2.6rem)scale(.6666666667);
       }
     }
   }
@@ -152,8 +163,18 @@ function onScroll () {
     align-items: center;
     height: 4rem;
     background: r.$bg-primary;
+    padding: 0 .5rem;
+
+    :deep(.btn) {
+      flex: 0 0 auto;
+      background: none !important;
+      padding: 0;
+      width: 3rem;
+      height: 3rem;
+    }
 
     &__title {
+      flex: 1 1 auto;
       font-weight: 600;
       text-transform: uppercase;
       font-size: 1rem;
@@ -163,7 +184,7 @@ function onScroll () {
       padding-right: 1.5rem;
       opacity: 0;
       transform-origin: 0 0;
-      transform: translate(-1.5rem, 2.6rem)scale(1.5);
+      transform: translate(-2rem, 2.6rem)scale(1.5);
 
       transition: transform .5s;
       transition-timing-function: cubic-bezier(0.19, 1, 0.22, 1);
@@ -177,22 +198,11 @@ function onScroll () {
   }
 
   &__back-btn {
-    flex: 0 0 auto;
-    background: none;
-    border: none;
-    font: inherit;
-    color: inherit;
-    cursor: pointer;
-    text-align: left;
-    padding-left: 1.5rem;
-    height: 100%;
-    width: 3rem;
+
   }
 
   &__add-btn {
-    position: absolute;
-    bottom: 1.5rem;
-    right: 1.5rem;
+
   }
 }
 </style>

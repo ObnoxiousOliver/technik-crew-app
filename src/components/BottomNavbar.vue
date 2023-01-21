@@ -119,6 +119,7 @@ onMounted(() => {
         transform: translate(-50%, -50%);
         background: r.$text-primary;
         border-radius: r.$radius;
+        box-shadow: white 0 0 5rem;
       }
     }
   }
