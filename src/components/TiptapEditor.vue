@@ -6,12 +6,8 @@
 <script lang="ts" setup>
 import EditorPanel from '@/components/EditorPanel.vue'
 import { useEditor, EditorContent } from '@tiptap/vue-3'
-import StarterKit from '@tiptap/starter-kit'
 import { onMounted } from 'vue'
-import { ListItem } from '@tiptap/extension-list-item'
-import { Underline } from '@tiptap/extension-underline'
-import { Subscript } from '@tiptap/extension-subscript'
-import { Superscript } from '@tiptap/extension-superscript'
+import { schema } from '../model/tiptap'
 
 const props = defineProps({
   modelValue: {
@@ -22,20 +18,7 @@ const emit = defineEmits(['update:modelValue'])
 
 const editor = useEditor({
   content: props.modelValue ?? '',
-  extensions: [
-    StarterKit.configure({
-      hardBreak: false,
-      heading: {
-        levels: [1, 2, 3]
-      },
-      horizontalRule: false,
-      blockquote: false
-    }),
-    ListItem,
-    Underline,
-    Subscript,
-    Superscript
-  ]
+  extensions: schema
 })
 
 function itemClick (name: string) {

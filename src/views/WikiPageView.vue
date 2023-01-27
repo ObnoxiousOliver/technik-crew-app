@@ -9,7 +9,10 @@
     }
   ]">
     <template #title>
-      <i :class="page?.icon || 'bi-file-earmark-text'" />
+      <span v-if="page?.icon">
+        {{ page?.icon }}
+      </span>
+      <i v-else class="bi-file-earmark-text" />
       {{ page?.title }}
     </template>
 
@@ -27,8 +30,8 @@
 </template>
 
 <script lang="ts" setup>
+import { schema } from '@/model/tiptap'
 import { WikiPage } from '@/model/wiki'
-import StarterKit from '@tiptap/starter-kit'
 import { generateHTML } from '@tiptap/vue-3'
 import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -39,9 +42,7 @@ const page = ref<WikiPage>()
 
 const content = computed(() => {
   if (!page.value?.content) return null
-  return generateHTML(page.value?.content, [
-    StarterKit
-  ])
+  return generateHTML(page.value?.content, schema)
 })
 
 WikiPage.get(route.params.id)
@@ -54,6 +55,8 @@ WikiPage.get(route.params.id)
 @use '../scss' as r;
 
 .content {
+  word-break: break-word;
+
   &--placeholder {
     color: r.$text-secondary;
   }

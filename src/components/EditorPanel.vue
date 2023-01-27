@@ -72,9 +72,11 @@ const buttons = [
 @use '../scss' as r;
 
 .editor-panel {
+  z-index: 1;
   overflow: auto hidden;
   border-radius: r.$radius r.$radius 0 0;
   background-color: r.$bg-secondary;
+  box-shadow: r.$bg-primary 0 calc(-1 * r.$radius) 0;
   display: flex;
 
   list-style-type: none;

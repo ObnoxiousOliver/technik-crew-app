@@ -40,7 +40,10 @@
         }"
       >
         <div class="page-grid__item__icon">
-          <i :class="page.icon || 'bi-file-earmark-text'" />
+          <span v-if="page.icon">
+            {{ page.icon }}
+          </span>
+          <i v-else class="bi-file-earmark-text" />
         </div>
         <div class="page-grid__item__title">
           {{ page.title }}
@@ -65,8 +68,6 @@
 
 <script lang="ts" setup>
 import UserPage from '@/layout/UserPage.vue'
-import SettingsList from '@/components/SettingsList.vue'
-import SettinsListLink from '@/components/SettingsListLink.vue'
 import { onMounted, ref } from 'vue'
 import { WikiPage, WikiPageDB } from '../model/wiki'
 import { useRouter } from 'vue-router'

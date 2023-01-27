@@ -12,7 +12,7 @@
       Emoji auswählen
     </template>
 
-    <EmojiPicker theme="dark" :native="true" />
+    <EmojiPicker theme="dark" :native="false" />
 
     <template #buttons>
       <ActionSheetButton class="danger">
@@ -64,6 +64,28 @@ const show = ref(false)
     .v3-body {
       .v3-body-inner {
         overflow: visible;
+
+        .v3-group .v3-emojis button {
+          border-radius: r.$radius;
+          transition: .2s;
+
+          &:hover {
+            background: lighten(r.$bg-secondary, 5);
+          }
+
+          &:focus-visible {
+            outline: none;
+            box-shadow: r.$focus;
+          }
+
+          img {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            max-width: 3rem;
+            max-height: 3rem;
+          }
+        }
       }
 
       .v3-group h5.v3-sticky {

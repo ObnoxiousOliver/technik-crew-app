@@ -8,13 +8,16 @@
     }
   ]">
     <template #title>
-      <i :class="page?.icon || 'bi-file-earmark-text'" />
+      <span v-if="page?.icon">
+        {{ page?.icon }}
+      </span>
+      <i v-else class="bi-file-earmark-text" />
       {{ page?.title }}
     </template>
 
     <Spinner v-if="loading" />
 
-    <div v-else>
+    <div class="wiki-page-edit__editor" v-else>
       <TiptapEditor v-model="content" />
     </div>
 
@@ -29,8 +32,8 @@
         <ActionSheetButton @click="back()" class="danger">
           <i class="bi-trash"/>Verwerfen
         </ActionSheetButton>
-        <ActionSheetButton>
-          <i class="bi-check-lg" @click="save()" />Speichern
+        <ActionSheetButton @click="save()">
+          <i class="bi-check-lg" />Speichern
         </ActionSheetButton>
         <ActionSheetButton>
           <i class="bi-x-lg" />Abbrechen
@@ -72,3 +75,21 @@ function beforeBack (back: () => void) {
   showConfirmBackSheet.value = true
 }
 </script>
+
+<style lang="scss" scoped>
+.wiki-page-edit {
+  &__editor {
+    :deep(.editor-panel) {
+      position: sticky;
+      top: 0;
+    }
+
+    :deep(.editor) {
+      .ProseMirror {
+        min-height: calc(100vh - 20rem);
+        padding-bottom: 10rem;
+      }
+    }
+  }
+}
+</style>
