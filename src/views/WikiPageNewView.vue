@@ -5,9 +5,9 @@
     </template>
 
     <FormContainer @submit.prevent="submit" :disabled="submitting">
-      <FormGroup>
+      <FormGroup inline>
+        <EmojiPicker v-model="icon" />
         <FloatingLabelInput label="Titel" v-model="title" />
-        <FloatingLabelInput label="Icon" v-model="icon" />
       </FormGroup>
       <Btn type="submit">
         Seite erstellen
@@ -17,6 +17,7 @@
 </template>
 
 <script lang="ts" setup>
+import EmojiPicker from '@/components/EmojiPicker.vue'
 import FloatingLabelInput from '@/components/FloatingLabelInput.vue'
 import { WikiPage } from '@/model/wiki'
 import { ref } from 'vue'
@@ -33,7 +34,7 @@ async function submit () {
 
   const page = await WikiPage.create({
     title: title.value,
-    icon: icon.value
+    icon: 'bi-' + icon.value
   })
 
   router.push({

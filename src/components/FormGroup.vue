@@ -23,15 +23,15 @@ const props = defineProps<{
     align-items: center;
     gap: 1rem;
 
-    & > :deep(.input), & > ::deep(.dropdown) {
-      flex: 1 1 auto;
-      width: 0;
-    }
-
-    :deep(label), & > :deep(.btn), & > :deep(.fill-width) {
-      flex: 1 1 auto;
-      width: 0;
-      overflow: hidden;
+    & > :deep(.input),
+    & > :deep(.dropdown),
+    & > :deep(label),
+    & > :deep(.btn),
+    & > :deep(.fill-width) {
+      &:not(.no-grow) {
+        flex: 1 1 auto;
+        width: 0;
+      }
     }
   }
 

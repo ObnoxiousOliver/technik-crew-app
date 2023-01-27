@@ -85,6 +85,15 @@ h1, h2, h3, h4, h5, h6 {
   color: r.$success;
 }
 
+.emoji {
+  display: inline-flex;
+  font-style: normal;
+  height: 1em;
+  width: 1em;
+  justify-content: center;
+  align-items: center;
+}
+
 .table {
   width: 100%;
   word-break: break-word;

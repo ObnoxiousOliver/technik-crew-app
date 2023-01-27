@@ -4,6 +4,7 @@
       <div
         v-if="show"
         @keydown.esc="show = false"
+        v-bind="$attrs"
         :class="['action-sheet' , {
           'action-sheet--no-content': !$slots.default,
           'action-sheet--scrollable': scrollable
@@ -155,6 +156,14 @@ function onPointerDown (e: PointerEvent) {
   background: rgba(0, 0, 0, .5);
   backdrop-filter: blur(.5rem);
 
+  &.expand-max {
+    .action-sheet {
+      &__box > div {
+        height: 80vh;
+      }
+    }
+  }
+
   &__box {
     position: absolute;
     inset: auto .5rem .5rem;
@@ -190,6 +199,7 @@ function onPointerDown (e: PointerEvent) {
   }
 
   &__content {
+    position: relative;
     flex: 1 1 auto;
     padding: 0 1.5rem 1.5rem;
     overflow: auto;
