@@ -40,8 +40,13 @@
         }"
       >
         <div class="page-grid__item__icon">
-          <span v-if="page.icon">
-            {{ page.icon }}
+          <span class="page-grid__item__icon__emoji" v-if="page.icon">
+            <span class="page-grid__item__icon__emoji__glow">
+              {{ page.icon }}
+            </span>
+            <span class="page-grid__item__icon__emoji__symbol">
+              {{ page.icon }}
+            </span>
           </span>
           <i v-else class="bi-file-earmark-text" />
         </div>
@@ -109,6 +114,22 @@ onMounted(async () => {
 
     &__icon {
       font-size: 2rem;
+
+      &__emoji {
+        position: relative;
+
+        &__glow {
+          position: absolute;
+          top: .5rem;
+          opacity: 0.3;
+          filter: blur(1rem);
+        }
+
+        &__symbol {
+          position: relative;
+          z-index: 1;
+        }
+      }
     }
 
     &__title {
