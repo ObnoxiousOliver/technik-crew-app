@@ -1,4 +1,4 @@
-import { collection, doc, getDoc, getDocs, getFirestore, query } from 'firebase/firestore'
+import { addDoc, collection, doc, getDoc, getDocs, getFirestore, limit, query, setDoc, where } from 'firebase/firestore'
 
 export type EventColors = 'gray' | 'red' | 'orange' | 'yellow' | 'green' | 'cyan' | 'blue' | 'purple' | 'pink'
 
@@ -8,11 +8,12 @@ export interface EventDB {
   wholeDay: boolean,
   startDate: number,
   endDate: number | null,
-  color: EventColors
+  color: EventColors,
+  months: string[] // "YYYY-MM"
 }
 
 export default class Event {
-  id: string
+  id: string | null = null
   private event: EventDB
 
   get name (): string {
@@ -63,7 +64,11 @@ export default class Event {
     this.event.color = color
   }
 
-  constructor (id: string, options: Partial<EventDB> = {}) {
+  get months (): string[] {
+    return this.event.months
+  }
+
+  constructor (id: string | null, options: Partial<EventDB> = {}) {
     this.id = id
 
     this.event = {
@@ -72,12 +77,95 @@ export default class Event {
       wholeDay: options.wholeDay ?? true,
       startDate: options.startDate ?? new Date().getTime(),
       endDate: options.endDate ?? null,
-      color: options.color ?? 'gray'
+      color: options.color ?? 'gray',
+      months: options.months ?? Event.getOverlappingMonths(options.startDate ?? new Date().getTime(), options.endDate ?? null)
     }
+  }
+
+  async save () {
+    if (!this.id) {
+      throw new Error('Cannot save event without id')
+    }
+
+    const db = getFirestore()
+
+    this.event.months = Event.getOverlappingMonths(this.event.startDate, this.event.endDate)
+
+    await setDoc(doc(db, 'events', this.id), this.toDB())
   }
 
   toDB (): EventDB {
     return this.event
+  }
+
+  static getOverlappingMonths (startDate: number, endDate: number | null): string[] {
+    const months: string[] = []
+
+    const start = new Date(startDate)
+    const end = endDate ? new Date(endDate) : new Date(startDate)
+
+    // set start date to the first day of the week
+    start.setDate(start.getDate() - start.getDay())
+    start.setHours(0, 0, 0, 0)
+
+    // set end date to the last day of the week
+    end.setDate(end.getDate() + (6 - end.getDay()))
+    end.setHours(23, 59, 59, 999)
+
+    console.log(end)
+
+    // console.log(`Start: ${start.toDateString()}`)
+    // console.log(`End: ${end.toDateString()}`)
+
+    // Gets the number of months between the start and end date
+    function totalMonths (start: Date, end: Date) {
+      return (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() + 1 - start.getMonth())
+    }
+
+    // Pushes all months between the start and end date
+    for (let i = 0; i < totalMonths(start, end); i++) {
+      const month = new Date(start.getFullYear(), start.getMonth() + i, 1)
+      months.push(`${month.getFullYear()}-${(month.getMonth() + 1).toString().padStart(2, '0')}`)
+    }
+
+    return months
+  }
+
+  static async getMonth (date: Date) {
+    const db = getFirestore()
+
+    const querySnapshot = await getDocs(query(
+      collection(db, 'events'),
+      where('months', 'array-contains', `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`)
+    ))
+
+    console.log(`Fetched ${querySnapshot.size} events for ${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`)
+
+    const events: Event[] = []
+    querySnapshot.forEach((doc) => {
+      events.push(new Event(doc.id, doc.data() as EventDB))
+    })
+
+    return events
+  }
+
+  static async getUpcoming (n: number) {
+    const db = getFirestore()
+
+    const querySnapshot = await getDocs(query(
+      collection(db, 'events'),
+      where('startDate', '>=', Date.now()),
+      limit(n)
+    ))
+
+    const events: Event[] = []
+    querySnapshot.forEach((doc) => {
+      events.push(new Event(doc.id, doc.data() as EventDB))
+    })
+
+    events.sort((a, b) => a.startDate - b.startDate)
+
+    return events
   }
 
   static async get (id?: string) {
@@ -97,5 +185,12 @@ export default class Event {
       })
       return events
     }
+  }
+
+  static async create (options: Partial<EventDB> = {}) {
+    const db = getFirestore()
+    const event = new Event(null, options)
+    const doc = await addDoc(collection(db, 'events'), event.toDB())
+    return new Event(doc.id, event.toDB())
   }
 }

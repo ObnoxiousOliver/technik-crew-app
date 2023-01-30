@@ -100,6 +100,12 @@ const { router, back, getLastPageOfRoot } = createRouter([
         name: 'event-new',
         pathName: 'new',
         component: () => import('../views/NewEventView.vue')
+      },
+      {
+        title: 'Termin',
+        name: 'event',
+        pathName: '/:id',
+        component: () => import('../views/EventView.vue')
       }
     ]
   },

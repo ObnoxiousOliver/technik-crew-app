@@ -14,23 +14,21 @@
 
 <script lang="ts" setup>
 import Event from '@/model/event'
-import { addDoc, collection, getFirestore } from '@firebase/firestore'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useNewEventStore } from '../stores/newEvent'
 
-const db = getFirestore()
 const router = useRouter()
 const store = useNewEventStore()
 
 async function submit () {
-  await addDoc(collection(db, 'events'), new Event({
+  await Event.create({
     name: title.value,
     description: desc.value,
     startDate: new Date(startDate.value).getTime(),
-    endDate: startDate.value === endDate.value ? null : new Date(endDate.value).getTime(),
-    wholeDay: wholeDay.value
-  }).toDB())
+    endDate: new Date(endDate.value).getTime(),
+    wholeDay: endDate.value
+  })
 
   router.push('/events')
   store.reset()
