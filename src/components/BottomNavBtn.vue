@@ -1,13 +1,27 @@
 <template>
-  <RouterLink class="nav-btn">
-    <i :class="`nav-btn__icon bi-${props.icon}`" />
-  </RouterLink>
+  <button @click="click" class="nav-btn">
+    <i :class="`nav-btn__icon bi-${icon}`" />
+  </button>
 </template>
 
 <script lang="ts" setup>
+import { getLastPageOfRoot } from '@/router'
+import { useRoute, useRouter } from 'vue-router'
+
+const route = useRoute()
+const router = useRouter()
 const props = defineProps({
-  icon: String
+  icon: String,
+  to: String
 })
+
+function click () {
+  if (route.meta.root === props.to) {
+    router.replace({ name: props.to })
+  } else {
+    router.push(getLastPageOfRoot(props.to))
+  }
+}
 </script>
 
 <style lang="scss" scoped>
@@ -17,8 +31,9 @@ const props = defineProps({
   width: 0;
   flex: 1 1 auto;
   position: relative;
-  display: grid;
-  place-items: center;
+  font: inherit;
+  border: none;
+  background: none;
   color: inherit;
 }
 </style>

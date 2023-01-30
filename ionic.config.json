@@ -1,0 +1,7 @@
+{
+  "name": "Technik Crew App",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue"
+}

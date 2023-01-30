@@ -1,45 +1,15 @@
 <template>
-  <RouterView :class="['router', {
-    'router--has-navbar': route.meta.showNavbar,
-  }]" v-slot="{ Component }">
-      <template v-if="Component">
-        <Transition :name="route.meta.transitionName">
-          <component :is="Component"></component>
-        </Transition>
-      </template>
-  </RouterView>
-
-  <Transition name="mask">
-    <div v-if="route.meta.showNavbar" class="mask" />
-  </Transition>
-  <Transition name="navbar">
-    <Navbar v-if="route.meta.showNavbar" :buttons="[
-      { to: { name: 'wiki' }, icon: 'compass' },
-      { to: { name: 'events' }, icon: 'calendar-week' },
-      { to: { name: 'dashboard' }, icon: 'house-door' },
-      { to: { name: 'equipment' }, icon: 'speaker' },
-      { to: { name: 'settings' }, icon: 'gear' },
-    ]">
-      <NavBtn to="/wiki" icon="compass" />
-      <NavBtn to="/events" icon="calendar-week" />
-      <NavBtn to="/dashboard" icon="house-door" />
-      <NavBtn to="/equipment" icon="speaker" />
-      <NavBtn to="/settings" icon="gear" />
-    </Navbar>
-  </Transition>
-
-  <div id="layer"></div>
+  <AppLayout />
 </template>
 
 <script lang="ts" setup>
-import Navbar from './components/BottomNavbar.vue'
-import NavBtn from './components/BottomNavBtn.vue'
+import AppLayout from './layout/AppLayout.vue'
 import { deleteUser, getAuth, onAuthStateChanged } from '@firebase/auth'
 import { doc, getDoc, getFirestore } from '@firebase/firestore'
 import { createPinia } from 'pinia'
 import { onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { signOut } from './utilities/auth'
+import { setStore, signOut } from './utilities/auth'
 
 const route = useRoute()
 const router = useRouter()
@@ -49,13 +19,20 @@ const auth = getAuth()
 
 onMounted(() => {
   onAuthStateChanged(auth, async (user) => {
-    if (!user && route.meta.requireAuth) {
-      router.push({
-        path: '/login',
-        query: { redirect: route.fullPath }
-      })
+    if (!user) {
+      localStorage.removeItem('last_auth')
+      localStorage.removeItem('last_user')
+
+      if (route.meta.requiresAuth) {
+        router.replace({
+          path: '/login',
+          query: { redirect: route.fullPath }
+        })
+      }
     }
     if (user) {
+      localStorage.setItem('last_auth', 'true')
+      setStore()
       if (!(await getDoc(doc(db, 'usernames', user.uid))).exists()) {
         router.push('/')
         // Delete user if user doesn't exist in database
@@ -78,40 +55,6 @@ watch(pinia.state, () => {
 @use './scss' as r;
 
 @import url('https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
-*, ::before, ::after {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
-}
-
-:root, body {
-}
-
-body {
-  background: r.$bg-primary;
-  color: r.$text-primary;
-  font-family: Rubik, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  user-select: none;
-  overflow: hidden;
-}
-
-#app {
-  position: fixed;
-
-  inset: 0 0 env(keyboard-inset-height, 0) 0;
-
-  overflow: hidden;
-  max-width: 30rem;
-  margin: 0 auto;
-}
-
-#layer {
-  position: absolute;
-  inset: 0;
-  z-index: 9999;
-  pointer-events: none;
-}
 
 p {
   margin-bottom: 1rem;
@@ -140,6 +83,15 @@ h1, h2, h3, h4, h5, h6 {
 }
 .success {
   color: r.$success;
+}
+
+.emoji {
+  display: inline-flex;
+  font-style: normal;
+  height: 1em;
+  width: 1em;
+  justify-content: center;
+  align-items: center;
 }
 
 .table {
@@ -195,112 +147,6 @@ a {
     &::before {
       box-shadow: r.$focus;
     }
-  }
-}
-
-.scroller-padding {
-  padding: 0 1.5rem 1rem;
-}
-
-.router {
-  &--has-navbar {
-    .scroller-padding {
-      padding-bottom: 5rem;
-    }
-  }
-}
-
-$transition: .5s cubic-bezier(0.19, 1, 0.22, 1);
-.mask {
-  z-index: 99;
-  position: absolute;
-  inset: auto 0 0;
-  height: 5rem;
-  background: linear-gradient(transparent, rgba(r.$bg-primary, 0.3), rgba(r.$bg-primary, 0.66), rgba(r.$bg-primary, 0.9), r.$bg-primary);
-  pointer-events: none;
-
-  &-enter-active,
-  &-leave-active {
-    transition: $transition;
-  }
-
-  &-enter-from,
-  &-leave-to {
-    opacity: 0;
-  }
-}
-
-.navbar {
-  &-enter-active,
-  &-leave-active {
-    transition: $transition;
-  }
-
-  &-enter-from,
-  &-leave-to {
-    transform: translateY(5rem);
-  }
-}
-
-.slide-left {
-  &-enter-active {
-    z-index: 1;
-    transition: $transition;
-  }
-  &-enter-from {
-    transform: translateX(100%);
-  }
-  &-leave-active {
-    transition: $transition;
-  }
-  &-leave-to {
-    transform: translateX(-20%);
-  }
-}
-
-.slide-right {
-  &-leave-active {
-    z-index: 1;
-    transition: $transition;
-  }
-  &-leave-to {
-    transform: translateX(100%);
-  }
-  &-enter-active {
-    transition: $transition;
-  }
-  &-enter-from {
-    transform: translateX(-20%);
-  }
-}
-.linear-slide-left {
-  &-enter-active {
-    z-index: 1;
-    transition: $transition;
-  }
-  &-enter-from {
-    transform: translateX(100%);
-  }
-  &-leave-active {
-    transition: $transition;
-  }
-  &-leave-to {
-    transform: translateX(-100%);
-  }
-}
-.linear-slide-right {
-  &-enter-active {
-    z-index: 1;
-    transition: $transition;
-  }
-  &-enter-from {
-    transform: translateX(-100%);
-  }
-  &-leave-active {
-    transition: $transition;
-  }
-  &-leave-to {
-    transform: translateX(100%);
   }
 }
 </style>

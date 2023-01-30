@@ -220,7 +220,6 @@ function expandSearch (value?: boolean, push = true) {
 .user-page {
   height: 100%;
   position: relative;
-  // overflow: hidden;
   margin: 0 -1.5rem;
   padding: 0 1.5rem;
 

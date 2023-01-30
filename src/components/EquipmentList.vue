@@ -91,10 +91,6 @@ const listedEquipment = computed(() => {
     return reverse.value ? list.reverse() : list
   }
   return []
-
-  function sort (a, b) {
-    // TODO: Sorting
-  }
 })
 
 function itemClick (item: {

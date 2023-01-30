@@ -91,10 +91,6 @@ function getDate (dateNumber: number, wholeDay: boolean): string {
 
   return dateString
 }
-
-function log (...args) {
-  console.log(...args)
-}
 </script>
 
 <style lang="scss" scoped>

@@ -1,387 +1,242 @@
 import { Permission } from '@/model/permissions'
-import { useUser } from '@/stores/user'
-import { setStore } from '@/utilities/auth'
-import { getAuth, onAuthStateChanged } from 'firebase/auth'
-import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
+import { createRouter } from './router'
 
-const routes: Array<RouteRecordRaw> = [
-  // Login
+const { router, back, getLastPageOfRoot } = createRouter([
+  // Auth
   {
+    title: 'Anmelden',
     name: 'login',
-    path: '/login',
     component: () => import('../views/auth/LoginView.vue'),
-    meta: {
-      requiresNoAuth: true,
-      title: 'Anmelden',
-      depth: 0
-    }
+    requiresAuth: false,
+    depth: -1,
+
+    children: [
+      // Reset password
+      {
+        title: 'Passwort zurücksetzen',
+        name: 'reset-password',
+        path: '/reset-password',
+        component: () => import('../views/auth/ResetPasswordView.vue'),
+        requiresAuth: null,
+        depth: Infinity,
+        meta: {
+          noRootTransition: true
+        }
+      },
+
+      // Sign up
+      {
+        title: 'Registrieren',
+        name: 'sign-up-code',
+        alias: '/sign-up',
+        path: '/sign-up/code/:code?',
+        component: () => import('../views/auth/signUp/EnterCodeView.vue'),
+
+        children: [
+          {
+            name: 'sign-up-email',
+            path: '/sign-up/email',
+            component: () => import('../views/auth/signUp/EnterEmailView.vue'),
+
+            children: [
+              {
+                name: 'sign-up-password',
+                path: '/sign-up/password',
+                component: () => import('../views/auth/signUp/EnterPasswordView.vue')
+              }
+            ]
+          }
+        ]
+      }
+    ]
   },
 
-  // Sign up
+  // Wiki
   {
-    name: 'sign-up-code',
-    alias: '/sign-up',
-    path: '/sign-up/code/:code?',
-    component: () => import('../views/auth/signUp/EnterCodeView.vue'),
+    title: 'Wiki',
+    name: 'wiki',
+    component: () => import('../views/WikiView.vue'),
+    requiresAuth: true,
     meta: {
-      requiresNoAuth: true,
-      title: 'Registrieren',
-      depth: 1,
-      defaultBackPath: '/login'
-    }
-  },
-  {
-    name: 'sign-up-email',
-    alias: '/sign-up',
-    path: '/sign-up/email',
-    component: () => import('../views/auth/signUp/EnterEmailView.vue'),
-    meta: {
-      requiresNoAuth: true,
-      title: 'Registrieren',
-      depth: 2,
-      defaultBackPath: '/sign-up/code'
-    }
-  },
-  {
-    name: 'sign-up-password',
-    alias: '/sign-up',
-    path: '/sign-up/password',
-    component: () => import('../views/auth/signUp/EnterPasswordView.vue'),
-    meta: {
-      requiresNoAuth: true,
-      title: 'Registrieren',
-      depth: 3,
-      defaultBackPath: '/sign-up/email'
-    }
-  },
+      showNavbar: true
+    },
 
-  // Dashboard
-  {
-    name: 'dashboard',
-    path: '/dashboard',
-    alias: '/',
-    component: () => import('../views/DashboardView.vue'),
-    meta: {
-      requiresAuth: true,
-      title: 'Dashboard',
-      showNavbar: true,
-      depth: 7,
-      linearTransition: true
-    }
+    children: [
+      {
+        name: 'wiki-page',
+        pathName: '/:id',
+        component: () => import('../views/WikiPageView.vue'),
+
+        children: [
+          {
+            name: 'wiki-page-edit',
+            pathName: '/edit',
+            component: () => import('../views/WikiPageEditView.vue')
+          }
+        ]
+      },
+      {
+        title: 'Neue Seite',
+        name: 'wiki-page-new',
+        pathName: '/new',
+        component: () => import('../views/WikiPageNewView.vue')
+      }
+    ]
   },
 
   // Event
   {
+    title: 'Termine',
     name: 'events',
-    path: '/events',
     component: () => import('../views/EventView.vue'),
+    requiresAuth: true,
     meta: {
-      requiresAuth: true,
-      title: 'Termine',
-      showNavbar: true,
-      depth: 6,
-      linearTransition: true
-    }
+      showNavbar: true
+    },
+
+    children: [
+      {
+        title: 'Neuer Termin',
+        name: 'event-new',
+        pathName: 'new',
+        component: () => import('../views/NewEventView.vue')
+      }
+    ]
   },
+
+  // Dashboard
   {
-    name: 'new-event',
-    path: '/events/new',
-    component: () => import('../views/NewEventView.vue'),
+    title: 'Dashboard',
+    name: 'dashboard',
+    alias: '/',
+    component: () => import('../views/DashboardView.vue'),
+    requiresAuth: true,
     meta: {
-      requriesAuth: true,
-      title: 'Neuer Termin',
-      depth: 10,
-      defaultBackPath: '/events',
       showNavbar: true
     }
   },
 
   // Equipment
   {
+    title: 'Equipment',
     name: 'equipment',
     path: '/equipment',
     component: () => import('../views/EquipmentView.vue'),
+    requiresAuth: true,
     meta: {
-      requiresAuth: true,
-      title: 'Equipment',
-      showNavbar: true,
-      depth: 8,
-      linearTransition: true
-    }
-  },
-  {
-    name: 'equipment-add',
-    path: '/equipment/add',
-    component: () => import('../views/EquipmentAddView.vue'),
-    meta: {
-      requiresAuth: true,
-      title: 'Neues Equipment',
-      depth: 10,
-      defaultBackPath: '/equipment',
       showNavbar: true
-    }
-  },
-  {
-    name: 'equipment-details',
-    path: '/equipment/:id',
-    component: () => import('../views/EquipmentDetailsView.vue'),
-    meta: {
-      requiresAuth: true,
-      title: 'Equipment Details',
-      depth: 10,
-      defaultBackPath: '/equipment',
-      showNavbar: true
-    }
-  },
+    },
 
-  // Wiki
-  {
-    name: 'wiki',
-    path: '/wiki',
-    component: () => import('../views/DashboardView.vue'),
-    meta: {
-      requiresAuth: true,
-      title: 'Wiki',
-      showNavbar: true,
-      depth: 5,
-      linearTransition: true
-    }
+    children: [
+      {
+        title: 'Neues Equipment',
+        name: 'equipment-add',
+        pathName: 'add',
+        component: () => import('../views/EquipmentAddView.vue')
+      },
+      {
+        title: 'Equipment Details',
+        name: 'equipment-details',
+        path: '/equipment/:id',
+        component: () => import('../views/EquipmentDetailsView.vue')
+      }
+    ]
   },
 
   // Settings
   {
+    title: 'Einstellungen',
     name: 'settings',
     path: '/settings',
     component: () => import('../views/settings/SettingsView.vue'),
-    meta: {
-      requiresAuth: true,
-      title: 'Einstellungen',
-      depth: 11,
-      defaultBackPath: '/dashboard'
-    }
-  },
+    requiresAuth: true,
+    backPath: '/dashboard',
 
-  // Profile
-  {
-    name: 'profile',
-    path: '/settings/profile',
-    component: () => import('../views/settings/profile/ProfileView.vue'),
-    meta: {
-      requiresAuth: true,
-      title: 'Profil',
-      depth: 100,
-      defaultBackPath: '/settings'
-    }
-  },
-  {
-    name: 'profile-edit',
-    path: '/settings/profile/edit',
-    component: () => import('../views/settings/profile/ProfileEditView.vue'),
-    meta: {
-      requiresAuth: true,
-      title: 'Profil bearbeiten',
-      depth: 101,
-      defaultBackPath: '/settings/profile'
-    }
-  },
-  {
-    name: 'profile-email',
-    path: '/settings/profile/email',
-    component: () => import('../views/settings/profile/ProfileEmailView.vue'),
-    meta: {
-      requiresAuth: true,
-      title: 'E-Mail Adresse ändern',
-      depth: 101,
-      defaultBackPath: '/settings/profile'
-    }
-  },
+    children: [
+      // Profile
+      {
+        title: 'Profil',
+        name: 'profile',
+        path: '/settings/profile',
+        component: () => import('../views/settings/profile/ProfileView.vue'),
 
-  // Reset password
-  {
-    name: 'reset-password',
-    path: '/reset-password',
-    component: () => import('../views/auth/ResetPasswordView.vue'),
-    meta: {
-      title: 'Passwort zurücksetzen',
-      depth: 1000,
-      defaultBackPath: '/settings'
-    }
-  },
-
-  // Who are the admins
-  {
-    name: 'who-are-the-admins',
-    path: '/admin/who',
-    component: () => import('../views/WhoAreTheAdminsView.vue'),
-    meta: {
-      title: 'Passwort zurücksetzen',
-      depth: 1001,
-      defaultBackPath: '/'
-    }
-  },
-
-  // Admin
-  // Tickets
-  {
-    name: 'tickets',
-    path: '/admin/tickets',
-    component: () => import('../views/admin/tickets/TicketsView.vue'),
-    meta: {
-      requiresAuth: true,
-      requiresPermission: 'create_tickets' as Permission,
-      title: 'Tickets',
-      depth: 100,
-      defaultBackPath: '/settings'
-    }
-  },
-  {
-    name: 'ticket-create',
-    path: '/admin/tickets/create',
-    component: () => import('../views/admin/tickets/TicketCreateView.vue'),
-    meta: {
-      requiresAuth: true,
-      requiresPermission: 'create_tickets' as Permission,
-      title: 'Ticket erstellen',
-      depth: 101,
-      defaultBackPath: '/admin/tickets'
-    }
-  },
-  // Users
-  {
-    name: 'users',
-    path: '/admin/users',
-    component: () => import('../views/admin/users/UsersView.vue'),
-    meta: {
-      requiresAuth: true,
-      requiresPermission: 'manage_users' as Permission,
-      title: 'Benutzer verwalten',
-      depth: 100,
-      defaultBackPath: '/settings'
-    }
-  },
-  {
-    name: 'user-manage',
-    path: '/admin/users/:username',
-    component: () => import('../views/admin/users/UserManageView.vue'),
-    meta: {
-      requiresAuth: true,
-      requiresPermission: 'manage_users' as Permission,
-      title: 'Benutzer verwalten',
-      depth: 101,
-      defaultBackPath: '/admin/users'
-    }
-  }
-]
-
-const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
-  routes
-})
-
-router.beforeEach((to, from, next) => {
-  if (to.matched.some(record => record.meta.requiresAuth)) {
-    if (getAuth().currentUser) {
-      next()
-      console.log('[Router]', 'User logged in')
-    } else {
-      onAuthStateChanged(getAuth(), async (user) => {
-        if (user) {
-          try {
-            await setStore()
-          } catch (err) {
-            console.error(err)
+        children: [
+          {
+            title: 'Profil bearbeiten',
+            name: 'profile-edit',
+            path: '/settings/profile/edit',
+            component: () => import('../views/settings/profile/ProfileEditView.vue')
+          },
+          {
+            title: 'E-Mail Adresse ändern',
+            name: 'profile-email',
+            path: '/settings/profile/email',
+            component: () => import('../views/settings/profile/ProfileEmailView.vue')
           }
-          next()
-          console.log('[Router]', 'User logged in')
-        } else {
-          next({
-            path: '/login',
-            query: { redirect: to.fullPath }
-          })
-          console.log('[Router]', 'User not logged in')
-        }
-      })()
+        ]
+      },
+
+      // Admin
+      // Tickets
+      {
+        title: 'Tickets',
+        name: 'tickets',
+        path: '/admin/tickets',
+        component: () => import('../views/admin/tickets/TicketsView.vue'),
+        requiresPermission: Permission.ManageTickets,
+
+        children: [
+          {
+            title: 'Ticket erstellen',
+            name: 'ticket-create',
+            path: '/admin/tickets/create',
+            component: () => import('../views/admin/tickets/TicketCreateView.vue')
+          }
+        ]
+      },
+
+      // Users
+      {
+        title: 'Benutzer verwalten',
+        name: 'users',
+        path: '/admin/users',
+        component: () => import('../views/admin/users/UsersView.vue'),
+        requiresAuth: true,
+        requiresPermission: Permission.ManageUsers,
+
+        children: [
+          {
+            title: 'Benutzer verwalten',
+            name: 'user-manage',
+            path: '/admin/users/:username',
+            component: () => import('../views/admin/users/UserManageView.vue'),
+            requiresAuth: true
+          }
+        ]
+      },
+
+      // Who are the admins
+      {
+        title: 'Wer sind die Admins?',
+        name: 'admins-who',
+        path: '/admin/who',
+        component: () => import('../views/WhoAreTheAdminsView.vue')
+      }
+    ]
+  },
+
+  // 404
+  {
+    name: '404',
+    path: '/:pathMatch(.*)*',
+    component: () => import('../views/NotFoundView.vue'),
+    depth: Infinity,
+    backPath: null,
+    meta: {
+      noRootTransition: true
     }
-  } else if (to.matched.some(record => record.meta.requiresNoAuth)) {
-    if (getAuth().currentUser) {
-      next('/')
-      console.log('[Router]', 'User logged in')
-    } else {
-      onAuthStateChanged(getAuth(), (user) => {
-        if (user) {
-          next('/')
-          console.log('[Router]', 'User logged in')
-        } else {
-          next()
-          console.log('[Router]', 'User not logged in')
-        }
-      })()
-    }
-  } else {
-    next()
   }
-})
-
-router.beforeEach(async (to, from, next) => {
-  if (to.matched.some(record => record.meta.requiresPermission)) {
-    const permission = to.meta.requiresPermission as Permission
-    const user = useUser()
-
-    if (!user.user) {
-      await setStore()
-    }
-
-    if (user.permissions?.is_admin) {
-      next()
-      console.log('[Router]', 'User is admin')
-    } else if (user.permissions?.[permission]) {
-      next()
-      console.log('[Router]', 'User has permission')
-    } else {
-      next(from)
-      console.log('[Router]', 'User has no permission')
-    }
-  } else {
-    next()
-  }
-})
-
-router.beforeEach((to, from) => {
-  let transitionName = to.meta.transition as string | undefined
-
-  const toDepth: number = to.meta.depth as number ?? to.path.split('/').length
-  const fromDepth: number = from.meta.depth as number ?? to.path.split('/').length
-  const depthDiff = fromDepth - toDepth
-
-  if (!transitionName) {
-    transitionName = depthDiff <= 0 ? 'slide-left' : 'slide-right'
-  }
-
-  if (from.meta.linearTransition && to.meta.linearTransition) {
-    transitionName = depthDiff <= 0 ? 'linear-slide-left' : 'linear-slide-right'
-  }
-
-  if (transitionName) {
-    to.meta.transitionName = transitionName
-  }
-})
-
-router.afterEach((to) => {
-  if (to.meta.title) {
-    document.title = to.meta.title as string
-  } else {
-    document.title = 'Technik Crew'
-  }
-})
-
-export function back (fallbackPath?: string) {
-  const route = router.currentRoute.value
-  console.log('[Router]', 'Back', history.state.back, fallbackPath, route.meta.defaultBackPath)
-  if (history.state.back) {
-    router.back()
-  } else {
-    router.replace(fallbackPath ?? route.meta.defaultBackPath ?? '/')
-  }
-}
+])
 
 export default router
+export { back, getLastPageOfRoot }
