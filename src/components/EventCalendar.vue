@@ -172,15 +172,15 @@ function getDate (dateNumber: number, wholeDay: boolean): string {
       cursor: pointer;
     }
 
-    .calendar-gray   { background-color: #4a4a4a; color: white; }
-    .calendar-red    { background-color: #FF7676; }
-    .calendar-orange { background-color: #FFAD61; }
-    .calendar-yellow { background-color: #FCFF6B; }
-    .calendar-green  { background-color: #92FF6B; }
-    .calendar-cyan   { background-color: #7AFFDF; }
-    .calendar-blue   { background-color: #799FFF; }
-    .calendar-purple { background-color: #C275FF; }
-    .calendar-pink   { background-color: #FF6BCD; }
+    .calendar-gray   { background-color: r.$col-gray; color: white; }
+    .calendar-red    { background-color: r.$col-red; }
+    .calendar-orange { background-color: r.$col-orange; }
+    .calendar-yellow { background-color: r.$col-yellow; }
+    .calendar-green  { background-color: r.$col-green; }
+    .calendar-cyan   { background-color: r.$col-cyan; }
+    .calendar-blue   { background-color: r.$col-blue; }
+    .calendar-purple { background-color: r.$col-purple; }
+    .calendar-pink   { background-color: r.$col-pink; }
 
     .toBeContinued {
       border-top-right-radius: 0;

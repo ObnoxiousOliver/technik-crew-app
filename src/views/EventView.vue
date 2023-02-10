@@ -1,11 +1,11 @@
 <template>
   <UserPage>
     <template #title>
-      <i class="bi-calendar-week"/>Termine
+      <i class="bi-calendar2-week"/>Termine
     </template>
-    <EventCalendar :events="events" @needUpdate="updateEvents">
+    <EventCalendar :events="events" v-model:date="date">
       <template #btns>
-        <Btn @click="updateEvents" aria-label="Aktualisieren">
+        <Btn @click="refresh" aria-label="Aktualisieren">
           <i class="bi-arrow-clockwise"></i>
         </Btn>
       </template>
@@ -21,25 +21,18 @@
 <script lang="ts" setup>
 import UserPage from '../layout/UserPage.vue'
 import EventCalendar from '../components/EventCalendar.vue'
-import { collection, getDocs, getFirestore, query, where } from '@firebase/firestore'
-import { onMounted, ref } from 'vue'
-import { EventDB } from '@/model/event'
+import { useEvents } from '@/stores/events'
+import { computed, ref, watch } from 'vue'
 
-const db = getFirestore()
+const eventStore = useEvents()
 
-const events = ref([] as EventDB[])
+const events = computed(() => eventStore.events)
 
-onMounted(() => {
-  updateEvents()
+const date = ref(new Date())
+watch(date, (val) => {
+  eventStore.fetchMonth(val)
 })
-
-async function updateEvents () {
-  const querySnapshot = await getDocs(query(collection(db, 'events'), where('startDate', '>', 0)))
-
-  events.value = []
-
-  querySnapshot.forEach(doc => {
-    events.value.push(doc.data() as EventDB)
-  })
+function refresh () {
+  eventStore.fetchMonth(date.value)
 }
 </script>

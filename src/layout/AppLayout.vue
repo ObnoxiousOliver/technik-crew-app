@@ -54,7 +54,7 @@
   <Transition name="navbar">
     <MobileNavbar v-if="showNavigation && bp.mode === 'mobile'" :buttons="[
       { to: 'wiki', icon: 'compass' },
-      { to: 'events', icon: 'calendar-week' },
+      { to: 'events', icon: 'calendar2-week' },
       { to: 'dashboard', icon: 'house-door' },
       { to: 'equipment', icon: 'speaker' },
       { to: 'settings', icon: 'gear' },

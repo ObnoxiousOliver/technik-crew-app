@@ -5,19 +5,7 @@
     </template>
 
     <div class="dashboard-grid">
-      <DashboardCard>
-        <template #title>
-          Nächste Termine
-        </template>
-
-        <ul>
-          <li v-for="event in upcomingEvents" :key="event.id">
-            <RouterLink :to="{ name: 'event', params: { id: event.id } }">
-              {{ event.name || 'Unbenannter Termin' }} {{ new Date(event.startDate) }}
-            </RouterLink>
-          </li>
-        </ul>
-      </DashboardCard>
+      <UpcomingEventsCard :events="upcomingEvents" />
 
       <EventCalendar :events="events" v-model:date="date">
         <template #btns>
@@ -31,7 +19,7 @@
 </template>
 
 <script lang="ts" setup>
-import DashboardCard from '@/components/DashboardCard.vue'
+import UpcomingEventsCard from '@/components/UpcomingEventsCard.vue'
 import { useEvents } from '@/stores/events'
 import { computed, onMounted, ref, watch } from 'vue'
 import EventCalendar from '../components/EventCalendar.vue'
@@ -40,7 +28,7 @@ import UserPage from '../layout/UserPage.vue'
 const eventStore = useEvents()
 const events = computed(() => eventStore.events)
 
-const upcomingAmount = ref(5)
+const upcomingAmount = ref(3)
 const upcomingEvents = computed(() => eventStore.upcoming)
 onMounted(async () => {
   await refresh()

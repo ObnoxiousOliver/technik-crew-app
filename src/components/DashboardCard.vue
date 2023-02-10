@@ -32,6 +32,12 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    font-weight: 600;
+
+    :deep(i) {
+      display: inline-block;
+      margin-right: .5rem;
+    }
 
     :deep(.btn) {
       width: calc(100% + 2rem);
