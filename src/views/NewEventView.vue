@@ -3,65 +3,51 @@
     <template #title>
       Neuer Termin
     </template>
-    Name: <input v-model="title" type="text"><br>
-    Start: <input v-model="startDate" type="date"><br>
-    End: <input v-model="endDate" type="date"><br>
-    Whole Day: <input v-model="wholeDay" type="checkbox"><br>
-    Desc:<br><textarea v-model="desc" /><br>
-    <button @click="submit">Add</button>
+
+    <FormContainer>
+      <FormGroup inline>
+        <SelectColor v-model="color" />
+
+        <input
+          type="text"
+          class="new-event__name fill-width"
+          placeholder="Unbenannter Termin..."
+        >
+      </FormGroup>
+    </FormContainer>
   </Page>
 </template>
 
 <script lang="ts" setup>
-import Event from '@/model/event'
-import { computed } from 'vue'
-import { useRouter } from 'vue-router'
-import { useNewEventStore } from '../stores/newEvent'
+import SelectColor from '@/components/SelectColor.vue'
+import { ref } from 'vue'
 
-const router = useRouter()
-const store = useNewEventStore()
+const color = ref('gray')
 
-async function submit () {
-  await Event.create({
-    name: title.value,
-    description: desc.value,
-    startDate: new Date(startDate.value).getTime(),
-    endDate: new Date(endDate.value).getTime(),
-    wholeDay: endDate.value
-  })
-
-  router.push('/events')
-  store.reset()
-}
-
-const title = computed({
-  get: () => store.title,
-  set: (val) => {
-    store.title = val
-  }
-})
-const startDate = computed({
-  get: () => store.startDate,
-  set: (val) => {
-    store.startDate = val
-  }
-})
-const endDate = computed({
-  get: () => store.endDate,
-  set: (val) => {
-    store.endDate = val
-  }
-})
-const wholeDay = computed({
-  get: () => store.wholeDay,
-  set: (val) => {
-    store.wholeDay = val
-  }
-})
-const desc = computed({
-  get: () => store.desc,
-  set: (val) => {
-    store.desc = val
-  }
-})
 </script>
+
+<style lang="scss" scoped>
+@use '../scss' as r;
+
+.new-event {
+  &__name {
+    border: none;
+    outline: none;
+    padding: .5rem;
+    background: none;
+    color: inherit;
+    font: inherit;
+    font-size: 1.5rem;
+
+    transition: .2s;
+
+    &:focus-visible {
+      box-shadow: 0 .1rem 0 r.$accent;
+    }
+
+    &::placeholder {
+      color: r.$text-secondary;
+    }
+  }
+}
+</style>

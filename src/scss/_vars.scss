@@ -17,13 +17,24 @@ $radius: .75rem;
 $focus: $accent 0 0 0 1px inset, rgba($accent, .1) 0 0 0 .4rem;
 $focus-danger: $danger 0 0 0 1px inset, rgba($danger, .1) 0 0 0 .4rem;
 
+:root {
+  --col-gray: #474953;
+  --col-red: #FF7676;
+  --col-orange: #FFAD61;
+  --col-yellow: #FCFF6B;
+  --col-green: #92FF6B;
+  --col-cyan: #7AFFDF;
+  --col-blue: #799FFF;
+  --col-purple: #C275FF;
+  --col-pink: #FF6BCD;
+}
 
-$col-gray: #474953;
-$col-red: #FF7676;
-$col-orange: #FFAD61;
-$col-yellow: #FCFF6B;
-$col-green: #92FF6B;
-$col-cyan: #7AFFDF;
-$col-blue: #799FFF;
-$col-purple: #C275FF;
-$col-pink: #FF6BCD;
+$col-gray: var(--col-gray);
+$col-red: var(--col-red);
+$col-orange: var(--col-orange);
+$col-yellow: var(--col-yellow);
+$col-green: var(--col-green);
+$col-cyan: var(--col-cyan);
+$col-blue: var(--col-blue);
+$col-purple: var(--col-purple);
+$col-pink: var(--col-pink);
