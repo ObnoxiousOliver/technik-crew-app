@@ -8,19 +8,6 @@
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint"
   },
-  "main": "electron/background.js",
-  "unusedDeps": {
-    "@capacitor/android": "4.6.1",
-    "@capacitor/app": "4.1.1",
-    "@capacitor/core": "4.6.1",
-    "@capacitor/haptics": "4.1.0",
-    "@capacitor/keyboard": "4.1.0",
-    "@capacitor/status-bar": "4.1.1",
-    "electron": "^22.0.2",
-    "electron-devtools-installer": "^3.1.0",
-    "@types/electron-devtools-installer": "^2.2.0",
-    "vue-cli-plugin-electron-builder": "~2.1.1"
-  },
   "dependencies": {
     "@tiptap/extension-link": "^2.0.0-beta.209",
     "@tiptap/extension-list-item": "^2.0.0-beta.209",
@@ -44,7 +31,6 @@
     "vue3-emoji-picker": "^1.1.7"
   },
   "devDependencies": {
-    "@capacitor/cli": "4.6.1",
     "@types/crypto-js": "^4.1.1",
     "@types/node": "^18.11.10",
     "@typescript-eslint/eslint-plugin": "^5.45.0",

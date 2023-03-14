@@ -69,38 +69,12 @@ import MobileNavbar from '../components/BottomNavbar.vue'
 import DesktopSidebar from '../components/DesktopSidebar.vue'
 import { useBreakpoint } from '../utilities/breakpoint'
 import { computed } from 'vue'
-// import { Capacitor } from '@capacitor/core'
-// import { Keyboard } from '@capacitor/keyboard'
 import { useRoute } from 'vue-router'
-// import { getPlatform } from '@/utilities/platform'
 
 const route = useRoute()
 const bp = useBreakpoint()
 
-// const platform = getPlatform()
-
 const showNavigation = computed(() => ['dashboard', 'wiki', 'events', 'equipment', 'settings'].includes(route.meta.root))
-// const keyboardOpen = ref(false)
-
-// if (Capacitor.getPlatform() !== 'web') {
-//   Keyboard.addListener('keyboardWillShow', () => {
-//     keyboardOpen.value = true
-//   })
-//   Keyboard.addListener('keyboardWillHide', () => {
-//     keyboardOpen.value = false
-//   })
-// }
-
-function updateZoomLevel () {
-  // if (platform === 'windows') {
-  //   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  //   const zoomFactor = (window.electron as any).getZoomFactor()
-  //   document.documentElement.style.setProperty('--zf', zoomFactor)
-  //   document.documentElement.style.setProperty('--titlebar-height', 40 / zoomFactor + 'px')
-  // }
-}
-window.addEventListener('resize', updateZoomLevel)
-updateZoomLevel()
 </script>
 
 <style lang="scss">
