@@ -16,7 +16,7 @@ export class Location {
   get description () { return this.location.description }
   private set description (value) { this.location.description = value }
 
-  private constructor (id: string | null, options: Partial<LocationDB> = {}) {
+  constructor (id: string | null, options: Partial<LocationDB> = {}) {
     this.id = id
     this.location = {
       name: options.name ?? '',
@@ -72,33 +72,18 @@ export class Location {
     })
   }
 
-  private static cachedLocations: {
-    // eslint-disable-next-line no-use-before-define
-    [id: string]: Location
-  } = {}
-
-  static async get (id?: string, useCache = true) {
+  static async get (id?: string) {
     const db = getFirestore()
     if (id) {
-      if (useCache && this.cachedLocations[id]) {
-        return this.cachedLocations[id]
-      }
-
       const docSnap = await getDoc(doc(db, 'locations', id))
       if (docSnap.exists()) {
-        this.cachedLocations[id] = new Location(id, docSnap.data() as LocationDB)
+        return new Location(id, docSnap.data() as LocationDB)
       }
-      return this.cachedLocations[id]
     } else {
-      if (useCache && Object.keys(this.cachedLocations).length > 0) {
-        return Object.values(this.cachedLocations)
-      }
-
       const querySnapshot = await getDocs(collection(db, 'locations'))
       const locations: Location[] = []
       querySnapshot.forEach((doc) => {
-        this.cachedLocations[doc.id] = new Location(doc.id, doc.data() as LocationDB)
-        locations.push(this.cachedLocations[doc.id])
+        locations.push(new Location(doc.id, doc.data() as LocationDB))
       })
       return locations
     }

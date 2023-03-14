@@ -20,13 +20,7 @@
       >
         <slot name="title" />
       </span>
-      <Btn
-        v-for="(button, i) in buttons"
-        :key="i"
-        @click="button.onClick"
-      >
-        <i :class="button.icon" />
-      </Btn>
+      <slot name="btns"/>
       <Btn
         class="page__add-btn"
         v-if="props.addBtn"

@@ -6,10 +6,16 @@
     @search="search"
     @searchOpen="inSearchMenu = $event"
     :searchRecents="[
+      'Equipment 1'
     ]"
   >
     <template #title>
       <i class="bi-speaker"/>Equipment
+    </template>
+    <template #btns>
+      <Btn @click="$router.push('/locations')" aria-label="Standorte">
+        <i class="bi-geo-alt" />
+      </Btn>
     </template>
 
     <EquipmentList :equipment="equipment" />

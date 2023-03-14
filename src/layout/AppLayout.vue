@@ -1,5 +1,5 @@
 <template>
-  <div class="titlebar" v-if="platform === 'windows'">
+  <!-- <div class="titlebar" v-if="platform === 'windows'">
     <div class="titlebar__content">
       Technik Crew
     </div>
@@ -9,25 +9,25 @@
     })" class="titlebar__button">
       <i class="bi-gear" />
     </Btn>
-  </div>
+  </div> -->
 
   <Transition name="sidebar">
     <aside
       v-if="showNavigation && bp.mode === 'desktop'"
       class="sidebar"
     >
-      <RouterView
+      <!-- <RouterView
         name="navbar"
         class="sidebar-router"
         v-slot="{ Component }"
-      >
-        <template v-if="Component">
+      > -->
+        <!-- <template v-if="Component">
           <Transition :name="route.meta.transitionName">
             <component :is="Component" />
           </Transition>
-        </template>
-        <DesktopSidebar v-else/>
-      </RouterView>
+        </template> -->
+        <DesktopSidebar/>
+      <!-- </RouterView> -->
     </aside>
   </Transition>
 
@@ -68,37 +68,36 @@
 import MobileNavbar from '../components/BottomNavbar.vue'
 import DesktopSidebar from '../components/DesktopSidebar.vue'
 import { useBreakpoint } from '../utilities/breakpoint'
-import { computed, ref } from 'vue'
-import { Capacitor } from '@capacitor/core'
-import { Keyboard } from '@capacitor/keyboard'
-import { useRoute, useRouter } from 'vue-router'
-import { getPlatform } from '@/utilities/platform'
+import { computed } from 'vue'
+// import { Capacitor } from '@capacitor/core'
+// import { Keyboard } from '@capacitor/keyboard'
+import { useRoute } from 'vue-router'
+// import { getPlatform } from '@/utilities/platform'
 
 const route = useRoute()
-const router = useRouter()
 const bp = useBreakpoint()
 
-const platform = getPlatform()
+// const platform = getPlatform()
 
 const showNavigation = computed(() => ['dashboard', 'wiki', 'events', 'equipment', 'settings'].includes(route.meta.root))
-const keyboardOpen = ref(false)
+// const keyboardOpen = ref(false)
 
-if (Capacitor.getPlatform() !== 'web') {
-  Keyboard.addListener('keyboardWillShow', () => {
-    keyboardOpen.value = true
-  })
-  Keyboard.addListener('keyboardWillHide', () => {
-    keyboardOpen.value = false
-  })
-}
+// if (Capacitor.getPlatform() !== 'web') {
+//   Keyboard.addListener('keyboardWillShow', () => {
+//     keyboardOpen.value = true
+//   })
+//   Keyboard.addListener('keyboardWillHide', () => {
+//     keyboardOpen.value = false
+//   })
+// }
 
 function updateZoomLevel () {
-  if (platform === 'windows') {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const zoomFactor = (window.electron as any).getZoomFactor()
-    document.documentElement.style.setProperty('--zf', zoomFactor)
-    document.documentElement.style.setProperty('--titlebar-height', 40 / zoomFactor + 'px')
-  }
+  // if (platform === 'windows') {
+  //   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  //   const zoomFactor = (window.electron as any).getZoomFactor()
+  //   document.documentElement.style.setProperty('--zf', zoomFactor)
+  //   document.documentElement.style.setProperty('--titlebar-height', 40 / zoomFactor + 'px')
+  // }
 }
 window.addEventListener('resize', updateZoomLevel)
 updateZoomLevel()

@@ -11,6 +11,9 @@
         <div class="user-page__title__content">
           <slot name="title" />
         </div>
+        <div class="user-page__title__buttons">
+          <slot name="btns" />
+        </div>
         <Transition name="user-page__title__buttons">
           <div v-if="!searchExpanded" class="user-page__title__buttons">
             <Btn
@@ -352,7 +355,7 @@ function expandSearch (value?: boolean, push = true) {
       display: flex;
       align-items: center;
 
-      .btn {
+      :deep(.btn) {
         background: none !important;
         padding: 0;
         width: 3rem;

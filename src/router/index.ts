@@ -57,9 +57,6 @@ const { router, back, getLastPageOfRoot } = createRouter([
     name: 'wiki',
     component: () => import('../views/WikiView.vue'),
     requiresAuth: true,
-    meta: {
-      showNavbar: true
-    },
 
     children: [
       {
@@ -90,9 +87,6 @@ const { router, back, getLastPageOfRoot } = createRouter([
     name: 'events',
     component: () => import('../views/EventView.vue'),
     requiresAuth: true,
-    meta: {
-      showNavbar: true
-    },
 
     children: [
       {
@@ -116,10 +110,7 @@ const { router, back, getLastPageOfRoot } = createRouter([
     name: 'dashboard',
     alias: '/',
     component: () => import('../views/DashboardView.vue'),
-    requiresAuth: true,
-    meta: {
-      showNavbar: true
-    }
+    requiresAuth: true
   },
 
   // Equipment
@@ -129,9 +120,6 @@ const { router, back, getLastPageOfRoot } = createRouter([
     path: '/equipment',
     component: () => import('../views/EquipmentView.vue'),
     requiresAuth: true,
-    meta: {
-      showNavbar: true
-    },
 
     children: [
       {
@@ -145,18 +133,44 @@ const { router, back, getLastPageOfRoot } = createRouter([
         name: 'equipment-details',
         path: '/equipment/:id',
         component: () => import('../views/EquipmentDetailsView.vue')
+      },
+
+      // Locations
+      {
+        title: 'Standorte',
+        name: 'locations',
+        path: '/locations',
+        component: () => import('../views/LocationsView.vue'),
+        children: [
+          {
+            title: 'Neuer Standort',
+            name: 'location-add',
+            path: '/locations/add',
+            component: () => import('../views/LocationAddView.vue')
+          },
+          {
+            title: 'Standort details',
+            name: 'location-details',
+            path: '/locations/:id',
+            component: () => import('../views/LocationDetailsView.vue')
+          }
+        ]
       }
     ]
   },
 
   // Settings
   {
+    depth: 99999,
     title: 'Einstellungen',
     name: 'settings',
     path: '/settings',
     component: () => import('../views/settings/SettingsView.vue'),
     requiresAuth: true,
     backPath: '/dashboard',
+    meta: {
+      noRootTransition: true
+    },
 
     children: [
       // Profile
