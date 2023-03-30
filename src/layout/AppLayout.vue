@@ -1,5 +1,5 @@
 <template>
-  <div class="titlebar" v-if="platform === 'windows'">
+  <!-- <div class="titlebar" v-if="platform === 'windows'">
     <div class="titlebar__content">
       Technik Crew
     </div>
@@ -9,25 +9,25 @@
     })" class="titlebar__button">
       <i class="bi-gear" />
     </Btn>
-  </div>
+  </div> -->
 
   <Transition name="sidebar">
     <aside
       v-if="showNavigation && bp.mode === 'desktop'"
       class="sidebar"
     >
-      <RouterView
+      <!-- <RouterView
         name="navbar"
         class="sidebar-router"
         v-slot="{ Component }"
-      >
-        <template v-if="Component">
+      > -->
+        <!-- <template v-if="Component">
           <Transition :name="route.meta.transitionName">
             <component :is="Component" />
           </Transition>
-        </template>
-        <DesktopSidebar v-else/>
-      </RouterView>
+        </template> -->
+        <DesktopSidebar/>
+      <!-- </RouterView> -->
     </aside>
   </Transition>
 
@@ -54,7 +54,7 @@
   <Transition name="navbar">
     <MobileNavbar v-if="showNavigation && bp.mode === 'mobile'" :buttons="[
       { to: 'wiki', icon: 'compass' },
-      { to: 'events', icon: 'calendar-week' },
+      { to: 'events', icon: 'calendar2-week' },
       { to: 'dashboard', icon: 'house-door' },
       { to: 'equipment', icon: 'speaker' },
       { to: 'settings', icon: 'gear' },
@@ -62,46 +62,45 @@
   </Transition>
 
   <div id="layer" />
+
+  <div class="toasts">
+    <div
+      v-for="toast in toasts"
+      :key="toast.id"
+      class="toast"
+    >
+      {{ toast.msg }}
+    </div>
+  </div>
 </template>
 
 <script lang="ts" setup>
 import MobileNavbar from '../components/BottomNavbar.vue'
 import DesktopSidebar from '../components/DesktopSidebar.vue'
 import { useBreakpoint } from '../utilities/breakpoint'
-import { computed, ref } from 'vue'
-import { Capacitor } from '@capacitor/core'
-import { Keyboard } from '@capacitor/keyboard'
-import { useRoute, useRouter } from 'vue-router'
-import { getPlatform } from '@/utilities/platform'
+import { computed, onBeforeUnmount, ref } from 'vue'
+import { useRoute } from 'vue-router'
+import { useToast } from '@/utilities/toast'
+import { createId } from '@/utilities/id'
 
 const route = useRoute()
-const router = useRouter()
 const bp = useBreakpoint()
 
-const platform = getPlatform()
-
 const showNavigation = computed(() => ['dashboard', 'wiki', 'events', 'equipment', 'settings'].includes(route.meta.root))
-const keyboardOpen = ref(false)
 
-if (Capacitor.getPlatform() !== 'web') {
-  Keyboard.addListener('keyboardWillShow', () => {
-    keyboardOpen.value = true
+const toasts = ref<{
+  id: number
+  msg: string
+}>([])
+onBeforeUnmount(useToast().onShow((msg) => {
+  toasts.value.push({
+    id: createId(),
+    msg
   })
-  Keyboard.addListener('keyboardWillHide', () => {
-    keyboardOpen.value = false
-  })
-}
-
-function updateZoomLevel () {
-  if (platform === 'windows') {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const zoomFactor = (window.electron as any).getZoomFactor()
-    document.documentElement.style.setProperty('--zf', zoomFactor)
-    document.documentElement.style.setProperty('--titlebar-height', 40 / zoomFactor + 'px')
-  }
-}
-window.addEventListener('resize', updateZoomLevel)
-updateZoomLevel()
+  setTimeout(() => {
+    toasts.value.shift()
+  }, 3000)
+}))
 </script>
 
 <style lang="scss">
@@ -224,6 +223,42 @@ $transition: .5s cubic-bezier(0.19, 1, 0.22, 1);
   &-leave-to {
     transform: translateX(-100%);
     margin-right: -16rem;
+  }
+}
+
+.toasts {
+  z-index: 999;
+  position: absolute;
+  bottom: 5rem;
+  left: 50%;
+  transform: translateX(-50%);
+
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  align-items: center;
+  pointer-events: none;
+
+  .toast {
+    padding: .5rem 1rem;
+    border-radius: .5rem;
+    background: r.$bg-secondary;
+    box-shadow: #000a 0 0 1rem;
+    color: r.$text-primary;
+    max-width: 20rem;
+    text-align: center;
+    pointer-events: auto;
+
+    &-enter-active,
+    &-leave-active {
+      transition: $transition;
+    }
+
+    &-enter-from,
+    &-leave-to {
+      opacity: 0;
+      transform: translateY(1rem);
+    }
   }
 }
 

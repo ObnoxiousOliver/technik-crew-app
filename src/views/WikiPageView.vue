@@ -1,19 +1,20 @@
 <template>
-  <Page :buttons="[
-    {
-      icon: 'bi-pencil-square',
-      onClick: () => router.push({
-        name: 'wiki-page-edit',
-        params: { id: page?.id }
-      })
-    }
-  ]">
+  <Page>
     <template #title>
       <span v-if="page?.icon">
         {{ page?.icon }}
       </span>
       <i v-else class="bi-file-earmark-text" />
       {{ page?.title }}
+    </template>
+
+    <template #btns>
+      <Btn @click="router.push({
+        name: 'wiki-page-edit',
+        params: { id: page?.id }
+      })">
+        <i class="bi-pencil-square" />
+      </Btn>
     </template>
 
     <Spinner v-if="!page" />

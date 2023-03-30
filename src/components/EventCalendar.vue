@@ -36,11 +36,23 @@ import { CalendarView } from 'vue-simple-calendar'
 import 'vue-simple-calendar/dist/style.css'
 import { ICalendarItem as CalendarItem } from 'vue-simple-calendar/dist/src/ICalendarItem'
 import { EventDB } from '../model/event'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 
-const showDate = ref(new Date())
+const emit = defineEmits([
+  'update:date'
+])
 const props = defineProps({
-  events: Array
+  events: Array,
+  date: Date
+})
+const showDate = ref(props.date ?? new Date())
+watch(showDate, (val) => {
+  emit('update:date', val)
+})
+watch(() => props.date, (val) => {
+  if (val) {
+    showDate.value = val
+  }
 })
 
 const show = ref(false)
@@ -49,14 +61,10 @@ setTimeout(() => {
   show.value = true
 }, 1000)
 
-const emit = defineEmits([
-  'needUpdate'
-])
-
 const items = computed((): CalendarItem[] => props.events
   ?.map((e: EventDB): CalendarItem => ({
     id: e.id,
-    title: e.name,
+    title: e.name || 'Unbenannter Termin',
     startDate: getDate(e.startDate, e.wholeDay),
     endDate: e.endDate && getDate(e.endDate, e.wholeDay),
     classes: ['calendar-' + (e.color ?? 'gray')]
@@ -65,17 +73,15 @@ const items = computed((): CalendarItem[] => props.events
 
 function nextMonth () {
   const d = new Date(showDate.value)
+  d.setDate(1)
   d.setMonth(d.getMonth() + 1)
   showDate.value = d
-
-  emit('needUpdate')
 }
 function previousMonth () {
   const d = new Date(showDate.value)
+  d.setDate(1)
   d.setMonth(d.getMonth() - 1)
   showDate.value = d
-
-  emit('needUpdate')
 }
 
 function getDate (dateNumber: number, wholeDay: boolean): string {
@@ -86,8 +92,6 @@ function getDate (dateNumber: number, wholeDay: boolean): string {
   if (!wholeDay) {
     dateString += ` ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:01`
   }
-
-  console.log(dateString)
 
   return dateString
 }
@@ -168,15 +172,15 @@ function getDate (dateNumber: number, wholeDay: boolean): string {
       cursor: pointer;
     }
 
-    .calendar-gray   { background-color: #4a4a4a; color: white; }
-    .calendar-red    { background-color: #FF7676; }
-    .calendar-orange { background-color: #FFAD61; }
-    .calendar-yellow { background-color: #FCFF6B; }
-    .calendar-green  { background-color: #92FF6B; }
-    .calendar-cyan   { background-color: #7AFFDF; }
-    .calendar-blue   { background-color: #799FFF; }
-    .calendar-purple { background-color: #C275FF; }
-    .calendar-pink   { background-color: #FF6BCD; }
+    .calendar-gray   { background-color: r.$col-gray; color: white; }
+    .calendar-red    { background-color: r.$col-red; }
+    .calendar-orange { background-color: r.$col-orange; }
+    .calendar-yellow { background-color: r.$col-yellow; }
+    .calendar-green  { background-color: r.$col-green; }
+    .calendar-cyan   { background-color: r.$col-cyan; }
+    .calendar-blue   { background-color: r.$col-blue; }
+    .calendar-purple { background-color: r.$col-purple; }
+    .calendar-pink   { background-color: r.$col-pink; }
 
     .toBeContinued {
       border-top-right-radius: 0;

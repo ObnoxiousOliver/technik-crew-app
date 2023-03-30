@@ -17,9 +17,4 @@ module.exports = defineConfig({
       favicon: './public/img/icons/favicon.svg'
     }
   },
-  pluginOptions: {
-    electronBuilder: {
-      preload: './src/preload.ts'
-    }
-  }
 })

@@ -8,6 +8,7 @@ import Dropdown from './components/DropdownSelection.vue'
 import ToggleSwitch from './components/ToggleSwitch.vue'
 import ActionSheet from './components/ActionSheet.vue'
 import ActionSheetButton from './components/ActionSheetButton.vue'
+import ActionSheetDivider from './components/ActionSheetDivider.vue'
 import Spinner from './components/LoadingSpinner.vue'
 import FormContainer from './components/FormContainer.vue'
 import FormInfo from './components/FormInfo.vue'
@@ -23,6 +24,12 @@ import { createPinia } from 'pinia'
 import 'bootstrap-icons/font/bootstrap-icons.scss'
 import './registerServiceWorker'
 import './main'
+import { useUser } from './stores/user'
+import { useUsers } from './stores/users'
+import { useEvents } from './stores/events'
+import { useLocations } from './stores/locations'
+import { useTicket } from './stores/ticket'
+import { useNewEventStore } from './stores/newEvent'
 
 // #region Initialize Firebase
 const firebaseConfig = {
@@ -53,6 +60,7 @@ createApp(App)
   .component('Username', UsernameDisplay)
   .component('ActionSheet', ActionSheet)
   .component('ActionSheetButton', ActionSheetButton)
+  .component('ActionSheetDivider', ActionSheetDivider)
   .component('Spinner', Spinner)
   .component('FormContainer', FormContainer)
   .component('FormInfo', FormInfo)

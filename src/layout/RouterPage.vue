@@ -20,13 +20,7 @@
       >
         <slot name="title" />
       </span>
-      <Btn
-        v-for="(button, i) in buttons"
-        :key="i"
-        @click="button.onClick"
-      >
-        <i :class="button.icon" />
-      </Btn>
+      <slot name="btns"/>
       <Btn
         class="page__add-btn"
         v-if="props.addBtn"
@@ -143,7 +137,7 @@ function onScroll () {
   }
 
   &__title {
-    z-index: 1;
+    z-index: 9;
     position: relative;
     font-weight: 600;
     text-transform: uppercase;
@@ -165,7 +159,7 @@ function onScroll () {
   }
 
   &__navigation {
-    z-index: 1;
+    z-index: 9;
     position: relative;
     display: flex;
     align-items: center;

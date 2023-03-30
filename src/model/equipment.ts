@@ -233,9 +233,7 @@ export class Equipment {
       throw new Error('Cannot get history on an equipment without an id')
     }
 
-    const db = getFirestore()
-    const querySnapshot = await getDocs(query(collection(db, 'equipment', this.id, 'history')))
-    return querySnapshot.docs.map(x => new HistoryState<unknown>(x.data()))
+    return HistoryState.get('equipment', this.id)
   }
 
   async setName (name: string) {
