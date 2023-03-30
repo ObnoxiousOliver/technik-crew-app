@@ -3,18 +3,7 @@
     <template #title>
       <i class="bi-calendar2-week"/>Termine
     </template>
-    <EventCalendar :events="events" v-model:date="date">
-      <template #btns>
-        <Btn @click="refresh" aria-label="Aktualisieren">
-          <i class="bi-arrow-clockwise"></i>
-        </Btn>
-      </template>
-    </EventCalendar>
-    <!-- {{ events }} -->
-
-    <RouterLink to="/events/new">Add</RouterLink>
-
-    <!-- <button @click="addEvent">Add</button> -->
+    <EventCalendar :events="events" v-model:date="date" />
   </UserPage>
 </template>
 
@@ -30,9 +19,6 @@ const events = computed(() => eventStore.events)
 
 const date = ref(new Date())
 watch(date, (val) => {
-  eventStore.fetchMonth(val)
+  eventStore.setSubscribingMonth(val)
 })
-function refresh () {
-  eventStore.fetchMonth(date.value)
-}
 </script>

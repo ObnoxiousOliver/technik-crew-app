@@ -1,11 +1,10 @@
 import { getDefaultPermissions, PermissionsDB } from '@/model/permissions'
 import { TicketDB } from '@/model/ticket'
 import { User, UserDB } from '@/model/user'
-import { useNewEventStore } from '@/stores/newEvent'
 import { useUser } from '@/stores/user'
 import CryptoJS from 'crypto-js'
 import { FirebaseError } from 'firebase/app'
-import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword, signOut as _signOut, updateEmail, updatePassword } from 'firebase/auth'
+import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword, signOut as _signOut, updateEmail } from 'firebase/auth'
 import { collection, doc, getDoc, getFirestore, setDoc } from 'firebase/firestore'
 import { logOnServer } from './log'
 
@@ -107,7 +106,6 @@ export async function signOut () {
   const auth = getAuth()
   await _signOut(auth)
   useUser().reset()
-  useNewEventStore().reset()
 }
 
 export function encryptEmail (email: string, name: string) {

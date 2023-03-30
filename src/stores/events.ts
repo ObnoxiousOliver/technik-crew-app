@@ -3,41 +3,8 @@ import { defineStore } from 'pinia'
 import { ref, watch } from 'vue'
 
 export const useEvents = defineStore('events', () => {
-  const selectedEvent = ref(null as null | Event)
   const events = ref([] as Event[])
   const upcoming = ref([] as Event[])
-
-  async function fetchMonth (date: Date) {
-    const fetchedEvents = await Event.getMonth(date)
-
-    const month = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`
-    events.value = events.value.filter(event => !event.months.includes(month))
-
-    events.value.push(...fetchedEvents)
-
-    events.value.sort((a, b) => {
-      return a.startDate - b.startDate
-    })
-  }
-
-  async function fetchUpcoming (n: number) {
-    const fetchedEvents = await Event.getUpcoming(n)
-
-    const minStart = Math.min(...fetchedEvents.map(x => x.startDate))
-    const maxStart = Math.max(...fetchedEvents.map(x => x.startDate))
-
-    events.value = events.value.filter(event => !(event.startDate >= minStart && event.startDate <= maxStart))
-    events.value.push(...fetchedEvents)
-    upcoming.value = fetchedEvents
-
-    events.value.sort((a, b) => {
-      return a.startDate - b.startDate
-    })
-
-    upcoming.value.sort((a, b) => {
-      return a.startDate - b.startDate
-    })
-  }
 
   // Load and save events to local storage
   watch([events, upcoming], () => {
@@ -46,6 +13,8 @@ export const useEvents = defineStore('events', () => {
 
     localStorage.setItem('events', eventJson)
     localStorage.setItem('upcoming', upcomingJson)
+  }, {
+    deep: true
   })
 
   events.value = JSON.parse(localStorage.getItem('events') || '[]')
@@ -54,11 +23,79 @@ export const useEvents = defineStore('events', () => {
   upcoming.value = JSON.parse(localStorage.getItem('upcoming') || '[]')
     .map((event: [string, EventDB]) => new Event(event[0], event[1]))
 
+  // Subscribe to events
+  let unsubscribe: (() => void) | null = null
+  const subscribingMonth = ref(new Date())
+  updateMonthSubscribtion(subscribingMonth.value)
+
+  watch(subscribingMonth, updateMonthSubscribtion)
+
+  function setSubscribingMonth (date = new Date()) {
+    if (date.getMonth() !== subscribingMonth.value.getMonth() ||
+      date.getFullYear() !== subscribingMonth.value.getFullYear()) {
+      subscribingMonth.value = date
+    }
+  }
+
+  function updateMonthSubscribtion (date: Date) {
+    console.log('Updating month subscription', `(${date.getMonth() + 1}/${date.getFullYear()})`)
+    if (unsubscribe) {
+      unsubscribe()
+    }
+
+    unsubscribe = Event.subscribeMonth(date, (change) => {
+      const { type, doc } = change
+      let index: number
+
+      switch (type) {
+        case 'added':
+          if (!events.value.find(x => x.id === doc.id)) {
+            events.value.push(new Event(doc.id, doc.data() as EventDB))
+            console.log('Added event', doc.id)
+          }
+          break
+        case 'modified':
+          index = events.value.findIndex(x => x.id === doc.id)
+          if (index !== -1) {
+            events.value[index] = new Event(doc.id, doc.data() as EventDB)
+            console.log('Modified event', doc.id)
+          } else {
+            events.value.push(new Event(doc.id, doc.data() as EventDB))
+            console.log('Added event', doc.id)
+          }
+          break
+        case 'removed':
+          index = events.value.findIndex(x => x.id === doc.id)
+          if (index !== -1) {
+            events.value.splice(index, 1)
+            console.log('Removed event', doc.id)
+          }
+          break
+      }
+    })
+  }
+
+  // Subscribe to upcoming events
+  Event.subscribeUpcoming(5, (type, event) => {
+    const index = upcoming.value.findIndex(x => x.id === event.id)
+    if (index === -1) {
+      upcoming.value.push(event)
+    }
+
+    switch (type) {
+      case 'added':
+      case 'modified':
+        upcoming.value[index] = event
+        break
+      case 'removed':
+        upcoming.value.splice(index, 1)
+        break
+    }
+  })
+
   return {
     events,
     upcoming,
-    fetchMonth,
-    fetchUpcoming,
-    selectedEvent
+    setSubscribingMonth
   }
 })

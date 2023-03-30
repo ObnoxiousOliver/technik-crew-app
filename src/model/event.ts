@@ -1,4 +1,4 @@
-import { addDoc, collection, doc, getDoc, getDocs, getFirestore, limit, query, setDoc, where } from 'firebase/firestore'
+import { addDoc, collection, doc, DocumentChange, DocumentData, getDoc, getDocs, getFirestore, limit, onSnapshot, query, setDoc, where } from 'firebase/firestore'
 
 export type EventColors = 'gray' | 'red' | 'orange' | 'yellow' | 'green' | 'cyan' | 'blue' | 'purple' | 'pink'
 
@@ -139,14 +139,32 @@ export default class Event {
       where('months', 'array-contains', `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`)
     ))
 
-    console.log(`Fetched ${querySnapshot.size} events for ${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`)
-
     const events: Event[] = []
     querySnapshot.forEach((doc) => {
       events.push(new Event(doc.id, doc.data() as EventDB))
     })
 
     return events
+  }
+
+  static subscribeMonth (date: Date, onChange: (change: DocumentChange<DocumentData>) => void) {
+    const db = getFirestore()
+
+    const dateString = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`
+
+    const q = query(
+      collection(db, 'events'),
+      where('months', 'array-contains', dateString)
+    )
+
+    const unsubscribe = onSnapshot(q, {
+    }, (querySnapshot) => {
+      querySnapshot.docChanges().forEach((change) => {
+        onChange(change)
+      })
+    })
+
+    return unsubscribe
   }
 
   static async getUpcoming (n: number) {
@@ -166,6 +184,24 @@ export default class Event {
     events.sort((a, b) => a.startDate - b.startDate)
 
     return events
+  }
+
+  static subscribeUpcoming (n: number, onChange: (type: 'added' | 'modified' | 'removed', event: Event) => void) {
+    const db = getFirestore()
+
+    const q = query(
+      collection(db, 'events'),
+      where('startDate', '>=', Date.now()),
+      limit(n)
+    )
+
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      querySnapshot.docChanges().forEach((change) => {
+        onChange(change.type, new Event(change.doc.id, change.doc.data() as EventDB))
+      })
+    })
+
+    return unsubscribe
   }
 
   static async get (id?: string) {
