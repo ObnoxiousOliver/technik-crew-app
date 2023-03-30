@@ -6,11 +6,12 @@
 import AppLayout from './layout/AppLayout.vue'
 import { deleteUser, getAuth, onAuthStateChanged } from '@firebase/auth'
 import { doc, getDoc, getFirestore } from '@firebase/firestore'
-import { createPinia } from 'pinia'
-import { onMounted, watch } from 'vue'
+import { onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { setStore, signOut } from './utilities/auth'
+import { useUsers } from './stores/users'
 
+useUsers()
 const route = useRoute()
 const router = useRouter()
 
@@ -44,11 +45,6 @@ onMounted(() => {
   })
 })
 
-const pinia = createPinia()
-
-watch(pinia.state, () => {
-  localStorage.setItem('store', pinia.state.value)
-})
 </script>
 
 <style lang="scss">
@@ -68,6 +64,14 @@ h1, h2, h3, h4, h5, h6 {
 
 .text-secondary {
   color: r.$text-secondary;
+}
+
+.user-select {
+  user-select: text;
+}
+
+.prewrap {
+  white-space: pre-wrap;
 }
 
 :focus {
@@ -122,7 +126,7 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
-a {
+:where(a:not(.btn)) {
   position: relative;
   color: r.$accent;
   transition: .2s;

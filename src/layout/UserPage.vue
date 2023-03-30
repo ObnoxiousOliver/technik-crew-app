@@ -11,11 +11,12 @@
         <div class="user-page__title__content">
           <slot name="title" />
         </div>
-        <div class="user-page__title__buttons">
-          <slot name="btns" />
-        </div>
+            <!-- <div class="user-page__title__buttons">
+              <slot name="btns" />
+            </div> -->
         <Transition name="user-page__title__buttons">
           <div v-if="!searchExpanded" class="user-page__title__buttons">
+            <slot name="btns" />
             <Btn
               class="user-page__title__buttons__search-btn"
               ref="searchBtnRef"

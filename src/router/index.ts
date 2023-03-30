@@ -149,10 +149,16 @@ const { router, back, getLastPageOfRoot } = createRouter([
             component: () => import('../views/LocationAddView.vue')
           },
           {
-            title: 'Standort details',
-            name: 'location-details',
+            title: 'Standort bearbeiten',
+            name: 'location-edit',
             path: '/locations/:id',
-            component: () => import('../views/LocationDetailsView.vue')
+            component: () => import('../views/LocationEditView.vue')
+          },
+          {
+            title: 'Standortverlauf',
+            name: 'location-history',
+            path: '/locations/:id/history',
+            component: () => import('../views/LocationHistoryView.vue')
           }
         ]
       }

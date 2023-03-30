@@ -62,19 +62,45 @@
   </Transition>
 
   <div id="layer" />
+
+  <div class="toasts">
+    <div
+      v-for="toast in toasts"
+      :key="toast.id"
+      class="toast"
+    >
+      {{ toast.msg }}
+    </div>
+  </div>
 </template>
 
 <script lang="ts" setup>
 import MobileNavbar from '../components/BottomNavbar.vue'
 import DesktopSidebar from '../components/DesktopSidebar.vue'
 import { useBreakpoint } from '../utilities/breakpoint'
-import { computed } from 'vue'
+import { computed, onBeforeUnmount, ref } from 'vue'
 import { useRoute } from 'vue-router'
+import { useToast } from '@/utilities/toast'
+import { createId } from '@/utilities/id'
 
 const route = useRoute()
 const bp = useBreakpoint()
 
 const showNavigation = computed(() => ['dashboard', 'wiki', 'events', 'equipment', 'settings'].includes(route.meta.root))
+
+const toasts = ref<{
+  id: number
+  msg: string
+}>([])
+onBeforeUnmount(useToast().onShow((msg) => {
+  toasts.value.push({
+    id: createId(),
+    msg
+  })
+  setTimeout(() => {
+    toasts.value.shift()
+  }, 3000)
+}))
 </script>
 
 <style lang="scss">
@@ -197,6 +223,42 @@ $transition: .5s cubic-bezier(0.19, 1, 0.22, 1);
   &-leave-to {
     transform: translateX(-100%);
     margin-right: -16rem;
+  }
+}
+
+.toasts {
+  z-index: 999;
+  position: absolute;
+  bottom: 5rem;
+  left: 50%;
+  transform: translateX(-50%);
+
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  align-items: center;
+  pointer-events: none;
+
+  .toast {
+    padding: .5rem 1rem;
+    border-radius: .5rem;
+    background: r.$bg-secondary;
+    box-shadow: #000a 0 0 1rem;
+    color: r.$text-primary;
+    max-width: 20rem;
+    text-align: center;
+    pointer-events: auto;
+
+    &-enter-active,
+    &-leave-active {
+      transition: $transition;
+    }
+
+    &-enter-from,
+    &-leave-to {
+      opacity: 0;
+      transform: translateY(1rem);
+    }
   }
 }
 

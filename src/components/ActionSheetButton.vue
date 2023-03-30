@@ -1,8 +1,21 @@
 <template>
-  <button v-wave class="action-sheet-btn">
+  <component :is="to ? 'router-link' : 'button'" :to="to" v-wave :class="['action-sheet-btn', {
+    'action-sheet-btn--danger': danger,
+    'action-sheet-btn--disabled': disabled
+  }]">
     <slot />
-  </button>
+  </component>
 </template>
+
+<script lang="ts" setup>
+import { RouteLocationRaw } from 'vue-router'
+
+defineProps<{
+  danger?: boolean,
+  disabled?: boolean,
+  to?: RouteLocationRaw
+}>()
+</script>
 
 <style lang="scss" scoped>
 @use '../scss' as r;
@@ -16,6 +29,7 @@
   display: block;
   padding: 1rem 1.5rem;
   width: 100%;
+  text-decoration: none;
   text-align: left;
 
   &:disabled {
@@ -26,8 +40,12 @@
     margin-right: 1rem;
   }
 
-  &.danger {
+  &.danger, &--danger {
     color: r.$danger;
+  }
+
+  &.disabled, &--disabled {
+    opacity: 0.5;
   }
 }
 </style>

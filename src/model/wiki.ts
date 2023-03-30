@@ -54,7 +54,7 @@ export class WikiPage {
     addDoc(
       collection(db, 'wiki', this.id, 'history'),
       new HistoryState({
-        author: options.author ?? useUser().user?.username,
+        author: options.author,
         description: options.description,
         date: options.date,
         type: options.type ?? 'wiki',
@@ -67,9 +67,7 @@ export class WikiPage {
       throw new Error('Cannot get history on a wiki page without an id')
     }
 
-    const db = getFirestore()
-    const querySnapshot = await getDocs(query(collection(db, 'wiki', this.id, 'history')))
-    return querySnapshot.docs.map(x => new HistoryState<unknown>(x.data()))
+    return HistoryState.get('wiki', this.id)
   }
 
   async setContent (content: JSONContent) {

@@ -16,5 +16,5 @@ module.exports = defineConfig({
     iconPaths: {
       favicon: './public/img/icons/favicon.svg'
     }
-  }
+  },
 })

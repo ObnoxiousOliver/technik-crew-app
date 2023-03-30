@@ -160,4 +160,17 @@ export class User implements UserDB {
       gender: ticket.gender
     })
   }
+
+  static async get () {
+    const db = getFirestore()
+
+    const users: { [key: string]: User} = {}
+    const querySnapshot = await getDocs(collection(db, 'users'))
+    querySnapshot.docs.forEach(user => {
+      const userData = user.data() as UserDB
+      users[userData.username] = new User(userData)
+    })
+
+    return users
+  }
 }

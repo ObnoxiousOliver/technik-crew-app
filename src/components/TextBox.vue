@@ -4,22 +4,24 @@
     'text-box--has-label': label
   }]">
     <div class="text-box__content">
-      <div v-if="label" class="text-box__label">
+      <div v-if="label" class="text-box__label" @click="inputEl?.focus()">
         {{ label }}
       </div>
-      <span
-        contenteditable="true"
-        role="textbox"
-        ref="inputEl"
-        class="text-box__area"
-        @paste="paste"
-        @focus="focused = true"
-        @blur="focused = false"
-        @input="input"
-      />
-      <span class="text-box__placeholder" v-if="value.length === 0">
-        {{ placeholder }}
-      </span>
+      <div class="text-box__area-container">
+        <span
+          contenteditable="true"
+          role="textbox"
+          ref="inputEl"
+          class="text-box__area"
+          @paste="paste"
+          @focus="focused = true"
+          @blur="focused = false"
+          @input="input"
+        />
+        <span class="text-box__placeholder" v-if="value.length === 0">
+          {{ placeholder }}
+        </span>
+      </div>
     </div>
 
     <div v-if="$slots.buttons" class="text-box__buttons">
@@ -96,7 +98,7 @@ function paste (e: ClipboardEvent) {
 
   &--has-label {
     .text-box {
-      &__area {
+      &__area, &__placeholder {
         padding: 0 1rem 1rem;
       }
     }
@@ -107,6 +109,10 @@ function paste (e: ClipboardEvent) {
     padding: .8rem 1rem .2rem;
     color: r.$text-secondary;
     font-weight: 600;
+  }
+
+  &__area-container {
+    position: relative;
   }
 
   &__area {
@@ -136,7 +142,8 @@ function paste (e: ClipboardEvent) {
 
   &__placeholder {
     position: absolute;
-    inset: 1rem;
+    inset: 0;
+    padding: 1rem;
     pointer-events: none;
     color: r.$text-secondary;
   }
