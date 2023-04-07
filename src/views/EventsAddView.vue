@@ -75,7 +75,7 @@
             </template>
           </template>
           <template v-else>
-            vom
+            von
             <b>{{ start.toLocaleDateString('de-DE', {
               weekday: 'long',
               year: 'numeric',
