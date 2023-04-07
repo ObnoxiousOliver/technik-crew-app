@@ -18,8 +18,7 @@
 @use '../scss' as r;
 
 .card {
-  background: r.$bg-secondary;
-  border-radius: r.$radius;
+  @include r.box;
   overflow: hidden;
 
   &__header {
@@ -54,6 +53,7 @@
 
     :deep(.btn) {
       background: none;
+      height: auto;
       padding: 0;
       width: 3rem;
       border-radius: 0;

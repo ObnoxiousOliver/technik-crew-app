@@ -6,8 +6,19 @@ export const useEvents = defineStore('events', () => {
   const events = ref([] as Event[])
   const upcoming = ref([] as Event[])
 
+  async function create (options: Partial<EventDB>) {
+    events.value.push(await Event.create(options))
+  }
+
   // Load and save events to local storage
   watch([events, upcoming], () => {
+    // Clear duplicates
+    const ids = events.value.map(x => x.id)
+    if (ids.length !== new Set(ids).size) {
+      console.warn('Duplicate events found')
+      events.value = events.value.filter((x, i) => ids.indexOf(x.id) === i)
+    }
+
     const eventJson = JSON.stringify(events.value.map(x => [x.id, x.toDB()]))
     const upcomingJson = JSON.stringify(upcoming.value.map(x => [x.id, x.toDB()]))
 
@@ -16,6 +27,28 @@ export const useEvents = defineStore('events', () => {
   }, {
     deep: true
   })
+
+  async function fetchUpcoming () {
+    const now = new Date()
+    now.setHours(0, 0, 0, 0)
+
+    // Get events that are already in the list
+    const ue = events.value.filter(x => x.startDate >= now.getTime())
+
+    if (ue.length >= 5) {
+      ue.sort((a, b) => a.startDate - b.startDate)
+      ue.splice(5)
+      upcoming.value = ue
+    } else {
+      upcoming.value = await Event.getUpcoming(5)
+
+      upcoming.value.forEach(x => {
+        if (!events.value.find(y => y.id === x.id)) {
+          events.value.push(x)
+        }
+      })
+    }
+  }
 
   events.value = JSON.parse(localStorage.getItem('events') || '[]')
     .map((event: [string, EventDB]) => new Event(event[0], event[1]))
@@ -37,23 +70,19 @@ export const useEvents = defineStore('events', () => {
     }
   }
 
-  function updateMonthSubscribtion (date: Date) {
+  async function updateMonthSubscribtion (date: Date) {
     console.log('Updating month subscription', `(${date.getMonth() + 1}/${date.getFullYear()})`)
     if (unsubscribe) {
       unsubscribe()
     }
 
+    await fetchMonth(subscribingMonth.value)
     unsubscribe = Event.subscribeMonth(date, (change) => {
       const { type, doc } = change
       let index: number
 
       switch (type) {
         case 'added':
-          if (!events.value.find(x => x.id === doc.id)) {
-            events.value.push(new Event(doc.id, doc.data() as EventDB))
-            console.log('Added event', doc.id)
-          }
-          break
         case 'modified':
           index = events.value.findIndex(x => x.id === doc.id)
           if (index !== -1) {
@@ -75,27 +104,21 @@ export const useEvents = defineStore('events', () => {
     })
   }
 
-  // Subscribe to upcoming events
-  Event.subscribeUpcoming(5, (type, event) => {
-    const index = upcoming.value.findIndex(x => x.id === event.id)
-    if (index === -1) {
-      upcoming.value.push(event)
-    }
-
-    switch (type) {
-      case 'added':
-      case 'modified':
-        upcoming.value[index] = event
-        break
-      case 'removed':
-        upcoming.value.splice(index, 1)
-        break
-    }
-  })
+  async function fetchMonth (date: Date) {
+    const monthEvents = await Event.getMonth(date)
+    events.value = events.value.filter(x => x.months.includes(`${date.getFullYear()}-${date.getMonth() + 1}`))
+    monthEvents.forEach(x => {
+      if (!events.value.find(y => y.id === x.id)) {
+        events.value.push(x)
+      }
+    })
+  }
 
   return {
     events,
     upcoming,
-    setSubscribingMonth
+    create,
+    setSubscribingMonth,
+    fetchUpcoming
   }
 })

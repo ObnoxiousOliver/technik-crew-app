@@ -1,7 +1,7 @@
 import { Permission } from '@/model/permissions'
 import { createRouter } from './router'
 
-const { router, back, getLastPageOfRoot } = createRouter([
+const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
   // Auth
   {
     title: 'Anmelden',
@@ -85,21 +85,21 @@ const { router, back, getLastPageOfRoot } = createRouter([
   {
     title: 'Termine',
     name: 'events',
-    component: () => import('../views/EventView.vue'),
+    component: () => import('../views/EventsView.vue'),
     requiresAuth: true,
 
     children: [
       {
         title: 'Neuer Termin',
-        name: 'event-add',
+        name: 'events-add',
         pathName: 'add',
-        component: () => import('../views/EventAddView.vue')
+        component: () => import('../views/EventsAddView.vue')
       },
       {
         title: 'Termin',
-        name: 'event',
+        name: 'events-detail',
         pathName: '/:id',
-        component: () => import('../views/EventView.vue')
+        component: () => import('../views/EventsView.vue')
       }
     ]
   },
@@ -265,4 +265,4 @@ const { router, back, getLastPageOfRoot } = createRouter([
 ])
 
 export default router
-export { back, getLastPageOfRoot }
+export { back, getLastPageOfRoot, temporaryRoute }

@@ -144,17 +144,9 @@ body {
   scroll-behavior: smooth;
 }
 
-@media (hover: hover) {
-  ::-webkit-scrollbar {
-    width: 1rem;
-    height: 1rem;
-  }
-  ::-webkit-scrollbar-thumb {
-    background: r.$text-secondary;
-    border-radius: .5rem;
-    border: transparent solid .45rem;
-    background-clip: padding-box;
-  }
+.mobile ::-webkit-scrollbar {
+  width: 0;
+  height: 0;
 }
 
 .window-content {

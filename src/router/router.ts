@@ -3,6 +3,7 @@ import { useUser } from '@/stores/user'
 import { setStore } from '@/utilities/auth'
 import { useBreakpoint } from '@/utilities/breakpoint'
 import { getAuth } from 'firebase/auth'
+import { Component } from 'vue'
 import { createRouter as _createRouter, createWebHistory, RouteComponent, RouteLocationNormalized, RouteMeta, RouteRecordRaw, RouteRecordRedirectOption, RouterOptions } from 'vue-router'
 
 export interface AbstractRoute {
@@ -231,5 +232,58 @@ export function createRouter (routes: AbstractRoute[], options: Partial<RouterOp
     return lastPageOfRoot[root] ?? { name: root }
   }
 
-  return { router, back, getLastPageOfRoot }
+  // Called on the first load of the app
+  const unhookFirstLoad = router.beforeResolve((to, from, next) => {
+    unhookFirstLoad()
+    const tempRoute = JSON.parse(localStorage.getItem('temporary_route') ?? '{}')
+    if (to.path === tempRoute.path) {
+      localStorage.removeItem('temporary_route')
+      next(tempRoute.backPath)
+    }
+    next()
+  })
+
+  function temporaryRoute (name: string, pathName: string, component: Component, meta: RouteMeta = {}) {
+    const currentRoute = router.currentRoute.value
+
+    router.addRoute({
+      name,
+      path: `${currentRoute.path}/${pathName}`,
+      component,
+      meta: {
+        root: currentRoute.meta.root,
+        depth: (currentRoute.meta.depth as number | undefined ?? 0) + 1,
+        requiresAuth: currentRoute.meta.requiresAuth,
+        requiresNoAuth: currentRoute.meta.requiresNoAuth,
+        requiresPermission: currentRoute.meta.requiresPermission,
+        backPath: currentRoute.path,
+        showNavbar: false,
+        ...meta
+      }
+    })
+
+    localStorage.setItem('temporary_route', JSON.stringify({
+      path: `${currentRoute.path}/${pathName}`,
+      backPath: currentRoute.path
+    }))
+
+    console.log('[Router]', 'Added temporary route', name, router.resolve({ name }))
+
+    // Remove route after leaving
+    const unhook = router.afterEach((to, from) => {
+      if (
+        (from.name === currentRoute.name &&
+          to.name !== name) ||
+        (to.name !== currentRoute.name &&
+          to.name !== name && to.meta.root === currentRoute.meta.root)
+      ) {
+        unhook()
+        localStorage.removeItem('temporary_route')
+        router.removeRoute(name)
+        console.log('[Router]', 'Removed temporary route', name)
+      }
+    })
+  }
+
+  return { router, back, getLastPageOfRoot, temporaryRoute }
 }

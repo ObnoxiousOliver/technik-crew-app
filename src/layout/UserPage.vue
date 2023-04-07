@@ -25,7 +25,7 @@
             >
               <i class="bi-search" />
             </Btn>
-            <Btn v-if="addBtn" @click="$emit('addBtn', $event)">
+            <Btn v-if="addBtn" @click="$emit('addBtn', $event)" :to="addBtnTo">
               <i class="bi-plus-lg" />
             </Btn>
           </div>
@@ -103,6 +103,7 @@ import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router'
 
 defineProps({
   addBtn: Boolean,
+  addBtnTo: [Object, String],
   search: Boolean,
   searchRecents: Array,
   searchSuggestions: Array
@@ -275,14 +276,10 @@ function expandSearch (value?: boolean, push = true) {
         }
       }
     }
-    &-enter-active {
-      .user-page__search__input__close-btn i {
-        transition: color .5s, transform .5s cubic-bezier(0.19, 1, 0.22, 1);
-      }
-    }
+    &-enter-active,
     &-leave-active {
       .user-page__search__input__close-btn i {
-        transition: color .5s, transform .3s .2s;
+        transition: color .5s, transform .5s cubic-bezier(0.19, 1, 0.22, 1);
       }
     }
 
@@ -302,7 +299,7 @@ function expandSearch (value?: boolean, push = true) {
 
             .user-page--has-add-btn & {
               clip-path: inset(0);
-              margin-right: 0;
+              margin-right: -1rem;
             }
 
             :deep(.input__before) {
@@ -333,7 +330,7 @@ function expandSearch (value?: boolean, push = true) {
     align-items: center;
     height: 4rem;
     margin: 0 -1.5rem;
-    padding: 1.5rem;
+    padding: 0 .5rem 0 1.5rem;
     background: r.$bg-primary;
     font-size: 1rem;
     font-weight: normal;

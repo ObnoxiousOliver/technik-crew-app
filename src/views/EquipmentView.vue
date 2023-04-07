@@ -1,7 +1,7 @@
 <template>
   <UserPage
     :addBtn="true"
-    @addBtn="router.push('/equipment/add')"
+    :addBtnTo="{ name: 'equipment-add' }"
     :search="true"
     @search="search"
     @searchOpen="inSearchMenu = $event"
@@ -24,11 +24,9 @@
 
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
 import UserPage from '../layout/UserPage.vue'
 import EquipmentList from '../components/EquipmentList.vue'
 import { Equipment } from '../model/equipment'
-const router = useRouter()
 
 const equipment = ref([])
 

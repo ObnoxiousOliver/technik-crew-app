@@ -13,14 +13,19 @@
         <RouterLink
           class="upcoming-events__event-link"
           v-wave
-          :to="{ name: 'event', params: { id: event.id } }"
+          :to="{ name: 'events-detail', params: { id: event.id } }"
         >
           <div :class="['upcoming-events__event-link__color', 'upcoming-events__event-link__color--' + event.color ?? 'gray']"></div>
           <div class="upcoming-events__event-link__name">
             {{ event.name || 'Unbenannter Termin' }}
             <br>
             <span class="upcoming-events__event-link__date">
-              am {{ getDate(event) }}
+              <template v-if="event.startDate !== event.endDate">
+                {{ getDate(event.startDate) }} - {{ getDate(event.endDate) }}
+              </template>
+              <template v-else>
+                {{ getDate(event.startDate) }}
+              </template>
             </span>
             <br>
           </div>
@@ -42,8 +47,8 @@ defineProps<{
   events: Event
 }>()
 
-function getDate (event: Event) {
-  const d = new Date(event.startDate)
+function getDate (date: number) {
+  const d = new Date(date)
 
   let year = 'numeric'
   if (d.getFullYear() === new Date().getFullYear()) {

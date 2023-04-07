@@ -1,65 +1,31 @@
 <template>
-  <Card>
-    <template #title>
-      <Btn @click="showDate = new Date()" :aria-label="`Nach ${new Date().toLocaleString('de', { month:'long' })} springen`">
-        {{ showDate.toLocaleString('de', { month:'long' }) }}
-        {{ showDate.getFullYear() }}
-      </Btn>
+  <calendar-view
+    :show-date="date"
+    :startingDayOfWeek="1"
+    :itemContentHeight="'1.4em'"
+    :itemTop="'2em'"
+    :itemBorderHeight="'0.2em'"
+    :time-format-options="{ hour: 'numeric', minute: '2-digit' }"
+    :items="items"
+    class="calendar theme-default"
+    @itemClick="itemClick"
+  >
+    <template #header>
     </template>
-    <template #btns>
-      <Btn @click="previousMonth" aria-label="Ein Monat zurück">
-        <i class="bi-chevron-left"></i>
-      </Btn>
-      <Btn @click="nextMonth" aria-label="Ein Monat vor">
-        <i class="bi-chevron-right"></i>
-      </Btn>
-      <slot name="btns" />
-    </template>
-    <calendar-view
-      :show-date="showDate"
-      :startingDayOfWeek="1"
-      :itemContentHeight="'1.4em'"
-      :itemBorderHeight="'0.2em'"
-      :time-format-options="{ hour: 'numeric', minute: '2-digit' }"
-      :items="items"
-      class="calendar theme-default"
-    >
-      <template #header>
-      </template>
-    </calendar-view>
-  </Card>
+  </calendar-view>
 </template>
 
 <script lang="ts" setup>
-import Card from './DashboardCard.vue'
 import { CalendarView } from 'vue-simple-calendar'
 import 'vue-simple-calendar/dist/style.css'
 import { ICalendarItem as CalendarItem } from 'vue-simple-calendar/dist/src/ICalendarItem'
 import { EventDB } from '../model/event'
-import { computed, ref, watch } from 'vue'
+import { computed } from 'vue'
 
-const emit = defineEmits([
-  'update:date'
-])
 const props = defineProps({
   events: Array,
   date: Date
 })
-const showDate = ref(props.date ?? new Date())
-watch(showDate, (val) => {
-  emit('update:date', val)
-})
-watch(() => props.date, (val) => {
-  if (val) {
-    showDate.value = val
-  }
-})
-
-const show = ref(false)
-
-setTimeout(() => {
-  show.value = true
-}, 1000)
 
 const items = computed((): CalendarItem[] => props.events
   ?.map((e: EventDB): CalendarItem => ({
@@ -71,19 +37,6 @@ const items = computed((): CalendarItem[] => props.events
   }))
 )
 
-function nextMonth () {
-  const d = new Date(showDate.value)
-  d.setDate(1)
-  d.setMonth(d.getMonth() + 1)
-  showDate.value = d
-}
-function previousMonth () {
-  const d = new Date(showDate.value)
-  d.setDate(1)
-  d.setMonth(d.getMonth() - 1)
-  showDate.value = d
-}
-
 function getDate (dateNumber: number, wholeDay: boolean): string {
   let dateString = ''
   const date = new Date(dateNumber)
@@ -94,6 +47,10 @@ function getDate (dateNumber: number, wholeDay: boolean): string {
   }
 
   return dateString
+}
+
+function itemClick (item: CalendarItem) {
+  console.log(item)
 }
 </script>
 
@@ -121,7 +78,13 @@ function getDate (dateNumber: number, wholeDay: boolean): string {
     }
 
     .cv-header-days {
-      border-width: 1px 0 1px;
+      border-width: 0 0 1px;
+    }
+
+    .cv-header-day {
+      padding: .8rem 0;
+      font-size: .8rem;
+      font-weight: 600;
     }
 
     .cv-weeks {
@@ -149,14 +112,33 @@ function getDate (dateNumber: number, wholeDay: boolean): string {
     }
 
     .today {
-      background: rgba(r.$accent, 0.1);
+
       .cv-day-number {
         color: r.$accent;
       }
+
+      &::before {
+        content: '';
+        z-index: -1;
+        position: absolute;
+        inset: 0 25% auto;
+        height: .3rem;
+        background: r.$accent;
+        border-radius: 0 0 r.$radius r.$radius;
+      }
+    }
+
+    .cv-day {
+      justify-content: center;
+    }
+
+    .cv-day-number {
+      margin-top: .3em;
     }
 
     .outsideOfMonth {
-      color: r.$text-secondary
+      color: r.$text-secondary;
+      font-size: .8rem;
     }
 
     .cv-item {
@@ -172,15 +154,43 @@ function getDate (dateNumber: number, wholeDay: boolean): string {
       cursor: pointer;
     }
 
-    .calendar-gray   { background-color: r.$col-gray; color: white; }
-    .calendar-red    { background-color: r.$col-red; }
-    .calendar-orange { background-color: r.$col-orange; }
-    .calendar-yellow { background-color: r.$col-yellow; }
-    .calendar-green  { background-color: r.$col-green; }
-    .calendar-cyan   { background-color: r.$col-cyan; }
-    .calendar-blue   { background-color: r.$col-blue; }
-    .calendar-purple { background-color: r.$col-purple; }
-    .calendar-pink   { background-color: r.$col-pink; }
+    .calendar-gray {
+      background-color: r.$col-gray;
+      color: white;
+      // box-shadow: rgba(r.$col-gray, 0.2) 0 .2rem 1rem;
+    }
+    .calendar-red {
+      background-color: r.$col-red;
+      // box-shadow: rgba(r.$col-red, 0.2) 0 .2rem 1rem;
+    }
+    .calendar-orange {
+      background-color: r.$col-orange;
+      // box-shadow: rgba(r.$col-orange, 0.2) 0 .2rem 1rem;
+    }
+    .calendar-yellow {
+      background-color: r.$col-yellow;
+      // box-shadow: rgba(r.$col-yellow, 0.2) 0 .2rem 1rem;
+    }
+    .calendar-green {
+      background-color: r.$col-green;
+      // box-shadow: rgba(r.$col-green, 0.2) 0 .2rem 1rem;
+    }
+    .calendar-cyan {
+      background-color: r.$col-cyan;
+      // box-shadow: rgba(r.$col-cyan, 0.2) 0 .2rem 1rem;
+    }
+    .calendar-blue {
+      background-color: r.$col-blue;
+      // box-shadow: rgba(r.$col-blue, 0.2) 0 .2rem 1rem;
+    }
+    .calendar-purple {
+      background-color: r.$col-purple;
+      // box-shadow: rgba(r.$col-purple, 0.2) 0 .2rem 1rem;
+    }
+    .calendar-pink {
+      background-color: r.$col-pink;
+      // box-shadow: rgba(r.$col-pink, 0.2) 0 .2rem 1rem;
+    }
 
     .toBeContinued {
       border-top-right-radius: 0;

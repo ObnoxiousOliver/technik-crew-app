@@ -29,17 +29,22 @@ export const useLocations = defineStore('locations', () => {
   // Save locations to local storage
   watch(locations, (locations) => {
     localStorage.setItem('locations', JSON.stringify(locations.map(x => [x.id, x.toDB()])))
+  }, {
+    deep: true
   })
 
   // Load locations from local storage
   locations.value = JSON.parse(localStorage.getItem('locations') || '[]')
     .map((loc: [string, LocationDB]) => new Location(loc[0], loc[1]))
 
+  const loading = ref(locations.value.length === 0)
+
   // Subscribe to changes
   Location.subscribe((type, location) => {
     const index = locations.value.findIndex(x => x.id === location.id)
     if (index === -1) {
       locations.value.push(location)
+      loading.value = false
       return
     }
 
@@ -59,6 +64,7 @@ export const useLocations = defineStore('locations', () => {
     fetchAll,
     create,
     getLocationById,
-    search
+    search,
+    loading
   }
 })
