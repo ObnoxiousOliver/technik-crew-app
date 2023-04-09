@@ -1,7 +1,8 @@
 import { decryptEmail } from '@/utilities/auth'
-import { collection, doc, getDoc, getDocs, getFirestore, query, setDoc, where } from 'firebase/firestore'
+import { collection, doc, getDoc, getDocs, getFirestore, onSnapshot, query, setDoc, where } from 'firebase/firestore'
 import { TicketDB } from './ticket'
 import { PermissionsDB, Permission } from './permissions'
+import { getAuth } from 'firebase/auth'
 
 export enum Gender {
   NonBinary = 'non-binary',
@@ -56,6 +57,15 @@ export class User implements UserDB {
     return this.cachedEmail
   }
 
+  subscribeEmail (callback: (email: string) => void) {
+    const db = getFirestore()
+    const unsubscribe = onSnapshot(doc(db, 'user-mail', this.username), doc => {
+      this.cachedEmail = decryptEmail(doc.get('email'), this.username)
+      callback(this.cachedEmail)
+    })
+    return unsubscribe
+  }
+
   cachedPermissions: PermissionsDB | undefined
   async getPermissions () {
     if (!this.cachedPermissions) {
@@ -72,6 +82,17 @@ export class User implements UserDB {
       this.cachedPermissions = permissions
     }
     return Object.assign({}, this.cachedPermissions)
+  }
+
+  static subscribePermissions (uid: string, callback: (permissions: PermissionsDB) => void) {
+    const db = getFirestore()
+
+    const unsubscribe = onSnapshot(doc(db, 'permissions', uid), doc => {
+      const permissions = doc.data() ?? {}
+      callback(permissions)
+    })
+
+    return unsubscribe
   }
 
   async setPermissions (changes: PermissionsDB) {
@@ -118,21 +139,31 @@ export class User implements UserDB {
     return this.cachedUid
   }
 
-  private static cashedUsers: {
-    // eslint-disable-next-line no-use-before-define
-    [username: string]: User
-  } = {}
+  static async getUsername (uid: string | undefined = getAuth().currentUser?.uid) {
+    if (!uid) return undefined
 
-  static async fromUsername (username: string, useCache = true): Promise<User | undefined> {
-    if (useCache && !this.cashedUsers[username]) {
-      const db = getFirestore()
+    const db = getFirestore()
 
-      const userDoc = await getDoc(doc(db, 'users', username))
-      if (!userDoc.exists()) return undefined
-      const user = userDoc.data() as UserDB
-      this.cashedUsers[username] = new User(user)
-    }
-    return this.cashedUsers[username]
+    return (await getDoc(doc(db, 'usernames', uid))).get('username')
+  }
+
+  static async getCurrentUser () {
+    const db = getFirestore()
+
+    const userDoc = await getDoc(doc(db, 'users', await this.getUsername()))
+    const user = userDoc.data() as UserDB
+    return new User(user)
+  }
+
+  static async fromUsername (username: string): Promise<User | undefined> {
+    const db = getFirestore()
+
+    const userDoc = await getDoc(doc(db, 'users', username))
+
+    if (!userDoc.exists()) return undefined
+
+    const user = userDoc.data() as UserDB
+    return new User(user)
   }
 
   static getDisplayName (user: {

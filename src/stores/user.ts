@@ -1,20 +1,100 @@
 import { getDefaultPermissions } from '@/model/permissions'
 import { User } from '@/model/user'
+import { getAuth } from 'firebase/auth'
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 export const useUser = defineStore('user', () => {
   const user = ref(null as null | User)
+  const username = computed(() => user.value?.username)
   const permissions = ref(getDefaultPermissions())
+  const email = ref(null as null | string)
+  const uid = ref(null as null | string)
+
+  watch([user, uid], async () => {
+    if (user.value) {
+      uid.value = getAuth().currentUser?.uid ?? null
+
+      setSubscription()
+      localStorage.setItem('last_user', JSON.stringify({
+        user: user.value?.toDB(),
+        permissions: permissions.value,
+        email: email.value,
+        uid: uid.value
+      }))
+    } else {
+      reset()
+    }
+  })
+
+  const lastUser = localStorage.getItem('last_user')
+  if (lastUser) {
+    const {
+      user: u,
+      permissions: p,
+      email: e,
+      uid: i
+    } = JSON.parse(lastUser)
+
+    user.value = new User(u)
+    Object.assign(permissions.value, p)
+    email.value = e
+    uid.value = i
+  }
+
+  let unsubscribe: (() => void) | null = null
+  function setSubscription () {
+    if (unsubscribe) unsubscribe()
+    if (!user.value) {
+      permissions.value = getDefaultPermissions()
+      email.value = null
+      uid.value = null
+      return
+    }
+
+    const u1 = user.value.subscribeEmail(e => {
+      email.value = e
+    })
+
+    let u2: (() => void) | undefined
+    if (uid.value) {
+      u2 = User.subscribePermissions(uid.value, p => {
+        Object.assign(permissions.value, p)
+      })
+    }
+
+    unsubscribe = () => {
+      u1()
+      u2?.()
+    }
+  }
+
+  async function setStore () {
+    const u = await User.getCurrentUser()
+    if (u) {
+      user.value = u
+      setSubscription()
+    } else {
+      user.value = null
+    }
+  }
 
   function reset () {
+    if (unsubscribe) unsubscribe()
+    localStorage.removeItem('last_user')
     user.value = null
     permissions.value = getDefaultPermissions()
+    email.value = null
+    uid.value = null
   }
 
   return {
     user,
+    username,
     permissions,
+    email,
+    uid,
+    setStore,
     reset
   }
 })
