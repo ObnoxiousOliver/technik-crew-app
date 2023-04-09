@@ -24,12 +24,6 @@ import { createPinia } from 'pinia'
 import 'bootstrap-icons/font/bootstrap-icons.scss'
 import './registerServiceWorker'
 import './main'
-import { useUser } from './stores/user'
-import { useUsers } from './stores/users'
-import { useEvents } from './stores/events'
-import { useLocations } from './stores/locations'
-import { useTicket } from './stores/ticket'
-import { useNewEventStore } from './stores/newEvent'
 
 // #region Initialize Firebase
 const firebaseConfig = {

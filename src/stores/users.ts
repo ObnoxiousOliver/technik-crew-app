@@ -5,10 +5,6 @@ import { defineStore } from 'pinia'
 export const useUsers = defineStore('users', () => {
   const users = ref<{ [key: string]: User }>({})
 
-  async function fetchAll () {
-    users.value = await User.get()
-  }
-
   function getUserByUsername (username: string) {
     return users.value[username] ?? null
   }
@@ -27,11 +23,8 @@ export const useUsers = defineStore('users', () => {
       users.value[user[0]] = new User(user[1])
     })
 
-  fetchAll()
-
   return {
     users,
-    fetchAll,
     getUserByUsername
   }
 })

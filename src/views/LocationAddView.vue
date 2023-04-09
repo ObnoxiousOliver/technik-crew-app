@@ -17,9 +17,6 @@
       <Btn type="submit">
         Hinzufügen
       </Btn>
-      <Btn @click="back">
-        Abbrechen
-      </Btn>
       <FormInfo :show="err">
         {{ err }}
       </FormInfo>

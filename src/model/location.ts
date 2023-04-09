@@ -148,7 +148,7 @@ export class Location {
     return location
   }
 
-  static async subscribe (onChange: (type: 'added' | 'modified' | 'removed', location: Location) => void) {
+  static subscribe (onChange: (type: 'added' | 'modified' | 'removed', location: Location) => void) {
     const db = getFirestore()
 
     onSnapshot(collection(db, 'locations'), {

@@ -167,12 +167,10 @@ function onScroll () {
     background: r.$bg-primary;
     padding: 0 .5rem;
 
-    :deep(.btn) {
+    :deep(:where(.btn)) {
+      @include r.btnTransparent;
+      @include r.btnSquare;
       flex: 0 0 auto;
-      background: none !important;
-      padding: 0;
-      width: 3rem;
-      height: 3rem;
     }
 
     &__title {

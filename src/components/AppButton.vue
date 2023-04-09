@@ -59,8 +59,7 @@ onMounted(() => {
   padding: .875rem 2rem;
   font-weight: 600;
 
-  background: r.$bg-secondary;
-  border-radius: r.$radius;
+  @include r.box;
   cursor: pointer;
 
   transition: background-color .2s, box-shadow .2s, opacity .2s;

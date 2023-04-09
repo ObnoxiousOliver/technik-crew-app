@@ -35,5 +35,12 @@ const props = defineProps<{
     }
   }
 
+  &.space-top {
+    margin-top: 1rem;
+  }
+
+  &.space-bottom {
+    margin-bottom: 1rem;
+  }
 }
 </style>

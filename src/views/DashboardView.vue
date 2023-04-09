@@ -7,13 +7,7 @@
     <div class="dashboard-grid">
       <UpcomingEventsCard :events="upcomingEvents" />
 
-      <EventCalendar :events="events" v-model:date="date">
-        <template #btns>
-          <Btn @click="refresh">
-            <i class="bi-arrow-counterclockwise"/>
-          </Btn>
-        </template>
-      </EventCalendar>
+      <EventCalendarCard :events="events" v-model:date="date" />
     </div>
   </UserPage>
 </template>
@@ -21,31 +15,21 @@
 <script lang="ts" setup>
 import UpcomingEventsCard from '@/components/UpcomingEventsCard.vue'
 import { useEvents } from '@/stores/events'
-import { computed, onMounted, ref, watch } from 'vue'
-import EventCalendar from '../components/EventCalendar.vue'
+import { computed, ref, watch } from 'vue'
+import EventCalendarCard from '../components/EventCalendarCard.vue'
 import UserPage from '../layout/UserPage.vue'
 
 const eventStore = useEvents()
 const events = computed(() => eventStore.events)
 
-const upcomingAmount = ref(3)
 const upcomingEvents = computed(() => eventStore.upcoming)
-onMounted(async () => {
-  await refresh()
-})
+
+eventStore.fetchUpcoming()
 
 const date = ref(new Date())
 watch(date, (val) => {
-  eventStore.fetchMonth(val)
+  eventStore.setSubscribingMonth(val)
 })
-async function refresh () {
-  await getMonth()
-  await eventStore.fetchUpcoming(upcomingAmount.value)
-}
-
-async function getMonth () {
-  await eventStore.fetchMonth(date.value)
-}
 </script>
 
 <style lang="scss" scoped>

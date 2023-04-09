@@ -8,12 +8,21 @@
       '--selected-index': selectedIndex,
       '--color-count': colors.length,
       '--menu-left': rect?.left + 'px',
+      '--menu-top': rect?.top + 'px',
     }"
   >
     <button
       type="button"
       @click="open = !open"
-      class="select-color__btn"
+      :class="['select-color__btn', {
+        'select-color__btn--open': open
+      }]"
+    />
+
+    <div
+      v-if="open"
+      class="select-color__mask"
+      @pointerdown="open = false"
     />
 
     <Transition name="select-color__menu">
@@ -108,6 +117,7 @@ function select (val: string) {
   height: 2rem;
 
   &__btn {
+    flex: 0 0 auto;
     width: 2rem;
     height: 2rem;
 
@@ -128,7 +138,7 @@ function select (val: string) {
       box-shadow: rgba(r.$text-primary, 0.2) 0 0 0 1px inset, r.$focus;
     }
 
-    &:not(.select-color__menu &) {
+    &:not(.select-color__menu &):not(&--open) {
       box-shadow:
         rgba(r.$text-primary, 0.2) 0 0 0 1px inset,
         var(--color-a) 0 .5rem 2rem;
@@ -154,16 +164,25 @@ function select (val: string) {
     position: absolute;
     top: -.5rem;
     left: -.5rem;
-    z-index: 2;
+    z-index: 99;
     display: flex;
-    flex-flow: row wrap;
+    flex-flow: column;
     gap: .5rem;
-    width: max-content;
-    max-width: calc(100vw - var(--menu-left));
+    width: auto;
     min-width: 3rem;
+    height: max-content;
+    max-height: calc(100vh - var(--menu-top) - 5rem);
+    min-height: 3rem;
+    overflow: auto;
     padding: .5rem;
     border-radius: 1.5rem;
     background: r.$bg-secondary;
+
+    // Hide scrollbar
+    scrollbar-width: none;
+    &::-webkit-scrollbar {
+      display: none;
+    }
 
     &-enter-active,
     &-leave-active {
@@ -174,6 +193,13 @@ function select (val: string) {
     &-leave-to {
       opacity: 0;
     }
+  }
+
+  &__mask {
+    position: fixed;
+    inset: 0;
+    pointer-events: all;
+    z-index: 99;
   }
 }
 </style>

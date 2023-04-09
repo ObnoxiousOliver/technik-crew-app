@@ -4,9 +4,6 @@
       <i class="bi-geo-alt" />Standorte
     </template>
     <template #btns>
-      <Btn @click="reload" aria-label="Aktualisieren">
-        <i class="bi-arrow-clockwise" />
-      </Btn>
       <Btn :to="{
         name: 'location-add'
       }" aria-label="Neuer Standort">
@@ -14,22 +11,24 @@
       </Btn>
     </template>
 
-    <InputField
-      v-model="searchInput"
-      class="locations-view__search"
-      placeholder="Suchen..."
-    >
-      <template #before>
-        <i class="bi-search" />
-      </template>
-      <template #after>
-        <Btn @click="searchInput = ''" aria-label="Suche leeren">
-          <i class="bi-x-lg" />
-        </Btn>
-      </template>
-    </InputField>
+    <div class="locations-view__sticky">
+      <InputField
+        v-model="searchInput"
+        class="locations-view__search"
+        placeholder="Suchen..."
+      >
+        <template #before>
+          <i class="bi-search" />
+        </template>
+        <template #after>
+          <Btn @click="searchInput = ''" aria-label="Suche leeren">
+            <i class="bi-x-lg" />
+          </Btn>
+        </template>
+      </InputField>
+    </div>
 
-    <div class="locations-view__divider"/>
+    <Spinner v-if="loading" />
 
     <LocationsList :locations="locations" @click="open" />
 
@@ -78,12 +77,13 @@
 <script lang="ts" setup>import LocationsList from '@/components/LocationsList.vue'
 import { useLocations } from '@/stores/locations'
 import { storeToRefs } from 'pinia'
-import { computed, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 import { useToast } from '@/utilities/toast'
 
 const locationStore = useLocations()
 
 const rawLocations = storeToRefs(locationStore).locations
+const { loading } = storeToRefs(locationStore)
 
 const locations = computed(() => {
   if (searchInput.value === '') return rawLocations.value
@@ -93,10 +93,6 @@ const locations = computed(() => {
 const show = ref(false)
 const location = ref<Location>(null)
 const searchInput = ref('')
-
-function reload () {
-  locationStore.fetchAll()
-}
 
 function open (loc) {
   location.value = loc
@@ -112,12 +108,21 @@ function copyID () {
 <style lang="scss" scoped>
 @use '../scss' as r;
 
-.locations-view__search {
-  width: stretch;
-}
+.locations-view {
+  &__sticky {
+    z-index: 1;
+    background: r.$bg-primary;
+    position: sticky;
+    top: 0;
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+    // padding: 0 1.5rem 1rem;
+    // margin: 0 -1.5rem 1rem;
+    // border-bottom: 1px solid r.$bg-stroke;
+  }
 
-.locations-view__divider {
-  margin: 1rem 0;
-  border-bottom: 1px solid r.$bg-stroke;
+  &__search {
+    width: stretch;
+  }
 }
 </style>

@@ -1,4 +1,4 @@
-import { addDoc, collection, doc, getDoc, getDocs, getFirestore, limit, query, setDoc, where } from 'firebase/firestore'
+import { addDoc, collection, doc, DocumentChange, DocumentData, getDoc, getDocs, getFirestore, limit, onSnapshot, query, setDoc, where } from 'firebase/firestore'
 
 export type EventColors = 'gray' | 'red' | 'orange' | 'yellow' | 'green' | 'cyan' | 'blue' | 'purple' | 'pink'
 
@@ -7,9 +7,11 @@ export interface EventDB {
   description: string,
   wholeDay: boolean,
   startDate: number,
-  endDate: number | null,
+  endDate: number,
   color: EventColors,
-  months: string[] // "YYYY-MM"
+  months: string[], // "YYYY-MM"
+  neededUsers: string[],
+  neededEquipment: string[]
 }
 
 export default class Event {
@@ -48,11 +50,11 @@ export default class Event {
     this.event.startDate = startDate
   }
 
-  get endDate (): number | null {
+  get endDate (): number {
     return this.event.endDate
   }
 
-  set endDate (endDate: number | null) {
+  set endDate (endDate: number) {
     this.event.endDate = endDate
   }
 
@@ -68,17 +70,60 @@ export default class Event {
     return this.event.months
   }
 
+  get neededUsers (): string[] {
+    return this.event.neededUsers
+  }
+
+  set neededUsers (neededUsers: string[]) {
+    this.event.neededUsers = neededUsers
+  }
+
+  get neededEquipment (): string[] {
+    return this.event.neededEquipment
+  }
+
+  set neededEquipment (neededEquipment: string[]) {
+    this.event.neededEquipment = neededEquipment
+  }
+
   constructor (id: string | null, options: Partial<EventDB> = {}) {
     this.id = id
+
+    const startDate = options.startDate
+      ? new Date(options.startDate)
+      : new Date()
+
+    let endDate: Date | null = options.endDate
+      ? new Date(options.endDate)
+      : new Date()
+
+    if (options.wholeDay) {
+      startDate.setHours(0, 0, 0, 0)
+      endDate.setHours(0, 0, 0, 0)
+    }
+
+    if (startDate.getTime() >= endDate.getTime()) {
+      if (options.wholeDay) {
+        endDate = null
+      } else {
+        endDate = new Date(startDate)
+        endDate.setHours(endDate.getHours() + 1)
+      }
+    }
 
     this.event = {
       name: options.name ?? 'Unbenannter Termin',
       description: options.description ?? '',
       wholeDay: options.wholeDay ?? true,
-      startDate: options.startDate ?? new Date().getTime(),
-      endDate: options.endDate ?? null,
+      startDate: startDate.getTime(),
+      endDate: endDate?.getTime() ?? startDate.getTime(),
       color: options.color ?? 'gray',
-      months: options.months ?? Event.getOverlappingMonths(options.startDate ?? new Date().getTime(), options.endDate ?? null)
+      months: options.months ??
+        Event.getOverlappingMonths(
+          startDate.getTime(),
+          endDate?.getTime() ?? startDate.getTime()),
+      neededUsers: options.neededUsers ?? [],
+      neededEquipment: options.neededEquipment ?? []
     }
   }
 
@@ -98,11 +143,11 @@ export default class Event {
     return this.event
   }
 
-  static getOverlappingMonths (startDate: number, endDate: number | null): string[] {
+  static getOverlappingMonths (startDate: number, endDate: number): string[] {
     const months: string[] = []
 
     const start = new Date(startDate)
-    const end = endDate ? new Date(endDate) : new Date(startDate)
+    const end = new Date(endDate)
 
     // set start date to the first day of the week
     start.setDate(start.getDate() - start.getDay())
@@ -139,8 +184,6 @@ export default class Event {
       where('months', 'array-contains', `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`)
     ))
 
-    console.log(`Fetched ${querySnapshot.size} events for ${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`)
-
     const events: Event[] = []
     querySnapshot.forEach((doc) => {
       events.push(new Event(doc.id, doc.data() as EventDB))
@@ -149,12 +192,35 @@ export default class Event {
     return events
   }
 
+  static subscribeMonth (date: Date, onChange: (change: DocumentChange<DocumentData>) => void) {
+    const db = getFirestore()
+
+    const dateString = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`
+
+    const q = query(
+      collection(db, 'events'),
+      where('months', 'array-contains', dateString)
+    )
+
+    const unsubscribe = onSnapshot(q, {
+    }, (querySnapshot) => {
+      querySnapshot.docChanges().forEach((change) => {
+        onChange(change)
+      })
+    })
+
+    return unsubscribe
+  }
+
   static async getUpcoming (n: number) {
     const db = getFirestore()
 
+    const now = new Date()
+    now.setHours(0, 0, 0, 0)
+
     const querySnapshot = await getDocs(query(
       collection(db, 'events'),
-      where('startDate', '>=', Date.now()),
+      where('startDate', '>=', now.getTime()),
       limit(n)
     ))
 
