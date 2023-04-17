@@ -8,6 +8,8 @@
       </div>
       <i v-if="props.arrow" class="settings-list-item__arrow bi-chevron-right" />
     </component>
+
+    <slot name="over" />
   </li>
 </template>
 
@@ -24,6 +26,8 @@ const props = defineProps({
 @use '../scss' as r;
 
 .settings-list-item {
+  position: relative;
+
   &--danger {
     color: r.$danger;
   }
@@ -38,7 +42,9 @@ const props = defineProps({
     display: flex;
     color: inherit;
     text-decoration: none;
-    padding: 1rem 1.5rem;
+    padding: 0 1.5rem;
+    line-height: 3rem;
+    height: 3rem;
   }
 
   &__content {

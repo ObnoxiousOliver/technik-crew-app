@@ -151,7 +151,7 @@ export class Location {
   static subscribe (onChange: (type: 'added' | 'modified' | 'removed', location: Location) => void) {
     const db = getFirestore()
 
-    onSnapshot(collection(db, 'locations'), {
+    return onSnapshot(collection(db, 'locations'), {
       next: (querySnapshot) => {
         querySnapshot.docChanges().forEach((change) => {
           const location = new Location(change.doc.id, change.doc.data() as LocationDB)

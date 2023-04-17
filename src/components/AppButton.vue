@@ -40,7 +40,7 @@ onMounted(() => {
   if (!btnEl.value) return
 
   if (!btnEl.value.textContent && !props['aria-label']) {
-    console.warn('AppButton: Button is not accessible. Make sure to set a label.', btnEl.value)
+    // console.warn('AppButton: Button is not accessible. Make sure to set a label.', btnEl.value)
   }
 })
 </script>
@@ -89,6 +89,10 @@ onMounted(() => {
 
   &.btn--square {
     @include r.btnSquare;
+
+    &.btn--small {
+      @include r.btnSquare(2rem);
+    }
   }
 
   &.btn--transparent {

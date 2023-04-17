@@ -76,7 +76,7 @@ export const useEvents = defineStore('events', () => {
       unsubscribe()
     }
 
-    await fetchMonth(subscribingMonth.value)
+    await fetchMonth(date)
     unsubscribe = Event.subscribeMonth(date, (change) => {
       const { type, doc } = change
       let index: number
@@ -106,7 +106,7 @@ export const useEvents = defineStore('events', () => {
 
   async function fetchMonth (date: Date) {
     const monthEvents = await Event.getMonth(date)
-    events.value = events.value.filter(x => x.months.includes(`${date.getFullYear()}-${date.getMonth() + 1}`))
+    events.value = events.value.filter(x => !x.months.includes(`${date.getFullYear()}-${date.getMonth() + 1}`))
     monthEvents.forEach(x => {
       if (!events.value.find(y => y.id === x.id)) {
         events.value.push(x)

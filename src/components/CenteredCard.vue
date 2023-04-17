@@ -27,12 +27,13 @@
 
   &__icon {
     font-size: 2rem;
+    margin-bottom: 1rem;
   }
 
   &__title {
     font-size: 2rem;
     font-weight: 600;
-    margin-bottom: 0.5rem;
+    margin-bottom: .5rem;
   }
 
   &__content {

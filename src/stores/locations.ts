@@ -2,6 +2,7 @@ import { Location, LocationDB } from '@/model/location'
 import { defineStore } from 'pinia'
 import { ref, watch } from 'vue'
 import { search as s } from '@/utilities/search'
+import { Unsubscribe, getAuth, onAuthStateChanged } from 'firebase/auth'
 
 export const useLocations = defineStore('locations', () => {
   const locations = ref<Location[]>([])
@@ -40,22 +41,39 @@ export const useLocations = defineStore('locations', () => {
   const loading = ref(locations.value.length === 0)
 
   // Subscribe to changes
-  Location.subscribe((type, location) => {
-    const index = locations.value.findIndex(x => x.id === location.id)
-    if (index === -1) {
-      locations.value.push(location)
-      loading.value = false
-      return
+  let unsubscribe: (() => void) | null = null
+  function subscribe () {
+    if (unsubscribe) {
+      unsubscribe()
     }
 
-    switch (type) {
-      case 'added':
-      case 'modified':
-        locations.value[index] = location
-        break
-      case 'removed':
-        locations.value.splice(index, 1)
-        break
+    unsubscribe = Location.subscribe((type, location) => {
+      const index = locations.value.findIndex(x => x.id === location.id)
+      if (index === -1) {
+        locations.value.push(location)
+        loading.value = false
+        return
+      }
+
+      switch (type) {
+        case 'added':
+        case 'modified':
+          locations.value[index] = location
+          break
+        case 'removed':
+          locations.value.splice(index, 1)
+          break
+      }
+    })
+  }
+
+  onAuthStateChanged(getAuth(), (user) => {
+    if (user) {
+      if (unsubscribe) return
+      subscribe()
+    } else {
+      unsubscribe?.()
+      unsubscribe = null
     }
   })
 

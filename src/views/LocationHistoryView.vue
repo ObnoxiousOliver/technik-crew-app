@@ -1,5 +1,5 @@
 <template>
-  <Page>
+  <Page opaqueTitlebar>
     <template #title>
       <i class="bi-clock-history" /> Standortverlauf
     </template>

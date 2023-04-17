@@ -34,6 +34,12 @@ const props = defineProps({
     padding: 0 1.5rem;
   }
 
+  &__title {
+    :deep(i) {
+      margin-right: .5rem;
+    }
+  }
+
   &__label {
     flex: 1 1 auto;
     line-height: 1.5;

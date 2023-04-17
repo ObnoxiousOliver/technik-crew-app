@@ -1,5 +1,5 @@
 import { useUser } from '@/stores/user'
-import { addDoc, collection, deleteDoc, doc, DocumentData, getDoc, getDocs, getFirestore, query, QuerySnapshot, setDoc, where } from 'firebase/firestore'
+import { addDoc, collection, deleteDoc, doc, DocumentChangeType, DocumentData, getDoc, getDocs, getFirestore, onSnapshot, query, QuerySnapshot, setDoc, where } from 'firebase/firestore'
 import { HistoryState } from './history'
 import { Location } from './location'
 
@@ -46,7 +46,7 @@ export const EquipmentTypeInfo: {
     name: 'Mikrofon'
   },
   other: {
-    icon: 'bi-question-circle',
+    icon: 'bi-box',
     name: 'Sonstiges'
   }
 }
@@ -58,6 +58,8 @@ export interface EquipmentDB {
   location: string | null
   group: string | null
   is_hidden: boolean
+  code: string | null
+  amount: number | null
 }
 
 export class Equipment {
@@ -82,6 +84,12 @@ export class Equipment {
   get isHidden () { return this.equipment.is_hidden }
   private set isHidden (value) { this.equipment.is_hidden = value }
 
+  get code () { return this.equipment.code }
+  private set code (value) { this.equipment.code = value }
+
+  get amount () { return this.equipment.amount }
+  private set amount (value) { this.equipment.amount = value }
+
   constructor (id: string | null, options: Partial<EquipmentDB> = {}) {
     this.id = id
     this.equipment = {
@@ -90,7 +98,9 @@ export class Equipment {
       description: options.description ?? '',
       location: options.location ?? null,
       group: options.group ?? null,
-      is_hidden: options.is_hidden ?? false
+      is_hidden: options.is_hidden ?? false,
+      code: options.code ?? null,
+      amount: options.amount ?? null
     }
   }
 
@@ -101,7 +111,9 @@ export class Equipment {
       description: this.equipment.description,
       location: this.equipment.location,
       group: this.equipment.group,
-      is_hidden: this.equipment.is_hidden
+      is_hidden: this.equipment.is_hidden,
+      code: this.equipment.code,
+      amount: this.equipment.amount
     }
   }
 
@@ -178,6 +190,26 @@ export class Equipment {
 
       return notes
     }
+  }
+
+  subscribeNotes (onChange: (type: DocumentChangeType, note: {
+    id: string
+    note: NoteDB
+  }) => void) {
+    if (!this.id) {
+      throw new Error('Cannot subscribe to notes on an equipment without an id')
+    }
+
+    const db = getFirestore()
+
+    const unsubscribe = onSnapshot(collection(db, 'equipment', this.id, 'notes'), (querySnapshot) => {
+      querySnapshot.docChanges().forEach((change) => {
+        const note = change.doc.data() as NoteDB
+        onChange(change.type, { note, id: change.doc.id })
+      })
+    })
+
+    return unsubscribe
   }
 
   async addNote (content: string) {
@@ -345,6 +377,34 @@ export class Equipment {
     })
   }
 
+  async setCode (code: string) {
+    if (!this.id) {
+      throw new Error('Cannot get history on an equipment without an id')
+    }
+    if (this.code === code) return
+
+    this.code = code
+    await this.save()
+    await this.recordHistory({
+      description: `Scan Code geändert -> ${code}`
+    })
+  }
+
+  async setAmount (amount: number) {
+    if (!this.id) {
+      throw new Error('Cannot get history on an equipment without an id')
+    }
+    if (amount < 1) throw new Error('Amount must be greater than or equal to 1')
+    if (amount % 1 !== 0) throw new Error('Amount must be an integer')
+
+    if (this.amount === amount) return
+    this.amount = amount === 1 ? null : amount
+    await this.save()
+    await this.recordHistory({
+      description: `Anzahl geändert -> ${amount}`
+    })
+  }
+
   async remove () {
     await this.setHidden(true)
   }
@@ -366,6 +426,9 @@ export class Equipment {
     [id: string]: Equipment
   } = {}
 
+  /**
+   * @deprecated use useEquipment() instead
+   */
   static async get (id?: string, onlyHidden: boolean| null = false, useCache = false) {
     const db = getFirestore()
 
@@ -398,6 +461,9 @@ export class Equipment {
     }
   }
 
+  /**
+   * @deprecated use useEquipment() instead
+   */
   static async getFromGroup (group: string) {
     const db = getFirestore()
     const querySnapshot = await getDocs(query(collection(db, 'equipment'), where('group', '==', group)))
@@ -405,6 +471,9 @@ export class Equipment {
     return querySnapshot.docs.map(x => new Equipment(x.id, x.data() as EquipmentDB))
   }
 
+  /**
+   * @deprecated use useEquipment() instead
+   */
   static async getFromLocation (location: string) {
     const db = getFirestore()
     const querySnapshot = await getDocs(query(collection(db, 'equipment'), where('location', '==', location)))
@@ -412,6 +481,9 @@ export class Equipment {
     return querySnapshot.docs.map(x => new Equipment(x.id, x.data() as EquipmentDB))
   }
 
+  /**
+   * @deprecated use useEquipment() instead
+   */
   static async getFromType (type: string) {
     const db = getFirestore()
     const querySnapshot = await getDocs(query(collection(db, 'equipment'), where('type', '==', type)))
@@ -427,5 +499,16 @@ export class Equipment {
       }
     }
     return groups
+  }
+
+  static subscribe (onChange: (type: DocumentChangeType, eq: Equipment) => void) {
+    const db = getFirestore()
+
+    return onSnapshot(collection(db, 'equipment'), (snapshot) => {
+      snapshot.docChanges().forEach((change) => {
+        const eq = new Equipment(change.doc.id, change.doc.data() as EquipmentDB)
+        onChange(change.type, eq)
+      })
+    })
   }
 }

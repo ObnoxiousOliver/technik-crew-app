@@ -118,7 +118,7 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
     title: 'Equipment',
     name: 'equipment',
     path: '/equipment',
-    component: () => import('../views/EquipmentView.vue'),
+    component: () => import('../views/equipment/EquipmentView.vue'),
     requiresAuth: true,
 
     children: [
@@ -126,13 +126,39 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
         title: 'Neues Equipment',
         name: 'equipment-add',
         pathName: 'add',
-        component: () => import('../views/EquipmentAddView.vue')
+        component: () => import('../views/equipment/EquipmentAddView.vue')
       },
       {
         title: 'Equipment Details',
         name: 'equipment-details',
         path: '/equipment/:id',
-        component: () => import('../views/EquipmentDetailsView.vue')
+        component: () => import('../views/equipment/EquipmentDetailsView.vue'),
+        children: [
+          {
+            title: 'Equipment Verlauf',
+            name: 'equipment-history',
+            path: '/equipment/:id/history',
+            component: () => import('../views/equipment/EquipmentHistoryView.vue')
+          },
+          {
+            title: 'Equipment bearbeiten',
+            name: 'equipment-edit',
+            path: '/equipment/:id/edit/:field?',
+            component: () => import('../views/equipment/EquipmentEditView.vue')
+          },
+          {
+            title: 'Equipment Anzahl Teilen',
+            name: 'equipment-split',
+            path: '/equipment/:id/split',
+            component: () => import('../views/equipment/EquipmentSplitView.vue')
+          }
+        ]
+      },
+      {
+        title: 'Equipment Code Scannen',
+        name: 'equipment-scan',
+        pathName: '/scan',
+        component: () => import('../views/equipment/EquipmentScanView.vue')
       },
 
       // Locations

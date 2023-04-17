@@ -15,14 +15,14 @@
 .settings-list-divider {
   position: relative;
   color: r.$text-secondary;
-  margin: 0 1rem;
+  margin: 0 1.5rem;
   padding: .5rem .3rem;
   font-size: .8rem;
   font-weight: 600;
   text-transform: uppercase;
 
   &--has-label {
-    margin: 1.5rem 1rem .5rem;
+    margin: 1.5rem 1.5rem .5rem;
     padding: 0 .3rem;
   }
 

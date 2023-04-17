@@ -256,7 +256,7 @@ $transition: .5s cubic-bezier(0.19, 1, 0.22, 1);
 
 .mobile-navbar-mask {
   z-index: 99;
-  position: absolute;
+  position: fixed;
   inset: auto 0 0;
   height: 5rem;
   background: linear-gradient(transparent, rgba(r.$bg-primary, 0.3), rgba(r.$bg-primary, 0.66), rgba(r.$bg-primary, 0.9), r.$bg-primary);

@@ -331,7 +331,25 @@ function expandSearch (value?: boolean, push = true) {
     height: 4rem;
     margin: 0 -1.5rem;
     padding: 0 .5rem 0 1.5rem;
-    background: r.$bg-primary;
+    background: linear-gradient(
+      to bottom,
+      r.$bg-primary 0%,
+      rgba(r.$bg-primary, 0.987) 12.3%,
+      rgba(r.$bg-primary, 0.952) 23.5%,
+      rgba(r.$bg-primary, 0.897) 33.4%,
+      rgba(r.$bg-primary, 0.826) 42.4%,
+      rgba(r.$bg-primary, 0.743) 50.4%,
+      rgba(r.$bg-primary, 0.651) 57.5%,
+      rgba(r.$bg-primary, 0.553) 63.9%,
+      rgba(r.$bg-primary, 0.454) 69.7%,
+      rgba(r.$bg-primary, 0.356) 74.9%,
+      rgba(r.$bg-primary, 0.264) 79.6%,
+      rgba(r.$bg-primary, 0.18) 84%,
+      rgba(r.$bg-primary, 0.108) 88.2%,
+      rgba(r.$bg-primary, 0.052) 92.1%,
+      rgba(r.$bg-primary, 0.014) 96.1%,
+      transparent 100%
+    );
     font-size: 1rem;
     font-weight: normal;
 

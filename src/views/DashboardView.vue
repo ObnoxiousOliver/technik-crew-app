@@ -5,6 +5,8 @@
     </template>
 
     <div class="dashboard-grid">
+      <LensCard />
+
       <UpcomingEventsCard :events="upcomingEvents" />
 
       <EventCalendarCard :events="events" v-model:date="date" />
@@ -13,6 +15,7 @@
 </template>
 
 <script lang="ts" setup>
+import LensCard from '@/components/LensCard.vue'
 import UpcomingEventsCard from '@/components/UpcomingEventsCard.vue'
 import { useEvents } from '@/stores/events'
 import { computed, ref, watch } from 'vue'

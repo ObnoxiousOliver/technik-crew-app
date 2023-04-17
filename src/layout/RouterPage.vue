@@ -4,7 +4,10 @@
       'page--heading-hidden': navigation && !headingVisible,
       'page--no-navigation': !navigation,
       'page--has-add-btn': props.addBtn,
+      'page--opaque-titlebar': props.opaqueTitlebar,
+      'page--pad-bottom': props.padBottom
     }]"
+    ref="root"
   >
     <nav v-if="props.navigation" class="page__navigation">
       <Btn
@@ -25,6 +28,7 @@
         class="page__add-btn"
         v-if="props.addBtn"
         @click="props.addBtn"
+        aria-label="Hinzufügen"
       >
         <i class="bi-plus-lg" />
       </Btn>
@@ -50,6 +54,8 @@ import { back as _back } from '@/router'
 
 const scroller = ref(null as null | HTMLElement)
 
+const root = ref(null as null | HTMLElement)
+
 const props = defineProps({
   navigation: {
     type: Boolean,
@@ -66,6 +72,14 @@ const props = defineProps({
   beforeBack: {
     type: Function,
     default: undefined
+  },
+  opaqueTitlebar: {
+    type: Boolean,
+    default: false
+  },
+  padBottom: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -89,6 +103,10 @@ const headingVisible = ref(true)
 function onScroll () {
   headingVisible.value = scroller.value?.scrollTop <= 1 * parseFloat(getComputedStyle(document.documentElement).fontSize)
 }
+
+defineExpose({
+  root
+})
 </script>
 
 <style lang="scss" scoped>
@@ -134,6 +152,10 @@ function onScroll () {
     padding-top: 4rem;
     scroll-padding-top: 4rem;
     overflow: hidden auto;
+
+    .page--pad-bottom & {
+      padding-bottom: 15rem;
+    }
   }
 
   &__title {
@@ -164,8 +186,30 @@ function onScroll () {
     display: flex;
     align-items: center;
     height: 4rem;
-    background: r.$bg-primary;
+    background: linear-gradient(
+      to bottom,
+      r.$bg-primary 0%,
+      rgba(r.$bg-primary, 0.987) 12.3%,
+      rgba(r.$bg-primary, 0.952) 23.5%,
+      rgba(r.$bg-primary, 0.897) 33.4%,
+      rgba(r.$bg-primary, 0.826) 42.4%,
+      rgba(r.$bg-primary, 0.743) 50.4%,
+      rgba(r.$bg-primary, 0.651) 57.5%,
+      rgba(r.$bg-primary, 0.553) 63.9%,
+      rgba(r.$bg-primary, 0.454) 69.7%,
+      rgba(r.$bg-primary, 0.356) 74.9%,
+      rgba(r.$bg-primary, 0.264) 79.6%,
+      rgba(r.$bg-primary, 0.18) 84%,
+      rgba(r.$bg-primary, 0.108) 88.2%,
+      rgba(r.$bg-primary, 0.052) 92.1%,
+      rgba(r.$bg-primary, 0.014) 96.1%,
+      transparent 100%
+    );
     padding: 0 .5rem;
+
+    .page--opaque-titlebar & {
+      background: r.$bg-primary;
+    }
 
     :deep(:where(.btn)) {
       @include r.btnTransparent;

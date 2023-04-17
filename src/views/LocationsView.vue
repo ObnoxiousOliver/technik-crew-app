@@ -1,5 +1,5 @@
 <template>
-  <Page>
+  <Page opaqueTitlebar>
     <template #title>
       <i class="bi-geo-alt" />Standorte
     </template>
