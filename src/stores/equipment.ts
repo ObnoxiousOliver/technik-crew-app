@@ -33,8 +33,13 @@ export const useEquipment = defineStore('equipment', () => {
   function subscribe () {
     unsubscribe?.()
 
-    unsubscribe = Equipment.subscribe((type, eq) => {
+    Equipment.get(undefined, null, false).then((eq) => {
+      equipment.value = eq as Equipment[]
+    }).finally(() => {
       loading.value = false
+    })
+
+    unsubscribe = Equipment.subscribe((type, eq) => {
       console.log('[Equipment] Equipment changed', type, eq)
       const index = equipment.value.findIndex((e) => e.id === eq.id)
       if (index === -1) {
@@ -101,12 +106,54 @@ export const useEquipment = defineStore('equipment', () => {
     }
   }
 
+  async function getNotes (eq: Equipment) {
+    if (!eq.id) return
+
+    const n = await eq.getNotes() as Record<string, NoteDB>
+    notes.value[eq.id] = n
+    return n
+  }
+
+  async function split (eq: Equipment, amount: number) {
+    if (!eq.amount) return
+    if (amount < 1) return
+    if (amount % 1 !== 0) return
+    if (amount >= eq.amount) return
+
+    const newEq = await Equipment.create({
+      ...eq.toDB(),
+      code: null,
+      amount: eq.amount - amount
+    }, false)
+
+    // Copy notes
+    const n = await getNotes(newEq)
+    if (n) {
+      await newEq.setNotes(n, false)
+    }
+
+    // Copy History
+    const h = await eq.getHistory()
+    await newEq.setHistory(h)
+
+    // Update old equipment
+    eq.setAmount(amount, false)
+    eq.recordHistory({
+      description: 'Anzahl geteilt auf -> ' + amount + ' + ' + newEq.amount
+    })
+    newEq.recordHistory({
+      description: 'Anzahl geteilt von -> ' + amount + ' + ' + eq.amount
+    })
+  }
+
   return {
     equipment,
     groups,
     loading,
     findByCode,
     findByID,
-    subscribeNotes
+    subscribeNotes,
+    getNotes,
+    split
   }
 })

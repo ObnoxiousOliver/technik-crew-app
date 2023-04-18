@@ -42,6 +42,12 @@
         {{ typeErr }}
       </FormInfo>
 
+      <FloatingLabelInput
+        label="Anzahl"
+        v-model="amount"
+        type="number"
+      />
+
       <Btn type="submit">
         Hinzufügen
       </Btn>
@@ -64,6 +70,7 @@ const categories = ref(EquipmentTypeInfo)
 const name = ref('')
 const description = ref('')
 const type = ref('')
+const amount = ref(1)
 
 const nameErr = ref()
 const typeErr = ref()

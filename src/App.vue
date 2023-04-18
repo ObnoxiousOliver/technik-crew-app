@@ -70,6 +70,10 @@ h1, h2, h3, h4, h5, h6 {
   color: r.$text-secondary;
 }
 
+.text-center {
+  text-align: center;
+}
+
 .user-select {
   user-select: text;
 }

@@ -9,7 +9,7 @@
           {{ toDateString(new Date(entry.date)) }}
         </span>
       </div>
-      <div class="history-list__description">
+      <div class="history-list__description prewrap">
         {{ entry.description }}
       </div>
     </li>

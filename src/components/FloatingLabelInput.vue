@@ -5,11 +5,13 @@
     <input
       class="input__field"
       :type="inputType"
-      v-model="inputValue"
+      :inputmode="inputType === 'number' ? 'numeric' : 'text'"
+      @change="onChange"
       @focus="focused = true"
       @blur="focused = false"
       :aria-label="props.label"
       v-bind="$attrs"
+      ref="input"
     >
     <Transition name="input__show-hide-btn">
       <button
@@ -37,7 +39,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 
 const emit = defineEmits([
   'update:modelValue'
@@ -49,23 +51,64 @@ const props = defineProps({
     default: () => 'text'
   },
   label: String,
-  modelValue: String
+  modelValue: [String, Number],
+  min: Number,
+  max: Number,
+  steps: {
+    type: Number,
+    default: () => 1
+  }
 })
 
 const inputType = computed(() => {
   if (props.type === 'password') {
     return showPassword.value ? 'text' : 'password'
   }
+  if (props.type === 'number') {
+    return 'text'
+  }
   return props.type
 })
 const showPassword = ref(false)
 
+const input = ref(null as HTMLInputElement | null)
+
 const inputValue = ref(props.modelValue)
 watch(() => props.modelValue, val => { inputValue.value = val })
-watch(inputValue, val => emit('update:modelValue', val))
+watch(inputValue, (val, old) => {
+  if (props.type === 'number') {
+    val = typeof val === 'number' ? val : parseFloat(val as string)
+    if (props.min) val = Math.max(val, props.min)
+    if (props.max) val = Math.min(val, props.max)
+
+    if (props.min) {
+      val = Math.round((val - props.min) / props.steps) * props.steps + props.min
+    } else {
+      val = Math.round(val / props.steps) * props.steps
+    }
+
+    if (!isFinite(val) || isNaN(val)) {
+      inputValue.value = old
+      input.value.value = old
+      return
+    }
+  }
+
+  input.value.value = val
+  emit('update:modelValue', val)
+})
+
+function onChange (e: InputEvent) {
+  inputValue.value = (e.target as HTMLInputElement).value
+  input.value.value = inputValue.value
+}
+
+onMounted(() => {
+  input.value.value = inputValue.value
+})
 
 const focused = ref(false)
-const float = computed(() => focused.value || inputValue.value?.length > 0)
+const float = computed(() => focused.value || inputValue.value?.toString().length > 0)
 </script>
 
 <style lang="scss" scoped>

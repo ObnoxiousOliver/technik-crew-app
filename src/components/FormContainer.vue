@@ -67,5 +67,13 @@ const props = defineProps<{
     border: none;
     transition: opacity .2s .1s;
   }
+
+  :deep(p) {
+    margin: 0;
+  }
+
+  :deep(ul, ol) {
+    padding-left: 1.2rem;
+  }
 }
 </style>

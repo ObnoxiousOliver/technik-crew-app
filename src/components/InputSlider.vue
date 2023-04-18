@@ -1,7 +1,9 @@
 <template>
   <div
     :class="['input-slider', {
-      'input-slider--active': active
+      'input-slider--active': active,
+      'input-slider--fill': fill,
+      'input-slider--ticks': ticks
     }]"
     tabindex="0"
     @keydown.right.shift="value = validate(value + steps * 10)"
@@ -16,21 +18,29 @@
       '--input-slider-limit-max': props.limitMax,
       '--input-slider-value': value,
       '--input-slider-progress': progress
-    }">
+    }"
+  >
     <div
       class="input-slider__track"
       ref="track"
       @pointerdown="onPointerDown"
     >
-      <div v-if="fill" class="input-slider__fill" />
+      <div v-if="fill" class="input-slider__fill">
+      </div>
+      <div v-if="limitMin !== min || limitMax !== max" class="input-slider__limit">
+        <div v-if="fill" class="input-slider__limit__fill" />
+      </div>
+      <div v-if="ticks" class="input-slider__ticks">
+        <div v-for="i in Math.round((max - min + 1) / steps)" :key="i" class="input-slider__tick" />
+      </div>
       <div class="input-slider__thumb" ref="thumb" />
     </div>
   </div>
 </template>
 
 <script lang="tsx" setup>
-import { useEventListener, useVModel } from '@vueuse/core'
-import { computed, defineComponent, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { useVModel } from '@vueuse/core'
+import { computed, ref, watch } from 'vue'
 
 const track = ref<HTMLElement>()
 const thumb = ref<HTMLElement>()
@@ -45,7 +55,8 @@ const props = defineProps<{
   steps?: number
   limitMin?: number
   limitMax?: number
-  noFill?: boolean
+  noFill?: boolean,
+  ticks?: boolean
 }>()
 
 const fill = computed(() => !props.noFill ?? true)
@@ -84,7 +95,8 @@ function onPointerDown (e1: PointerEvent) {
     active.value = true
     const rect = track.value.getBoundingClientRect()
     const thumbRect = thumb.value.getBoundingClientRect()
-    const tw = thumbRect.width
+    const thumbStyle = getComputedStyle(thumb.value)
+    const tw = thumbRect.width + +thumbStyle.marginLeft.replace('px', '') + +thumbStyle.marginRight.replace('px', '')
     const x = e.clientX - rect.left - tw / 2
     const w = rect.width - tw
     const v = (x / w) * (max.value - min.value) + min.value
@@ -110,88 +122,168 @@ function onPointerDown (e1: PointerEvent) {
 @use '../scss' as r;
 
 .input-slider {
-  @include r.box;
   position: relative;
-  border-radius: 1rem;
-  padding: .2rem;
-
   transition: .5s cubic-bezier(0.19, 1, 0.22, 1);
 
   &:focus-visible {
     outline: none;
-    box-shadow: r.$focus;
+
+    .input-slider__track {
+      box-shadow: r.$focus;
+    }
   }
 
   &:hover, &--active, &:active {
-    background: lighten(r.$bg-secondary, 5%);
+    .input-slider__track {
+      background: lighten(r.$bg-secondary, 5%);
+    }
   }
 
   &--active, &:active {
-    margin: -.25rem;
-    padding: .3rem;
+    margin: -.3rem;
 
     .input-slider__track {
-      height: 1.3rem;
+      height: 2rem;
     }
     .input-slider__thumb {
-      height: 1.3rem;
-      width: 1.3rem;
+      margin: .3rem;
+      height: 1.4rem;
+      width: 1.4rem;
     }
   }
 
   &__track {
+    flex: 1;
+    @include r.box;
+    border-radius: 1rem;
     position: relative;
-    height: 1rem;
+    height: 1.4rem;
     transition: .5s cubic-bezier(0.19, 1, 0.22, 1);
     touch-action: pan-y;
   }
 
   --progress: (var(--input-slider-value, 0) - var(--input-slider-min, 0)) / (var(--input-slider-max, 100) - var(--input-slider-min, 0));
+  --limitMin: (var(--input-slider-limit-min, 0) - var(--input-slider-min, 0)) / (var(--input-slider-max, 100) - var(--input-slider-min, 0));
+  --limitMax: (var(--input-slider-limit-max, 0) - var(--input-slider-min, 0)) / (var(--input-slider-max, 100) - var(--input-slider-min, 0));
 
   &__fill {
     position: absolute;
-    inset: -.2rem 0 -.2rem -.2rem;
-    width: calc(var(--progress) * 100% - 1rem * var(--progress) + 1.4rem);
+    inset: 0;
+    width: calc(var(--progress) * 100% - 1.4rem * var(--progress) + 1.4rem);
     background: r.$text-primary;
     border-radius: 1rem;
 
     transition: .5s cubic-bezier(0.19, 1, 0.22, 1);
 
     :where(.input-slider:active) & {
-      width: calc(var(--progress) * 100% - 1rem * var(--progress) + 1.7rem);
+      width: calc(var(--progress) * 100% - 1.4rem * var(--progress) + 2rem);
     }
 
     .input-slider--active & {
-      width: calc(var(--input-slider-progress) + 1.7rem);
+      width: calc(var(--input-slider-progress) + 2rem);
       transition: .5s cubic-bezier(0.19, 1, 0.22, 1), width 0s;
     }
 
-    & + .input-slider__thumb {
-      transform: scale(.8);
+    & ~ .input-slider__thumb {
+      width: .8rem;
+      height: .8rem;
+      margin: .3rem;
       background: r.$bg-primary;
     }
   }
 
+  &__limit {
+    position: absolute;
+    inset: 0;
+    left: calc(var(--limitMin) * 100% - 1.4rem * var(--limitMin));
+    right: calc(100% - (var(--limitMax) * 100% + 1.4rem * (1 - var(--limitMax))));
+    background: r.$bg-stroke;
+    border-radius: 1rem;
+    margin: .65rem;
+    overflow: hidden;
+
+    transition: .5s cubic-bezier(0.19, 1, 0.22, 1);
+    will-change: margin, background;
+
+    .input-slider--ticks & {
+      border-radius: 0;
+    }
+
+    .input-slider:hover &,
+    .input-slider--active &,
+    .input-slider:active & {
+      background: lighten(r.$bg-stroke, 5%);
+    }
+
+    .input-slider--active &,
+    :where(.input-slider:active) & {
+      margin: .8rem;
+    }
+
+    &__fill {
+      position: absolute;
+      inset: 0;
+      width: calc(((var(--progress) - var(--limitMin)) / (var(--limitMax) - var(--limitMin))) * 100%);
+      background: r.$bg-secondary;
+
+      transition: .5s cubic-bezier(0.19, 1, 0.22, 1);
+
+      .input-slider--active & {
+        width: calc((var(--input-slider-progress) - (100% * var(--limitMin)) / (var(--limitMax) - var(--limitMin))) + .55rem);
+        transition: .5s cubic-bezier(0.19, 1, 0.22, 1), width 0s;
+      }
+    }
+  }
+
+  &__ticks {
+    position: absolute;
+    inset: .5rem .6rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: .5s cubic-bezier(0.19, 1, 0.22, 1);
+
+    .input-slider--active &,
+    :where(.input-slider:active) & {
+      inset: .6rem .8rem;
+    }
+  }
+
+  &__tick {
+    width: .1rem;
+    border-radius: .5rem;
+    height: stretch;
+    background: r.$bg-stroke;
+
+    transition: .5s cubic-bezier(0.19, 1, 0.22, 1);
+
+    .input-slider:hover &,
+    .input-slider--active &,
+    .input-slider:active & {
+      background: lighten(r.$bg-stroke, 5%);
+    }
+
+    // .input-slider--active &,
+    // .input-slider:active & {
+    //   width: .2rem;
+    // }
+  }
+
   &__thumb {
     position: absolute;
+    top: 0;
     width: 1rem;
     height: 1rem;
     background: r.$text-primary;
     border-radius: 50%;
+    margin: .2rem;
 
     transition: .5s cubic-bezier(0.19, 1, 0.22, 1);
-    left: calc(var(--progress) * 100% - 1rem * var(--progress));
+    left: calc(var(--progress) * 100% - 1.4rem * var(--progress));
 
     .input-slider--active & {
       left: var(--input-slider-progress);
       transition: .5s cubic-bezier(0.19, 1, 0.22, 1), left 0s;
-    }
-
-    &::before {
-      content: '';
-      position: absolute;
-      inset: -.5rem;
-      border-radius: 50%;
     }
   }
 }

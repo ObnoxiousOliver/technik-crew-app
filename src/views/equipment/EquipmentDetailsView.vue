@@ -10,11 +10,6 @@
         </span
         >{{ equipment?.name }}
       </template>
-      <template #btns>
-        <Btn>
-          <i class="bi-three-dots-vertical" />
-        </Btn>
-      </template>
 
       <template v-if="equipment?.location">
         {{ equipment?.location }}

@@ -16,7 +16,17 @@
         {{ eq.name }}
       </div>
 
-      <i v-if="eq.code" class="equipment-list-button__qr-code bi-qr-code-scan" />
+      <div class="equipment-list-button__location">
+        {{ eq.location ?? 'N/A' }}
+      </div>
+
+      <div class="equipment-list-button__amount">
+        {{ eq.amount ? `${eq.amount}x` : '' }}
+      </div>
+
+      <div class="equipment-list-button__qr-code">
+        <i v-if="eq.code" class="bi-qr-code-scan" />
+      </div>
 
     </div>
 
@@ -63,7 +73,15 @@
         <ActionSheetButton @click="addToGroup">
           <i class="bi-box-arrow-in-up" />In Gruppe einfügen
         </ActionSheetButton>
-        <ActionSheetButton>
+        <ActionSheetButton
+          :to="{
+            name: 'equipment-edit',
+            params: {
+              id: eq.id,
+              field: 'location'
+            }
+          }"
+        >
           <i class="bi-geo-alt" />Standort ändern
         </ActionSheetButton>
       </template>
@@ -77,11 +95,8 @@
 
 <script lang="ts" setup>
 import { Equipment, EquipmentTypeInfo } from '@/model/equipment'
-import { useTemp } from '@/stores/temp'
 import { computed, ref } from 'vue'
 import SettingsListLink from './SettingsListLink.vue'
-
-const temp = useTemp()
 
 const props = defineProps<{
   eq: Equipment
@@ -101,23 +116,38 @@ function removeGroup () {
 @use '../scss' as r;
 
 .equipment-list-button {
+  i {
+    margin: 0;
+  }
+
   &__content {
+    height: 100%;
     width: stretch;
-    display: flex;
+    display: grid;
+    grid-template-columns: 2rem 4fr 3fr minmax(1rem, 1fr) 2rem;
+    align-items: stretch;
     padding-right: 1rem;
+    line-height: 1;
+
+    & > * {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: flex;
+      align-items: center;
+    }
   }
 
-  &__icon {
-
-  }
-
-  &__name {
-    flex: 1 1 auto;
+  &__amount {
+    color: r.$text-secondary;
   }
 
   &__qr-code {
-    margin-left: 1rem;
+    text-align: center;
     color: r.$text-secondary;
+
+    i {
+      margin: 0;
+    }
   }
 
   &__options-btn {
@@ -127,6 +157,11 @@ function removeGroup () {
     top: 50%;
     transform: translateY(-50%);
     font-size: 1rem;
+  }
+
+  &__location {
+    color: r.$text-secondary;
+    font-size: 0.8rem;
   }
 }
 </style>

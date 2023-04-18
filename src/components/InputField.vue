@@ -13,9 +13,11 @@
       class="input__field"
       ref="input"
       :disabled="disabled"
-      v-model="value"
+      @change="onChange"
       @focus="focused = true"
       @blur="focused = false"
+      :type="type === 'number' ? 'text' : type"
+      :inputmode="type === 'number' ? 'decimal' : undefined"
       v-bind="$attrs"
     >
     <div v-if="$slots.after" class="input__after">
@@ -25,30 +27,63 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 
 const focused = ref(false)
 const input = ref(null as HTMLInputElement | null)
 
 const emit = defineEmits(['update:modelValue'])
 
-const props = defineProps({
-  disabled: {
-    type: Boolean,
-    default: false
-  },
-  modelValue: {
-    type: String,
-    default: ''
-  }
-})
+const props = defineProps<{
+  disabled?: boolean
+  modelValue?: string | number
+  type?: 'text' | 'password' | 'email' | 'number' | 'search'
+  min?: number
+  max?: number
+  steps?: number
+}>()
+const disabled = computed(() => props.disabled ?? false)
+const type = computed(() => props.type ?? 'text')
+
+const min = computed(() => props.min ?? 0)
+const max = computed(() => props.max ?? 100)
+const steps = computed(() => props.steps ?? 1)
 
 const value = ref(props.modelValue)
-watch(value, (val) => {
+watch(value, (val, old) => {
+  if (props.type === 'number') {
+    val = typeof val === 'number' ? val : parseFloat(val as string)
+    if (min.value) val = Math.max(val, min.value)
+    if (max.value) val = Math.min(val, max.value)
+
+    if (min.value) {
+      val = Math.round((val - min.value) / steps.value) * steps.value + min.value
+    } else {
+      val = Math.round(val / steps.value) * steps.value
+    }
+
+    if (!isFinite(val) || isNaN(val)) {
+      value.value = old
+      input.value.value = old
+      return
+    }
+  }
+
+  input.value.value = val
   emit('update:modelValue', val)
 })
 watch(() => props.modelValue, (val) => {
   value.value = val
+  input.value.value = val
+})
+
+function onChange (e: InputEvent) {
+  value.value = (e.target as HTMLInputElement).value
+  input.value.value = value.value
+}
+
+onMounted(() => {
+  input.value.value = value.value
 })
 
 defineExpose({

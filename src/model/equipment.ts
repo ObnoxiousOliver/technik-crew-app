@@ -153,23 +153,9 @@ export class Equipment {
       }).toDB())
   }
 
-  private static cachedNotes: {
-    [id: string]: {
-      [id: string]: NoteDB
-    }
-  }
-
-  async getNotes (id?: string, useCache = true) {
+  async getNotes (id?: string) {
     if (!this.id) {
       throw new Error('Cannot get notes on an equipment without an id')
-    }
-
-    if (useCache && Equipment.cachedNotes && Equipment.cachedNotes[this.id]) {
-      if (id) {
-        return Equipment.cachedNotes[this.id][id]
-      } else {
-        return Equipment.cachedNotes[this.id]
-      }
     }
 
     const db = getFirestore()
@@ -189,6 +175,26 @@ export class Equipment {
       })
 
       return notes
+    }
+  }
+
+  async setNotes (notes: Record<string, NoteDB>, recordHistory = true) {
+    if (!this.id) {
+      throw new Error('Cannot set notes on an equipment without an id')
+    }
+
+    const db = getFirestore()
+    for (const id in notes) {
+      const note = notes[id]
+      await setDoc(doc(db, 'equipment', this.id, 'notes', id), note)
+    }
+
+    if (recordHistory) {
+      await this.recordHistory({
+        description: 'Notizen aktualisiert',
+        type: 'note',
+        content: notes
+      })
     }
   }
 
@@ -266,6 +272,18 @@ export class Equipment {
     }
 
     return HistoryState.get('equipment', this.id)
+  }
+
+  async setHistory (history: HistoryState<unknown>[]) {
+    if (!this.id) {
+      throw new Error('Cannot get history on an equipment without an id')
+    }
+
+    const db = getFirestore()
+
+    for (const state of history) {
+      await addDoc(collection(db, 'equipment', this.id, 'history'), state.toDB())
+    }
   }
 
   async setName (name: string) {
@@ -390,7 +408,7 @@ export class Equipment {
     })
   }
 
-  async setAmount (amount: number) {
+  async setAmount (amount: number, recordHistory = true) {
     if (!this.id) {
       throw new Error('Cannot get history on an equipment without an id')
     }
@@ -400,8 +418,59 @@ export class Equipment {
     if (this.amount === amount) return
     this.amount = amount === 1 ? null : amount
     await this.save()
+
+    if (recordHistory) {
+      await this.recordHistory({
+        description: `Anzahl geändert -> ${amount}`
+      })
+    }
+  }
+
+  async set (options: Partial<EquipmentDB>) {
+    if (!this.id) {
+      throw new Error('Cannot get history on an equipment without an id')
+    }
+
+    const changes = []
+
+    if (options.name && options.name !== this.name) {
+      this.name = options.name
+      changes.push(`Name geändert -> ${options.name}`)
+    }
+    if (options.type && options.type !== this.type) {
+      this.type = options.type
+      changes.push(`Typ geändert -> ${options.type}`)
+    }
+    if (options.description && options.description !== this.description) {
+      this.description = options.description
+      changes.push(`Beschreibung geändert ->\n${options.description}`)
+    }
+    if (options.location && options.location !== this.location) {
+      this.location = options.location
+      changes.push(`Standort geändert -> ${((await Location.get(options.location)) as Location)?.name}`)
+    }
+    if (options.group && options.group !== this.group) {
+      this.group = options.group
+      changes.push(`Gruppe geändert -> ${options.group}`)
+    }
+    if (options.is_hidden && options.is_hidden !== this.isHidden) {
+      this.isHidden = options.is_hidden
+      changes.push(options.is_hidden ? 'Ausgeblendet' : 'Wieder sichtbar')
+    }
+    if (options.code && options.code !== this.code) {
+      this.code = options.code
+      changes.push(`Scan Code geändert -> ${options.code}`)
+    }
+    if (options.amount && options.amount !== this.amount) {
+      this.amount = options.amount === 1 ? null : options.amount
+      changes.push(`Anzahl geändert -> ${options.amount}`)
+    }
+
+    if (changes.length === 0) return
+
+    await this.save()
     await this.recordHistory({
-      description: `Anzahl geändert -> ${amount}`
+      description: changes.join('\n')
     })
   }
 
@@ -409,15 +478,19 @@ export class Equipment {
     await this.setHidden(true)
   }
 
-  static async create (options: Partial<EquipmentDB> = {}) {
+  static async create (options: Partial<EquipmentDB> = {}, recordHistory = true) {
     const db = getFirestore()
     let equipment = new Equipment(null, options)
 
     const docRef = await addDoc(collection(db, 'equipment'), equipment.toDB())
     equipment = new Equipment(docRef.id, options)
-    await equipment.recordHistory({
-      description: 'Equipment erstellt'
-    })
+
+    if (recordHistory) {
+      await equipment.recordHistory({
+        description: 'Equipment erstellt'
+      })
+    }
+
     return equipment
   }
 
@@ -426,9 +499,6 @@ export class Equipment {
     [id: string]: Equipment
   } = {}
 
-  /**
-   * @deprecated use useEquipment() instead
-   */
   static async get (id?: string, onlyHidden: boolean| null = false, useCache = false) {
     const db = getFirestore()
 

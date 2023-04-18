@@ -205,6 +205,7 @@ function result (result: Result) {
     border: none;
     font: inherit;
     color: inherit;
+    width: stretch;
   }
 }
 </style>

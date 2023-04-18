@@ -39,6 +39,10 @@
       </div>
       <div class="equipment-scan__overlay">
         QR-Code oder Barcode scannen
+
+        <div v-if="errMsg" class="equipment-scan__err">
+          {{ errMsg }}
+        </div>
       </div>
     </template>
   </Page>
@@ -50,6 +54,12 @@ import { useEquipment } from '@/stores/equipment'
 import { Result } from '@zxing/library'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
+
+const emit = defineEmits(['scan'])
+const props = defineProps<{
+  preventDefault?: boolean
+  errMsg?: string
+}>()
 
 const equipment = useEquipment()
 const router = useRouter()
@@ -103,6 +113,9 @@ onMounted(() => {
 
 function result (result: Result) {
   if (!result) return
+  emit('scan', result.getText())
+
+  if (props.preventDefault) return
 
   const eq = equipment.findByCode(result.getText())
   if (!eq) return
@@ -120,6 +133,15 @@ function result (result: Result) {
     aspect-ratio: unset;
     position: absolute;
     inset: 0;
+  }
+
+  &__err {
+    @include r.box;
+    color: r.$danger;
+    padding: .5rem 1rem;
+    width: fit-content;
+    margin: .5rem auto;
+    max-width: 70%;
   }
 
   &__spinner {
