@@ -1,8 +1,6 @@
 const listeners: ((msg: string) => void)[] = []
 export function useToast () {
   function show (msg: string) {
-    console.log('TOAST:', msg)
-
     listeners.forEach(cb => cb(msg))
   }
 

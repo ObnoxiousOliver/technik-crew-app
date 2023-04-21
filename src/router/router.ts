@@ -2,6 +2,7 @@ import { Permission } from '@/model/permissions'
 import { useUser } from '@/stores/user'
 import { setStore } from '@/utilities/auth'
 import { useBreakpoint } from '@/utilities/breakpoint'
+import { dev, logRouter } from '@/utilities/developer'
 import { useOffline } from '@/utilities/offline'
 import { getAuth } from 'firebase/auth'
 import { Component } from 'vue'
@@ -97,7 +98,7 @@ export function createRouter (routes: AbstractRoute[], options: Partial<RouterOp
     routes: compiledRoutes ?? []
   })
 
-  console.group('[Router]', 'compiled routes')
+  console.group(...dev(logRouter), 'compiled routes')
   console.table(compiledRoutes?.map(route => ({
     name: route.name,
     path: route.path,
@@ -126,27 +127,27 @@ export function createRouter (routes: AbstractRoute[], options: Partial<RouterOp
     if (to.matched.some(record => record.meta.requiresAuth)) {
       if (getAuth().currentUser) {
         next()
-        console.log('[Router]', 'User logged in')
+        console.log(...dev(logRouter), 'User logged in')
       } else if (localStorage.getItem('last_auth') === 'true') {
         next()
-        console.log('[Router]', 'User logged in')
+        console.log(...dev(logRouter), 'User logged in')
       } else {
         next({
           path: '/login',
           query: { redirect: to.fullPath }
         })
-        console.log('[Router]', 'User not logged in')
+        console.log(...dev(logRouter), 'User not logged in')
       }
     } else if (to.matched.some(record => record.meta.requiresNoAuth)) {
       if (getAuth().currentUser) {
         next(from)
-        console.log('[Router]', 'User logged in')
+        console.log(...dev(logRouter), 'User logged in')
       } else if (localStorage.getItem('last_auth') === 'true') {
         next(from)
-        console.log('[Router]', 'User logged in')
+        console.log(...dev(logRouter), 'User logged in')
       } else {
         next()
-        console.log('[Router]', 'User not logged in')
+        console.log(...dev(logRouter), 'User not logged in')
       }
     } else {
       next()
@@ -165,13 +166,13 @@ export function createRouter (routes: AbstractRoute[], options: Partial<RouterOp
 
       if (user.permissions?.is_admin) {
         next()
-        console.log('[Router]', 'User is admin')
+        console.log(...dev(logRouter), 'User is admin')
       } else if (user.permissions?.[permission]) {
         next()
-        console.log('[Router]', 'User has permission')
+        console.log(...dev(logRouter), 'User has permission')
       } else {
         next(from)
-        console.log('[Router]', 'User has no permission')
+        console.log(...dev(logRouter), 'User has no permission')
       }
     } else {
       next()
@@ -242,7 +243,7 @@ export function createRouter (routes: AbstractRoute[], options: Partial<RouterOp
     const queryBackPath = route.query.back as string | null
     const backPath = fallbackPath ?? queryBackPath ?? metaBackPath ?? '/'
 
-    console.log('[Router]', 'Back to', backPath)
+    console.log(...dev(logRouter), 'Back to', backPath)
     if (history.state?.back === backPath || metaBackPath === null) {
       router.back()
     } else {
@@ -289,7 +290,7 @@ export function createRouter (routes: AbstractRoute[], options: Partial<RouterOp
       backPath: currentRoute.path
     }))
 
-    console.log('[Router]', 'Added temporary route', name, router.resolve({ name }))
+    console.log(...dev(logRouter), 'Added temporary route', name, router.resolve({ name }))
 
     // Remove route after leaving
     const unhook = router.afterEach((to, from) => {
@@ -302,7 +303,7 @@ export function createRouter (routes: AbstractRoute[], options: Partial<RouterOp
         unhook()
         localStorage.removeItem('temporary_route')
         router.removeRoute(name)
-        console.log('[Router]', 'Removed temporary route', name)
+        console.log(...dev(logRouter), 'Removed temporary route', name)
       }
     })
   }
