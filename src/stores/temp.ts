@@ -14,18 +14,17 @@ export const useTemp = defineStore('temp', () => {
   function setData (name: string, d: unknown) {
     data.value[name] = d
 
-    return (deleteData = true) => getData(name, deleteData)
+    return (_deleteData = true) => getData(name, _deleteData)
   }
 
-  function getData (name: string, deleteData = true) {
+  function getData (name: string, _deleteData = true) {
     const d = data.value[name]
-    if (deleteData) delete data.value[name]
+    if (_deleteData) deleteData(name)
+    return d
+  }
 
-    if (d) {
-      return d as unknown
-    } else {
-      return null
-    }
+  function deleteData (name: string) {
+    delete data.value[name]
   }
 
   function tempRoute (options: {
@@ -38,15 +37,15 @@ export const useTemp = defineStore('temp', () => {
 
     temporaryRoute(name, pathName, component, meta)
 
-    return (deleteData = true) => getData(name, deleteData)
+    return (_deleteData = true) => getData(name, _deleteData)
   }
 
   function setDataFromTempRoute (d: unknown, routeBack = true) {
     data.value[router.currentRoute.value.name as string] = d
     if (routeBack) back()
   }
-  function getDataFromTempRoute (deleteData = true) {
-    return getData(router.currentRoute.value.name as string, deleteData)
+  function getDataFromTempRoute (_deleteData = true) {
+    return getData(router.currentRoute.value.name as string, _deleteData)
   }
 
   return {
@@ -54,6 +53,8 @@ export const useTemp = defineStore('temp', () => {
     setDataFromTempRoute,
     getDataFromTempRoute,
     setData,
-    getData
+    getData,
+    deleteData,
+    data
   }
 })

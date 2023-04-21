@@ -15,8 +15,6 @@ export const useLocations = defineStore('locations', () => {
 
   async function create (name: string, description: string) {
     const loc = await Location.create({ name, description })
-
-    locations.value.push(loc)
   }
 
   function getLocationById (id: string) {
@@ -42,10 +40,12 @@ export const useLocations = defineStore('locations', () => {
 
   // Subscribe to changes
   let unsubscribe: (() => void) | null = null
-  function subscribe () {
+  async function subscribe () {
     if (unsubscribe) {
       unsubscribe()
     }
+
+    locations.value = await Location.get() as Location[]
 
     unsubscribe = Location.subscribe((type, location) => {
       const index = locations.value.findIndex(x => x.id === location.id)

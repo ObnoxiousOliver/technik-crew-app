@@ -156,16 +156,25 @@ function result (result: Result) {
   }
 
   &__scanner {
-    background: radial-gradient(85.03% 131.43% at 17.64% 110.98%, #253BFF 0%, rgba(37, 59, 255, 0) 100%), radial-gradient(84.39% 143.51% at 100% 7.07%, rgba(95, 25, 128, 0.8) 0%, rgba(255, 91, 91, 0) 100%) ;
+    background: radial-gradient(85.03% 131.43% at 17.64% 110.98%, #2430a3 0%, rgba(37, 59, 255, 0) 100%), radial-gradient(84.39% 143.51% at 100% 7.07%, rgba(95, 25, 128, 0.8) 0%, rgba(255, 91, 91, 0) 100%) ;
+    aspect-ratio: auto;
+    height: 100%;
 
-    will-change: filter;
-    transition: filter .5s;
-    filter: blur(2rem);
+    :deep(video) {
+      will-change: filter;
+      transition: filter .5s, transform .5s cubic-bezier(0.19, 1, 0.22, 1);
+      filter: blur(1rem);
+      transform: scale(2);
+    }
 
     .lens-card--active & {
       background: none;
-      transition: none;
-      filter: blur(0);
+
+      :deep(video) {
+        transition: none;
+        filter: blur(0);
+        transform: scale(1);
+      }
     }
   }
 
@@ -198,6 +207,7 @@ function result (result: Result) {
       font-size: 3rem;
       margin-bottom: 1rem;
     }
+
   }
 
   &__start-scan {

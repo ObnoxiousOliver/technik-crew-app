@@ -1,12 +1,14 @@
 <template>
   <Page
+    opaqueTitlebar
     :beforeBack="beforeBack"
     :buttons="[
-    {
-      icon: 'bi-check-lg',
-      onClick: () => save()
-    }
-  ]">
+      {
+        icon: 'bi-check-lg',
+        onClick: () => save()
+      }
+    ]"
+  >
     <template #title>
       <span v-if="page?.icon">
         {{ page?.icon }}

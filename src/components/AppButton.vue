@@ -14,8 +14,10 @@
     :type="to ? undefined : (type ?? 'button')"
     ref="btnEl"
   >
-    <i class="btn__chip-x bi-x-lg" v-if="chip" />
-    <slot />
+    <div class="btn__content">
+      <i class="btn__chip-x bi-x-lg" v-if="chip" />
+      <slot />
+    </div>
   </component>
 </template>
 
@@ -48,9 +50,19 @@ onMounted(() => {
 <style lang="scss" scoped>
 @use '../scss' as r;
 
+:where(.btn__content) {
+  flex: 1;
+
+  & > :deep(i.btn__icon) {
+    margin-right: .5rem;
+  }
+}
+
 :where(.btn) {
   all: unset;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: stretch;
   border: none;
   font: inherit;
   color: inherit;
@@ -64,10 +76,6 @@ onMounted(() => {
 
   transition: background-color .2s, box-shadow .2s, opacity .2s;
 
-  & > :deep(i.btn__icon) {
-    margin-right: .25rem;
-  }
-
   &:focus-visible {
     outline: none;
     box-shadow: r.$focus;
@@ -80,11 +88,6 @@ onMounted(() => {
 
   &:hover:not(:disabled) {
     background: lighten(r.$bg-secondary, 5);
-  }
-
-  &.btn--is-link {
-    display: inline-grid;
-    place-items: center;
   }
 
   &.btn--square {

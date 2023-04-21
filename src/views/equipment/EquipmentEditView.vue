@@ -1,13 +1,12 @@
 <template>
-  <EquipmentScanView v-if="editField === 'code'" @scan="scan" preventDefault :errMsg="scanErr" />
+  <NotFoundView v-if="!equipment" />
+
+  <EquipmentScanView v-else-if="editField === 'code'" @scan="scan" preventDefault :errMsg="scanErr" />
 
   <Page v-else>
     <template #title>
       <template v-if="editField === 'amount'">
         <i class="bi-ui-radios-grid" />Anzahl ändern
-      </template>
-      <template v-else-if="editField === 'location'">
-        <i class="bi-geo-alt" />Standort ändern
       </template>
       <template v-else>
         <i class="bi-pencil-square" />Equipment bearbeiten
@@ -53,6 +52,20 @@
         type="number"
       />
 
+      <SettingsList v-if="!editField">
+        <SettingsListDivider>
+          Standort
+        </SettingsListDivider>
+        <SettingsListLink :to="{
+          name: 'equipment-edit-location',
+          params: { id: equipment?.id }
+        }">
+          <i class="bi-geo-alt"></i>
+          {{ location?.name ?? 'Kein Standort ausgewählt' }}
+        </SettingsListLink>
+        <SettingsListDivider />
+      </SettingsList>
+
       <Btn type="submit">
         Speichern
       </Btn>
@@ -65,24 +78,35 @@ import TextBox from '@/components/TextBox.vue'
 import DropdownSelection from '@/components/DropdownSelection.vue'
 import EquipmentScanView from '@/views/equipment/EquipmentScanView.vue'
 import FloatingLabelInput from '@/components/FloatingLabelInput.vue'
+import SettingsList from '@/components/SettingsList.vue'
+import SettingsListLink from '@/components/SettingsListLink.vue'
+import SettingsListDivider from '@/components/SettingsListDivider.vue'
 import { useRoute } from 'vue-router'
 import { back } from '@/router'
 import { useEquipment } from '@/stores/equipment'
 import { computed, ref } from 'vue'
 import { EquipmentTypeInfo } from '@/model/equipment'
+import { useLocations } from '@/stores/locations'
+import { Location } from '@/model/location'
+import NotFoundView from '@/views/NotFoundView.vue'
+
+const locStore = useLocations()
 
 const route = useRoute()
 const editField = computed(() => (route.params.field as undefined | 'code' | 'amount' | 'name' | 'description' | 'type' | 'location'))
 
 const eqStore = useEquipment()
 const equipment = computed(() => eqStore.findByID(route.params.id))
+
+document.title = equipment.value?.name + ' - Bearbeiten'
+
 const typeInfo = EquipmentTypeInfo
 
-const name = ref(equipment.value?.name)
-const description = ref(equipment.value?.description)
+const name = ref(equipment.value?.name ?? '')
+const description = ref(equipment.value?.description ?? '')
 const amount = ref(equipment.value?.amount ?? 1)
 const type = ref(equipment.value?.type ?? 'other')
-const location = ref(equipment.value?.location)
+const location = ref<Location>(locStore.getLocationById(equipment.value?.location))
 
 const scanErr = ref('')
 function scan (code: string) {
@@ -121,7 +145,7 @@ async function submit () {
     name: name.value,
     description: description.value,
     type: type.value,
-    location: location.value,
+    location: location.value.id,
     amount: amount.value
   })
 

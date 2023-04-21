@@ -18,12 +18,12 @@
   margin: 0 1.5rem;
   padding: .5rem .3rem;
   font-size: .8rem;
+  height: 1px;
   font-weight: 600;
   text-transform: uppercase;
 
   &--has-label {
-    margin: 1.5rem 1.5rem .5rem;
-    padding: 0 .3rem;
+    margin-top: .5rem;
   }
 
   &__stroke {
@@ -34,7 +34,9 @@
   }
 
   &__label {
-    position: relative;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
     background: r.$bg-primary;
     padding: 0 .2rem;
   }

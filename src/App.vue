@@ -6,10 +6,12 @@
 import AppLayout from './layout/AppLayout.vue'
 import { deleteUser, getAuth, onAuthStateChanged } from '@firebase/auth'
 import { doc, getDoc, getFirestore } from '@firebase/firestore'
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { setStore, signOut } from './utilities/auth'
 import { useUsers } from './stores/users'
+
+const isOffline = ref(true)
 
 useUsers()
 const route = useRoute()

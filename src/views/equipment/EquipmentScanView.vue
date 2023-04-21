@@ -17,7 +17,21 @@
       @result="result"
     />
 
-    <Spinner v-if="scanner?.loading" class="equipment-scan__spinner" />
+    <template v-if="err">
+      <div class="equipment-scan__error">
+        <i class="bi-exclamation-triangle" />
+
+        <template v-if="notSupported">
+          Dein Gerät unterstützt leider keine Kamera.
+        </template>
+
+        <template v-else-if="notALlowed">
+          Du hast die Kamera nicht freigegeben.
+        </template>
+      </div>
+    </template>
+
+    <Spinner v-else-if="scanner?.loading" class="equipment-scan__spinner" />
 
     <template v-else>
       <div class="equipment-scan__frame">
@@ -50,6 +64,7 @@
 
 <script lang="ts" setup>
 import QrCodeScanner from '@/components/QrcodeScanner.vue'
+import { AppError } from '@/model/error'
 import { useEquipment } from '@/stores/equipment'
 import { Result } from '@zxing/library'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
@@ -82,13 +97,26 @@ let currentAspectRatio = 0
 let timeout
 watch(aspectRatio, update)
 
+const notSupported = ref(false)
+const notALlowed = ref(false)
+const err = computed(() => notSupported.value || notALlowed.value)
 function update () {
+  if (err.value) return
+
   if (Math.abs(currentAspectRatio - aspectRatio.value) < 0.1) return
   clearTimeout(timeout)
   timeout = setTimeout(() => {
     currentAspectRatio = aspectRatio.value
-    scanner.value?.startScan()
     timeout = null
+
+    ;(scanner.value?.startScan() as Promise<void>)
+      .catch((err: AppError) => {
+        if (err.code === 'NOT_SUPPORTED') {
+          notSupported.value = true
+        } else if (err.code === 'NOT_ALLOWED') {
+          notALlowed.value = true
+        }
+      })
   }, 100)
 }
 
@@ -186,6 +214,19 @@ function result (result: Result) {
 
     .equipment-scan--landscape & {
       inset: 50% 0 auto;
+    }
+  }
+
+  &__error {
+    color: r.$danger;
+    text-align: center;
+
+    margin: 5rem 1rem 0;
+
+    i {
+      display: block;
+      font-size: 4rem;
+      margin-bottom: 1rem;
     }
   }
 }

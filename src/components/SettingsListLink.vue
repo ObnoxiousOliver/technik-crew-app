@@ -2,7 +2,7 @@
   <li :class="['settings-list-item', {
     'settings-list-item--danger': props.danger
   }]">
-    <component :is="props.isButton ? 'button' : 'RouterLink'" class="settings-list-item__button" v-wave :to="props.to">
+    <component :is="props.isButton ? 'button' : 'RouterLink'" class="settings-list-item__button" v-wave :to="props.to" @click="emit('click')">
       <div class="settings-list-item__content">
         <slot />
       </div>
@@ -14,6 +14,8 @@
 </template>
 
 <script lang="ts" setup>
+const emit = defineEmits(['click'])
+
 const props = defineProps({
   to: [Object, String],
   danger: Boolean,
@@ -48,6 +50,7 @@ const props = defineProps({
   }
 
   &__content {
+    height: 100%;
     flex: 1 1 auto;
 
     :deep(i) {

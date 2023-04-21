@@ -1,5 +1,7 @@
 <template>
-  <Page padBottom>
+  <NotFoundView v-if="!equipment" />
+
+  <Page v-else padBottom>
     <CenteredCard>
       <template #icon>
         <i :class="typeInfo[equipment?.type]?.icon ?? typeInfo.other.icon" />
@@ -11,10 +13,8 @@
         >{{ equipment?.name }}
       </template>
 
-      <template v-if="equipment?.location">
-        {{ equipment?.location }}
-      </template>
-      <template v-else>
+      <LocationDisplay :id="equipment?.location" />
+      <template v-if="!equipment?.location">
         Kein Standort angegeben
       </template>
     </CenteredCard>
@@ -31,7 +31,11 @@
       <SettingsListOption>
         <i class="bi-geo-alt" />Standort
         <template #desc>
-          {{ equipment?.location ?? 'Kein Standort angegeben' }}
+          <LocationDisplay :id="equipment?.location" />
+
+          <template v-if="!equipment?.location">
+            Kein Standort angegeben
+          </template>
         </template>
       </SettingsListOption>
       <SettingsListOption>
@@ -65,13 +69,11 @@
       </SettingsListDivider>
 
       <SettingsListLink :to="{
-        name: 'equipment-edit',
-        params: {
-          id: equipment.id,
-          field: 'location'
-        }
+        name: 'equipment-edit-location',
+        params: { id: equipment.id },
+        query: { back: route.fullPath }
       }">
-        <i class="bi-geo-alt" />Standort
+        <i class="bi-geo-alt" /><template v-if="equipment?.group">Gruppen </template>Standort
         <template v-if="equipment?.location">
           ändern
         </template>
@@ -200,6 +202,7 @@ import SettingsListLink from '@/components/SettingsListLink.vue'
 import SettingsListDivider from '@/components/SettingsListDivider.vue'
 import SettingsListOption from '@/components/SettingsListOption.vue'
 import EquipmentNote from '../../components/EquipmentNote.vue'
+import NotFoundView from '@/views/NotFoundView.vue'
 import { EquipmentTypeInfo, NoteDB } from '@/model/equipment'
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
@@ -243,6 +246,8 @@ watch(equipment, () => {
   notes.value = {}
 
   if (equipment.value) {
+    if (equipment.value?.name) document.title = equipment.value?.name
+
     unsubscribe = eqStore.subscribeNotes(equipment.value, (note) => {
       loading.value = false
       notes.value = note

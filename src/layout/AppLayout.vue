@@ -72,16 +72,47 @@
       {{ toast.msg }}
     </div>
   </div>
+
+  <teleport to="body">
+    <Transition name="network-indicator">
+      <div v-if="showNetworkIndicator" class="network-indicator">
+        <template v-if="isOffline">
+          <i class="bi-wifi-off" />App ist im Offline-Modus
+          <RouterLink :to="{ name: 'help-offline' }">
+            Mehr Infos <i class="bi-arrow-right" />
+          </RouterLink>
+        </template>
+        <template v-else>
+          <i class="bi-wifi" />Wieder online
+        </template>
+      </div>
+    </Transition>
+  </teleport>
 </template>
 
 <script lang="ts" setup>
 import MobileNavbar from '../components/BottomNavbar.vue'
 import DesktopSidebar from '../components/DesktopSidebar.vue'
 import { useBreakpoint } from '../utilities/breakpoint'
-import { computed, onBeforeUnmount, ref } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useToast } from '@/utilities/toast'
 import { createId } from '@/utilities/id'
+import { useOffline } from '@/utilities/offline'
+
+const isOffline = useOffline()
+const showNetworkIndicator = ref(false)
+watch(isOffline, (offline) => {
+  showNetworkIndicator.value = offline
+}, { immediate: true, flush: 'post' })
+
+watch(isOffline, (offline) => {
+  if (offline) {
+    document.documentElement.classList.add('offline')
+  } else {
+    document.documentElement.classList.remove('offline')
+  }
+}, { immediate: true })
 
 const route = useRoute()
 const bp = useBreakpoint()
@@ -123,6 +154,9 @@ body {
   overflow: hidden;
 }
 
+$offlineIndicatorOutDelay: 1s;
+$offlineIndicatorOutDuration: 3s;
+
 #app {
   position: fixed;
   inset: var(--titlebar-height, 0) 0 0;
@@ -130,6 +164,13 @@ body {
 
   display: flex;
   margin: 0 auto;
+
+  transition: top $offlineIndicatorOutDuration $offlineIndicatorOutDelay cubic-bezier(0.19, 1, 0.22, 1);
+
+  .offline & {
+    top: 1.5rem;
+    transition: .5s cubic-bezier(0.19, 1, 0.22, 1);
+  }
 }
 
 #layer {
@@ -150,8 +191,43 @@ body {
   height: 0;
 }
 
+.network-indicator {
+  position: relative;
+  z-index: 9999;
+  text-align: center;
+  height: 1.5rem;
+  line-height: 1.5rem;
+  font-size: .8rem;
+  box-shadow: r.$bg-stroke 0 -1px 0 inset;
+  color: r.$success;
+
+  .offline & {
+    color: r.$danger;
+  }
+
+  a {
+    text-decoration: none;
+  }
+
+  & > i:first-child {
+    margin-right: .5rem;
+  }
+
+  &-enter-active {
+    transition: .5s cubic-bezier(0.19, 1, 0.22, 1);
+  }
+
+  &-leave-active {
+    transition: $offlineIndicatorOutDuration $offlineIndicatorOutDelay cubic-bezier(0.19, 1, 0.22, 1);
+  }
+
+  &-enter-from, &-leave-to {
+    transform: translateY(-100%);
+  }
+}
+
 .window-content {
-  flex: 1 1 auto;
+  flex: 1;
   position: relative;
   overflow: hidden;
   margin: 0 auto;
