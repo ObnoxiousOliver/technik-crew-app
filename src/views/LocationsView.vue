@@ -4,9 +4,12 @@
       <i class="bi-geo-alt" />Standorte
     </template>
     <template #btns>
-      <Btn :to="{
-        name: 'location-add'
-      }" aria-label="Neuer Standort">
+      <Btn
+        :to="{
+          name: 'location-add'
+        }"
+        aria-label="Neuer Standort"
+      >
         <i class="bi-plus-lg" />
       </Btn>
     </template>
@@ -28,20 +31,24 @@
       </div>
 
       <template #buttons>
-        <ActionSheetButton :to="{
-          name: 'location-edit',
-          params: {
-            id: location?.id
-          }
-        }">
+        <ActionSheetButton
+          :to="{
+            name: 'location-edit',
+            params: {
+              id: location?.id
+            }
+          }"
+        >
           <i class="bi-pencil-square" /> Bearbeiten
         </ActionSheetButton>
-        <ActionSheetButton :to="{
-          name: 'location-history',
-          params: {
-            id: location?.id
-          }
-        }">
+        <ActionSheetButton
+          :to="{
+            name: 'location-history',
+            params: {
+              id: location?.id
+            }
+          }"
+        >
           <i class="bi-clock-history" /> Verlauf anzeigen
         </ActionSheetButton>
         <ActionSheetDivider />

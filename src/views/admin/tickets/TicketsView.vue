@@ -52,10 +52,10 @@
             <td>Geschlecht</td>
             <td>
               {{ {
-                  'male': 'männlich',
-                  'female': 'weiblich',
-                  'non-binary': 'divers'
-                }[showTicket.gender] }}
+                'male': 'männlich',
+                'female': 'weiblich',
+                'non-binary': 'divers'
+              }[showTicket.gender] }}
             </td>
           </tr>
           <tr>

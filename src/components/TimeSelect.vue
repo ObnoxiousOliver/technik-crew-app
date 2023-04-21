@@ -14,7 +14,13 @@
       <i class="bi-clock" />
     </div>
 
-    <input tabindex="-1" v-model="timeInput" ref="input" type="time" class="time-select__input">
+    <input
+      tabindex="-1"
+      v-model="timeInput"
+      ref="input"
+      type="time"
+      class="time-select__input"
+    >
   </Btn>
 </template>
 

@@ -9,8 +9,7 @@
       <template #title>
         <span v-if="equipment?.amount > 1" class="equipment-details__amount">
           {{ equipment?.amount }}x
-        </span
-        >{{ equipment?.name }}
+        </span>{{ equipment?.name }}
       </template>
 
       <LocationDisplay :id="equipment?.location" />
@@ -68,11 +67,13 @@
         Aktionen
       </SettingsListDivider>
 
-      <SettingsListLink :to="{
-        name: 'equipment-edit-location',
-        params: { id: equipment.id },
-        query: { back: route.fullPath }
-      }">
+      <SettingsListLink
+        :to="{
+          name: 'equipment-edit-location',
+          params: { id: equipment.id },
+          query: { back: route.fullPath }
+        }"
+      >
         <i class="bi-geo-alt" /><template v-if="equipment?.group">Gruppen </template>Standort
         <template v-if="equipment?.location">
           ändern
@@ -82,13 +83,15 @@
         </template>
       </SettingsListLink>
 
-      <SettingsListLink :to="{
-        name: 'equipment-edit',
-        params: {
-          id: equipment.id,
-          field: 'code'
-        }
-      }">
+      <SettingsListLink
+        :to="{
+          name: 'equipment-edit',
+          params: {
+            id: equipment.id,
+            field: 'code'
+          }
+        }"
+      >
         <i class="bi-qr-code-scan" />QR- oder Barcode
         <template v-if="equipment?.location">
           ändern
@@ -100,44 +103,52 @@
 
       <SettingsListDivider v-if="equipment?.amount > 1" />
 
-      <SettingsListLink :to="{
-        name: 'equipment-edit',
-        params: {
-          id: equipment.id,
-          field: 'amount'
-        }
-      }">
+      <SettingsListLink
+        :to="{
+          name: 'equipment-edit',
+          params: {
+            id: equipment.id,
+            field: 'amount'
+          }
+        }"
+      >
         <i class="bi-ui-radios-grid" />Anzahl ändern
       </SettingsListLink>
 
       <template v-if="equipment.amount > 1">
-        <SettingsListLink :to="{
-          name: 'equipment-split',
-          params: {
-            id: equipment.id,
-          }
-        }">
+        <SettingsListLink
+          :to="{
+            name: 'equipment-split',
+            params: {
+              id: equipment.id,
+            }
+          }"
+        >
           <i class="bi-vr" />Anzahl teilen
         </SettingsListLink>
       </template>
 
       <SettingsListDivider />
 
-      <SettingsListLink :to="{
-        name: 'equipment-edit',
-        params: {
-          id: equipment.id
-        }
-      }">
+      <SettingsListLink
+        :to="{
+          name: 'equipment-edit',
+          params: {
+            id: equipment.id
+          }
+        }"
+      >
         <i class="bi-pencil-square" />Bearbeiten
       </SettingsListLink>
 
-      <SettingsListLink :to="{
-        name: 'equipment-history',
-        params: {
-          id: equipment.id
-        }
-      }">
+      <SettingsListLink
+        :to="{
+          name: 'equipment-history',
+          params: {
+            id: equipment.id
+          }
+        }"
+      >
         <i class="bi-clock-history" />Verlauf anzeigen
       </SettingsListLink>
 
@@ -179,13 +190,15 @@
 
     <ActionSheet v-model:show="showNoteOptionsSheet">
       <template #buttons>
-        <ActionSheetButton :to="{
-          name: 'equipment-note',
-          params: {
-            id: equipment.id,
-            noteId: noteOptions
-          }
-        }">
+        <ActionSheetButton
+          :to="{
+            name: 'equipment-note',
+            params: {
+              id: equipment.id,
+              noteId: noteOptions
+            }
+          }"
+        >
           <i class="bi-pencil" />Anmerkung bearbeiten
         </ActionSheetButton>
         <ActionSheetButton @click="deleteNote" class="danger">

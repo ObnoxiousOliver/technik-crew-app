@@ -6,11 +6,13 @@
     </div>
     <div class="user-badge__info">
       {{ user?.username }} -
-      <i :class="{
-        'male': 'bi-gender-male',
-        'female': 'bi-gender-female',
-        'non-binary': 'bi-gender-ambiguous'
-      }[user?.gender]" />
+      <i
+        :class="{
+          'male': 'bi-gender-male',
+          'female': 'bi-gender-female',
+          'non-binary': 'bi-gender-ambiguous'
+        }[user?.gender]"
+      />
       {{ {
         'male': 'männlich',
         'female': 'weiblich',

@@ -7,9 +7,11 @@
       :groupOpen="open"
     />
 
-    <li :style="{
-      '--height': item.equipment.length * 3 + 'rem'
-    }">
+    <li
+      :style="{
+        '--height': item.equipment.length * 3 + 'rem'
+      }"
+    >
       <Transition name="equipment-list-button__list">
         <ul
           class="equipment-list-button__list"

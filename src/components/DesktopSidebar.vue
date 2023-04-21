@@ -1,7 +1,10 @@
 <template>
-  <div class="home-sidebar" :style="{
-    '--active': active
-  }">
+  <div
+    class="home-sidebar"
+    :style="{
+      '--active': active
+    }"
+  >
     <h2>
       <Username :user="userStore.user" full />
     </h2>
@@ -42,7 +45,7 @@
             Einstellungen
           </DesktopSidebarBtn>
         </li>
-        <div :class="['home-sidebar__page-indicator', upDown]"/>
+        <div :class="['home-sidebar__page-indicator', upDown]" />
       </ul>
     </div>
   </div>

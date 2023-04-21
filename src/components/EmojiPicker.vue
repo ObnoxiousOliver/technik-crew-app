@@ -16,7 +16,7 @@
 
     <template #buttons>
       <ActionSheetButton class="danger">
-        <i class="bi-x-lg"/>Abbrechen
+        <i class="bi-x-lg" />Abbrechen
       </ActionSheetButton>
     </template>
   </ActionSheet>

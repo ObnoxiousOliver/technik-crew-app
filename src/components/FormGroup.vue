@@ -1,7 +1,9 @@
 <template>
-  <div :class="['form-group', {
-    'form-group--inline': props.inline
-  }]">
+  <div
+    :class="['form-group', {
+      'form-group--inline': props.inline
+    }]"
+  >
     <slot />
   </div>
 </template>

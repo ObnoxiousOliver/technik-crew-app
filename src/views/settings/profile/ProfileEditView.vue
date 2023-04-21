@@ -6,7 +6,7 @@
 
     <FormContainer @submit.prevent="submit" :disabled="submitting">
       <FormGroup>
-        <FloatingLabelInput label="Vorname" v-model="firstname"/>
+        <FloatingLabelInput label="Vorname" v-model="firstname" />
         <FloatingLabelInput label="Nachname" v-model="lastname" />
       </FormGroup>
       <FormInfo :show="nameError">

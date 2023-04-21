@@ -9,10 +9,12 @@
     </template>
 
     <template #btns>
-      <Btn @click="router.push({
-        name: 'wiki-page-edit',
-        params: { id: page?.id }
-      })">
+      <Btn
+        @click="router.push({
+          name: 'wiki-page-edit',
+          params: { id: page?.id }
+        })"
+      >
         <i class="bi-pencil-square" />
       </Btn>
     </template>

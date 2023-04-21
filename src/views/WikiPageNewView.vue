@@ -4,9 +4,13 @@
       Neue Seite
     </template>
 
-    <p ref="p" class="rainbow-text" :style="{
-      '--progress': progress,
-    }">
+    <p
+      ref="p"
+      class="rainbow-text"
+      :style="{
+        '--progress': progress,
+      }"
+    >
       Gib einen Titel ein und schreibe ein Emoji an erster Stelle.
       Das Emoji wird als Icon für die Seite verwendet{{ icon ? ': ' + icon : '.' }}
     </p>

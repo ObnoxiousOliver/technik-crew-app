@@ -1,7 +1,7 @@
 <template>
   <Page>
     <template #title>
-      <i class="bi-geo-alt"/>Neuer Standort
+      <i class="bi-geo-alt" />Neuer Standort
     </template>
 
     <FormContainer @submit.prevent="submit" :disabled="submitting">

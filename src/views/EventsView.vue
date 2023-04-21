@@ -9,7 +9,7 @@
     <template #btns>
     </template>
     <template #title>
-      <i class="bi-calendar2-week"/>Termine
+      <i class="bi-calendar2-week" />Termine
     </template>
 
     <div class="events-view__btns">
