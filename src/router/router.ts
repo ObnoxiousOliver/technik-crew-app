@@ -2,6 +2,7 @@ import { Permission } from '@/model/permissions'
 import { useUser } from '@/stores/user'
 import { setStore } from '@/utilities/auth'
 import { useBreakpoint } from '@/utilities/breakpoint'
+import { useOffline } from '@/utilities/offline'
 import { getAuth } from 'firebase/auth'
 import { Component } from 'vue'
 import { createRouter as _createRouter, createWebHistory, RouteComponent, RouteLocationNormalized, RouteMeta, RouteRecordRaw, RouteRecordRedirectOption, RouterOptions } from 'vue-router'
@@ -23,6 +24,7 @@ export interface AbstractRoute {
   redirect?: RouteRecordRedirectOption,
   alias?: string | string[],
   meta?: RouteMeta
+  offlineVisible?: boolean
 }
 
 export function compileRoutes (routes: AbstractRoute[]): RouteRecordRaw[] | null {
@@ -44,7 +46,8 @@ export function compileRoutes (routes: AbstractRoute[]): RouteRecordRaw[] | null
         backPath,
         redirect,
         alias,
-        meta
+        meta,
+        offlineVisible
       } = route
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -58,6 +61,7 @@ export function compileRoutes (routes: AbstractRoute[]): RouteRecordRaw[] | null
           depth: depth ?? (parent?.meta?.depth === undefined ? 0 : (parent?.meta?.depth as number) + 1),
           backPath: backPath !== null ? backPath ?? parentPath ?? null : null,
           root: parent?.meta?.root ?? parent?.name ?? name,
+          offlineVisible: offlineVisible ?? false,
           ...meta
         }
       }
@@ -102,7 +106,23 @@ export function createRouter (routes: AbstractRoute[], options: Partial<RouterOp
   })))
   console.groupEnd()
 
+  // Check if user is logged in
   router.beforeEach(async (to, from, next) => {
+    // Check if page is available offline
+    if (useOffline().value) {
+      if (to.matched.some(record => record.meta.offlineVisible)) {
+        next()
+      } else if (from.matched.some(record => record.meta.offlineVisible)) {
+        next(from)
+      } else {
+        next({
+          path: '/'
+        })
+      }
+
+      return
+    }
+
     if (to.matched.some(record => record.meta.requiresAuth)) {
       if (getAuth().currentUser) {
         next()
@@ -190,6 +210,7 @@ export function createRouter (routes: AbstractRoute[], options: Partial<RouterOp
     }
   })
 
+  // Set page title
   router.afterEach((to) => {
     if (to.meta.title) {
       document.title = to.meta.title as string
