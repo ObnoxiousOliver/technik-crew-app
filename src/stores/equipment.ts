@@ -1,4 +1,5 @@
 import { Equipment, EquipmentDB, NoteDB } from '@/model/equipment'
+import { useOffline } from '@/utilities/offline'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { defineStore } from 'pinia'
 import { Ref, computed, ref, watch } from 'vue'
@@ -31,6 +32,8 @@ export const useEquipment = defineStore('equipment', () => {
   // Subscribe to changes
   let unsubscribe: (() => void) | null = null
   function subscribe () {
+    console.log('[Equipment] Subscribing to equipment')
+
     unsubscribe?.()
 
     Equipment.get(undefined, null, false).then((eq) => {
@@ -59,12 +62,23 @@ export const useEquipment = defineStore('equipment', () => {
     })
   }
   onAuthStateChanged(getAuth(), (user) => {
+    if (useOffline().value) return
+
     if (user) {
       if (unsubscribe) return
       subscribe()
     } else {
       unsubscribe?.()
       unsubscribe = null
+    }
+  })
+  // Unsubscribe if offline-mode is enabled
+  watch(useOffline(), (offline) => {
+    if (offline) {
+      unsubscribe?.()
+      unsubscribe = null
+    } else {
+      subscribe()
     }
   })
 
@@ -106,8 +120,20 @@ export const useEquipment = defineStore('equipment', () => {
     }
   }
 
+  /**
+   * Get notes of an equipment
+   * @param eq Equipment
+   * @returns Notes
+   * @returns cached notes if offline
+   * @returns undefined if equipment has no ID
+   * @async
+   */
   async function getNotes (eq: Equipment) {
     if (!eq.id) return
+
+    if (useOffline().value) {
+      return notes.value[eq.id] ?? {}
+    }
 
     const n = await eq.getNotes() as Record<string, NoteDB>
     notes.value[eq.id] = n
@@ -115,6 +141,8 @@ export const useEquipment = defineStore('equipment', () => {
   }
 
   async function split (eq: Equipment, amount: number) {
+    if (useOffline().value) return
+
     if (!eq.amount) return
     if (amount < 1) return
     if (amount % 1 !== 0) return

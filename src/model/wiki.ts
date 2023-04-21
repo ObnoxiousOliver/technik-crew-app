@@ -1,4 +1,3 @@
-import { useUser } from '@/stores/user'
 import { JSONContent } from '@tiptap/vue-3'
 import { addDoc, collection, doc, getDoc, getDocs, getFirestore, query, setDoc } from 'firebase/firestore'
 import { HistoryState } from './history'

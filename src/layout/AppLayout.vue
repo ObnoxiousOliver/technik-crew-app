@@ -102,17 +102,16 @@ import { useOffline } from '@/utilities/offline'
 
 const isOffline = useOffline()
 const showNetworkIndicator = ref(false)
-watch(isOffline, (offline) => {
-  showNetworkIndicator.value = offline
-}, { immediate: true, flush: 'post' })
 
 watch(isOffline, (offline) => {
+  showNetworkIndicator.value = offline
+
   if (offline) {
     document.documentElement.classList.add('offline')
   } else {
     document.documentElement.classList.remove('offline')
   }
-}, { immediate: true })
+}, { immediate: true, flush: 'post' })
 
 const route = useRoute()
 const bp = useBreakpoint()

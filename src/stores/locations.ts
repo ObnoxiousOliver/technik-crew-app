@@ -2,7 +2,8 @@ import { Location, LocationDB } from '@/model/location'
 import { defineStore } from 'pinia'
 import { ref, watch } from 'vue'
 import { search as s } from '@/utilities/search'
-import { Unsubscribe, getAuth, onAuthStateChanged } from 'firebase/auth'
+import { getAuth, onAuthStateChanged } from 'firebase/auth'
+import { useOffline } from '@/utilities/offline'
 
 export const useLocations = defineStore('locations', () => {
   const locations = ref<Location[]>([])
@@ -15,6 +16,7 @@ export const useLocations = defineStore('locations', () => {
 
   async function create (name: string, description: string) {
     const loc = await Location.create({ name, description })
+    return loc
   }
 
   function getLocationById (id: string) {
@@ -41,6 +43,9 @@ export const useLocations = defineStore('locations', () => {
   // Subscribe to changes
   let unsubscribe: (() => void) | null = null
   async function subscribe () {
+    if (useOffline().value) return
+
+    console.log('[Locations] Subscribing to locations')
     if (unsubscribe) {
       unsubscribe()
     }
@@ -68,12 +73,23 @@ export const useLocations = defineStore('locations', () => {
   }
 
   onAuthStateChanged(getAuth(), (user) => {
+    if (useOffline().value) return
+
     if (user) {
       if (unsubscribe) return
       subscribe()
     } else {
       unsubscribe?.()
       unsubscribe = null
+    }
+  })
+
+  watch(useOffline(), (offline) => {
+    if (offline) {
+      unsubscribe?.()
+      unsubscribe = null
+    } else {
+      subscribe()
     }
   })
 

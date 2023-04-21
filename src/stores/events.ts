@@ -1,4 +1,5 @@
 import Event, { EventDB } from '@/model/event'
+import { useOffline } from '@/utilities/offline'
 import { defineStore } from 'pinia'
 import { ref, watch } from 'vue'
 
@@ -35,7 +36,7 @@ export const useEvents = defineStore('events', () => {
     // Get events that are already in the list
     const ue = events.value.filter(x => x.startDate >= now.getTime())
 
-    if (ue.length >= 5) {
+    if (ue.length >= 5 || useOffline().value) {
       ue.sort((a, b) => a.startDate - b.startDate)
       ue.splice(5)
       upcoming.value = ue
@@ -71,6 +72,8 @@ export const useEvents = defineStore('events', () => {
   }
 
   async function updateMonthSubscribtion (date: Date) {
+    if (useOffline().value) return
+
     console.log('Updating month subscription', `(${date.getMonth() + 1}/${date.getFullYear()})`)
     if (unsubscribe) {
       unsubscribe()
@@ -105,6 +108,8 @@ export const useEvents = defineStore('events', () => {
   }
 
   async function fetchMonth (date: Date) {
+    if (useOffline().value) return
+
     const monthEvents = await Event.getMonth(date)
     events.value = events.value.filter(x => !x.months.includes(`${date.getFullYear()}-${date.getMonth() + 1}`))
     monthEvents.forEach(x => {
@@ -113,6 +118,15 @@ export const useEvents = defineStore('events', () => {
       }
     })
   }
+
+  watch(useOffline(), (offline) => {
+    if (offline) {
+      unsubscribe?.()
+      unsubscribe = null
+    } else {
+      updateMonthSubscribtion(subscribingMonth.value)
+    }
+  })
 
   return {
     events,
