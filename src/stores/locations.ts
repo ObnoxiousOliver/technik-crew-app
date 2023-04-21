@@ -2,7 +2,7 @@ import { Location, LocationDB } from '@/model/location'
 import { defineStore } from 'pinia'
 import { ref, watch } from 'vue'
 import { search as s } from '@/utilities/search'
-import { Unsubscribe, getAuth, onAuthStateChanged } from 'firebase/auth'
+import { getAuth, onAuthStateChanged } from 'firebase/auth'
 
 export const useLocations = defineStore('locations', () => {
   const locations = ref<Location[]>([])
@@ -14,7 +14,7 @@ export const useLocations = defineStore('locations', () => {
   }
 
   async function create (name: string, description: string) {
-    const loc = await Location.create({ name, description })
+    await Location.create({ name, description })
   }
 
   function getLocationById (id: string) {

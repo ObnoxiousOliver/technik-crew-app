@@ -1,7 +1,12 @@
 <template>
   <NotFoundView v-if="!equipment" />
 
-  <EquipmentScanView v-else-if="editField === 'code'" @scan="scan" preventDefault :errMsg="scanErr" />
+  <EquipmentScanView
+    v-else-if="editField === 'code'"
+    @scan="scan"
+    preventDefault
+    :errMsg="scanErr"
+  />
 
   <Page v-else>
     <template #title>
@@ -56,10 +61,12 @@
         <SettingsListDivider>
           Standort
         </SettingsListDivider>
-        <SettingsListLink :to="{
-          name: 'equipment-edit-location',
-          params: { id: equipment?.id }
-        }">
+        <SettingsListLink
+          :to="{
+            name: 'equipment-edit-location',
+            params: { id: equipment?.id }
+          }"
+        >
           <i class="bi-geo-alt"></i>
           {{ location?.name ?? 'Kein Standort ausgewählt' }}
         </SettingsListLink>

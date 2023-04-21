@@ -21,12 +21,12 @@
         class="sidebar-router"
         v-slot="{ Component }"
       > -->
-        <!-- <template v-if="Component">
+      <!-- <template v-if="Component">
           <Transition :name="route.meta.transitionName">
             <component :is="Component" />
           </Transition>
         </template> -->
-        <DesktopSidebar/>
+      <DesktopSidebar />
       <!-- </RouterView> -->
     </aside>
   </Transition>
@@ -52,13 +52,16 @@
     <div v-if="showNavigation && bp.mode === 'mobile'" class="mobile-navbar-mask" />
   </Transition>
   <Transition name="navbar">
-    <MobileNavbar v-if="showNavigation && bp.mode === 'mobile'" :buttons="[
-      { to: 'wiki', icon: 'compass' },
-      { to: 'events', icon: 'calendar2-week' },
-      { to: 'dashboard', icon: 'house-door' },
-      { to: 'equipment', icon: 'speaker' },
-      { to: 'settings', icon: 'gear' },
-    ]" />
+    <MobileNavbar
+      v-if="showNavigation && bp.mode === 'mobile'"
+      :buttons="[
+        { to: 'wiki', icon: 'compass' },
+        { to: 'events', icon: 'calendar2-week' },
+        { to: 'dashboard', icon: 'house-door' },
+        { to: 'equipment', icon: 'speaker' },
+        { to: 'settings', icon: 'gear' },
+      ]"
+    />
   </Transition>
 
   <div id="layer" />

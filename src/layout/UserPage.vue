@@ -1,17 +1,21 @@
 <template>
   <Page :navigation="false">
-    <div :class="['user-page', {
-      'user-page--search-expanded': searchExpanded,
-      'user-page--has-add-btn': addBtn,
-      'user-page--has-search-btn': search
-    }]" ref="page" :style="{
-      '--search-btn-left': searchBtnLeft
-    }">
+    <div
+      :class="['user-page', {
+        'user-page--search-expanded': searchExpanded,
+        'user-page--has-add-btn': addBtn,
+        'user-page--has-search-btn': search
+      }]"
+      ref="page"
+      :style="{
+        '--search-btn-left': searchBtnLeft
+      }"
+    >
       <h2 class="user-page__title">
         <div class="user-page__title__content">
           <slot name="title" />
         </div>
-            <!-- <div class="user-page__title__buttons">
+        <!-- <div class="user-page__title__buttons">
               <slot name="btns" />
             </div> -->
         <Transition name="user-page__title__buttons">
@@ -33,7 +37,7 @@
       </h2>
       <Transition name="user-page__search">
         <div v-if="searchExpanded" class="user-page__search">
-          <div class="user-page__search__input" >
+          <div class="user-page__search__input">
             <InputField
               class="user-page__search__input__field"
               placeholder="Suchen..."

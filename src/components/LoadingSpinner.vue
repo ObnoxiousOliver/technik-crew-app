@@ -1,11 +1,11 @@
 <template>
   <div class="loading-spinner">
     <div class="loading-spinner__spinner">
-      <div/>
-      <div/>
-      <div/>
-      <div/>
-      <div/>
+      <div />
+      <div />
+      <div />
+      <div />
+      <div />
     </div>
   </div>
 </template>

@@ -1,8 +1,10 @@
 <template>
-  <div :class="['text-box', {
-    'text-box--focused': focused,
-    'text-box--has-label': label
-  }]">
+  <div
+    :class="['text-box', {
+      'text-box--focused': focused,
+      'text-box--has-label': label
+    }]"
+  >
     <div class="text-box__content">
       <div v-if="label" class="text-box__label" @click="inputEl?.focus()">
         {{ label }}

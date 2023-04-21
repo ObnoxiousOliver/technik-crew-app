@@ -17,7 +17,7 @@
 
       <div class="equipment-list-button__name-icon-container">
         <i v-if="isGroup" class="equipment-list-button__icon bi-chevron-right" />
-        <i v-else :class="['equipment-list-button__icon', typeInfo[eq.type]?.icon ?? typeInfo.other.icon]"/>
+        <i v-else :class="['equipment-list-button__icon', typeInfo[eq.type]?.icon ?? typeInfo.other.icon]" />
 
         <div class="equipment-list-button__name">
           {{ eq.name }}
@@ -36,9 +36,9 @@
           <div v-if="eq?.amount && eq?.amount > 1" class="equipment-list-button__amount">
             {{ eq.amount }}x
           </div> -->
-          <div v-if="eq.code" class="equipment-list-button__qr-code">
-            <i class="bi-qr-code-scan" />
-          </div>
+        <div v-if="eq.code" class="equipment-list-button__qr-code">
+          <i class="bi-qr-code-scan" />
+        </div>
         <!-- </div> -->
       </template>
 
@@ -57,7 +57,7 @@
 
   <ActionSheet v-model:show="showSheet">
     <template #title>
-      <i :class="['equipment-list-button__icon', typeInfo[eq.type]?.icon ?? typeInfo.other.icon]"/>{{ eq.name }}
+      <i :class="['equipment-list-button__icon', typeInfo[eq.type]?.icon ?? typeInfo.other.icon]" />{{ eq.name }}
     </template>
 
     {{ eq.description }}
@@ -67,11 +67,13 @@
 
     <template #buttons>
       <template v-if="!isGroup">
-        <ActionSheetButton :to="{
-          name: 'equipment-edit',
-          params: { id: eq.id },
-          query: { back: route.fullPath }
-        }">
+        <ActionSheetButton
+          :to="{
+            name: 'equipment-edit',
+            params: { id: eq.id },
+            query: { back: route.fullPath }
+          }"
+        >
           <i class="bi-pencil-square" />Bearbeiten
         </ActionSheetButton>
         <ActionSheetDivider />
@@ -83,11 +85,13 @@
           <ActionSheetButton @click="renameGroup">
             <i class="bi-input-cursor-text" />Gruppe umbenennen
           </ActionSheetButton>
-          <ActionSheetButton :to="{
-            name: 'equipment-edit-location',
-            params: { id: eq.id },
-            query: { back: route.fullPath }
-          }">
+          <ActionSheetButton
+            :to="{
+              name: 'equipment-edit-location',
+              params: { id: eq.id },
+              query: { back: route.fullPath }
+            }"
+          >
             <i class="bi-geo-alt" />Standort von <b>{{eq.group}}</b> ändern
           </ActionSheetButton>
         </template>
@@ -109,11 +113,13 @@
       </template>
 
       <template v-else>
-        <ActionSheetButton :to="{
-          name: 'equipment-edit-location',
-          params: { id: eq.equipment[0].id },
-          query: { back: route.fullPath, group: eq.name }
-        }">
+        <ActionSheetButton
+          :to="{
+            name: 'equipment-edit-location',
+            params: { id: eq.equipment[0].id },
+            query: { back: route.fullPath, group: eq.name }
+          }"
+        >
           <i class="bi-geo-alt" />Standort von <b>{{eq.name}}</b> ändern
         </ActionSheetButton>
       </template>

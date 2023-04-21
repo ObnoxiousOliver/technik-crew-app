@@ -6,7 +6,7 @@
     @search="search"
   >
     <template #title>
-      <i class="bi-speaker"/>Equipment
+      <i class="bi-speaker" />Equipment
     </template>
     <template #btns>
       <Btn :to="{ name: 'locations' }" aria-label="Standorte">

@@ -1,7 +1,9 @@
 <template>
-  <li :class="['settings-list-option', {
-    'settings-list-option--has-desc': $slots.desc
-  }]">
+  <li
+    :class="['settings-list-option', {
+      'settings-list-option--has-desc': $slots.desc
+    }]"
+  >
     <label :for="props.for" class="settings-list-option__label">
       <div class="settings-list-option__title">
         <slot />

@@ -50,7 +50,12 @@
         </FormGroup>
         <FormGroup inline>
           <label class="events-add__datetime-label no-grow">bis</label>
-          <DateTimeSelect class="fill-width" :disabled="oneday" :disabledTime="wholeday" v-model="end"/>
+          <DateTimeSelect
+            class="fill-width"
+            :disabled="oneday"
+            :disabledTime="wholeday"
+            v-model="end"
+          />
         </FormGroup>
 
         <p class="events-add__datetime-info">
@@ -163,14 +168,8 @@ import { computed, onBeforeMount, ref, watch } from 'vue'
 import { useEvents } from '@/stores/events'
 import { EventColors } from '@/model/event'
 import { back } from '@/router'
-import { SelectUsersPreset } from './tempViews/presets'
-import { useTemp } from '@/stores/temp'
-import { useUsers } from '@/stores/users'
 
 const events = useEvents()
-const temp = useTemp()
-const users = useUsers()
-
 const color = ref<EventColors>('gray')
 const name = ref('')
 const description = ref('')
@@ -275,10 +274,6 @@ watch([start, wholeday, oneday], () => {
     end.value = d
   }
 })
-
-const neededUsers = ref<string[]>(
-  temp.tempRoute(SelectUsersPreset('events-add-select-users'))() ?? []
-)
 
 const nameErr = ref('')
 

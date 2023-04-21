@@ -16,12 +16,15 @@
 
     <template v-if="start && !scanner?.loading">
       <div class="lens-card__frame">
-        <svg xmlns="http://www.w3.org/2000/svg" :viewBox="[
-          0 - 100 / width / 2,
-          0 - 100 / width / 2,
-          16 + 100 / width,
-          16 + 100 / width
-        ]">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          :viewBox="[
+            0 - 100 / width / 2,
+            0 - 100 / width / 2,
+            16 + 100 / width,
+            16 + 100 / width
+          ]"
+        >
           <path
             d="M 0 3 L 0 2 A 2 2 0 0 1 2 0 L 3 0 M 13 0 L 14 0 A 2 2 0 0 1 16 2 L 16 3 M 3 16 L 2 16 A 2 2 0 0 1 0 14 L 0 13 M 16 13 L 16 14 A 2 2 0 0 1 14 16 L 13 16"
             fill="none"
@@ -33,7 +36,13 @@
       </div>
 
       <div class="lens-card__overlay">
-        <Btn class="lens-card__overlay__x" aria-label="Kamera schließen" transparent square @click="start = false">
+        <Btn
+          class="lens-card__overlay__x"
+          aria-label="Kamera schließen"
+          transparent
+          square
+          @click="start = false"
+        >
           <i class="bi-x-lg" />
         </Btn>
 

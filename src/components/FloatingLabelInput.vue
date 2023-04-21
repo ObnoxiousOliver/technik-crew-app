@@ -1,7 +1,9 @@
 <template>
-  <div :class="['input', {
-    'input--float': float
-  }]">
+  <div
+    :class="['input', {
+      'input--float': float
+    }]"
+  >
     <input
       class="input__field"
       :type="inputType"

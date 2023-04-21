@@ -26,7 +26,7 @@
 
 <script lang="ts" setup>
 
-const props = defineProps({
+defineProps({
   activeElements: {
     type: Object,
     default: () => ({})

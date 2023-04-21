@@ -1,8 +1,13 @@
 <template>
-  <component :is="to ? 'router-link' : 'button'" :to="to" v-wave :class="['action-sheet-btn', {
-    'action-sheet-btn--danger': danger,
-    'action-sheet-btn--disabled': disabled
-  }]">
+  <component
+    :is="to ? 'router-link' : 'button'"
+    :to="to"
+    v-wave
+    :class="['action-sheet-btn', {
+      'action-sheet-btn--danger': danger,
+      'action-sheet-btn--disabled': disabled
+    }]"
+  >
     <slot />
   </component>
 </template>

@@ -1,7 +1,7 @@
 <template>
   <Page>
     <template #title>
-      <i class="bi-key"/>Passwort ändern
+      <i class="bi-key" />Passwort ändern
     </template>
 
     <p>Bestätige die E-Mail Adresse deines Accounts, damir wir dir die E-Mail zum ändern deines Passworts senden können.</p>

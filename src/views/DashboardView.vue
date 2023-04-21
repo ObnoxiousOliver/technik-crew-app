@@ -1,7 +1,7 @@
 <template>
   <UserPage>
     <template #title>
-      <i class="bi-house-door"/>Dashboard
+      <i class="bi-house-door" />Dashboard
     </template>
 
     <div class="dashboard-grid">

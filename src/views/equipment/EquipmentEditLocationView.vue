@@ -9,10 +9,15 @@
       Equipmentteile der Gruppe gesetzt.
     </p>
 
-    <LocationsList :locations="locStore.locations" search hasNoLocationOption @click="(loc) => {
-      equipment?.setLocation(loc?.id ?? null)
-      back()
-    }" />
+    <LocationsList
+      :locations="locStore.locations"
+      search
+      hasNoLocationOption
+      @click="(loc) => {
+        equipment?.setLocation(loc?.id ?? null)
+        back()
+      }"
+    />
   </Page>
 </template>
 
