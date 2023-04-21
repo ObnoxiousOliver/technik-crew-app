@@ -6,7 +6,7 @@
       Neues Equipment
     </template>
 
-    <FormContainer @submit.prevent="submit" :disabled="submitting" >
+    <FormContainer @submit.prevent="submit" :disabled="submitting">
       <FloatingLabelInput
         label="Name"
         v-model="name"
@@ -48,6 +48,19 @@
         type="number"
       />
 
+      <SettingsList>
+        <SettingsListDivider>
+          Standort
+        </SettingsListDivider>
+        <SettingsListLink :to="{
+          name: 'equipment-add-select-location'
+        }">
+          <i class="bi-geo-alt"></i>
+          {{ location?.name ?? 'Kein Standort ausgewählt' }}
+        </SettingsListLink>
+        <SettingsListDivider />
+      </SettingsList>
+
       <Btn type="submit">
         Hinzufügen
       </Btn>
@@ -60,17 +73,41 @@
 </template>
 
 <script lang="ts" setup>
+import SettingsList from '@/components/SettingsList.vue'
+import SettingsListLink from '@/components/SettingsListLink.vue'
+import SettingsListDivider from '@/components/SettingsListDivider.vue'
 import { Equipment, EquipmentTypeInfo } from '@/model/equipment'
 import { back } from '@/router'
-import { ref } from 'vue'
+import { useTemp } from '@/stores/temp'
+import { ref, watch } from 'vue'
 import FloatingLabelInput from '../../components/FloatingLabelInput.vue'
+import { SelectLocationPreset } from '../tempViews/presets'
+import { Location } from '@/model/location'
+import { useLocations } from '@/stores/locations'
 
+const temp = useTemp()
+const locationData = temp.tempRoute(SelectLocationPreset('equipment-add-select-location'))()
+
+const locStore = useLocations()
+
+console.log(locationData)
 const categories = ref(EquipmentTypeInfo)
 
-const name = ref('')
-const description = ref('')
-const type = ref('')
-const amount = ref(1)
+const name = ref(temp.getData('equipment-add', false)?.name ?? '')
+const description = ref(temp.getData('equipment-add', false)?.description ?? '')
+const type = ref(temp.getData('equipment-add', false)?.type ?? '')
+const amount = ref(temp.getData('equipment-add', false)?.amount ?? 1)
+const location = ref<Location>(locationData === null ? null : locationData ?? locStore.getLocationById(temp.getData('equipment-add', false)?.location))
+
+watch([name, description, type, amount, location], () => {
+  temp.setData('equipment-add', {
+    name: name.value,
+    description: description.value,
+    type: type.value,
+    amount: amount.value,
+    location: location.value?.id
+  })
+}, { deep: true, immediate: true })
 
 const nameErr = ref()
 const typeErr = ref()
@@ -99,11 +136,15 @@ async function submit () {
   await Equipment.create({
     name: name.value,
     description: description.value,
-    type: type.value
+    type: type.value,
+    location: location.value?.id
   }).catch(err => {
     submitting.value = false
     err.value = err
   })
+
+  temp.deleteData('equipment-add')
+
   back()
 }
 </script>

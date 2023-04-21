@@ -86,7 +86,7 @@ async function startScan () {
   }
 
   video.value.srcObject = stream
-  video.value.play()
+  if (video.value.paused) video.value.play()
 
   reader.decodeFromStream(stream, undefined, handleResult)
   loading.value = false
@@ -122,9 +122,9 @@ defineExpose({
 
   video {
     display: block;
-    width: stretch;
-    height: stretch;
-    object-fit: contain;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 }
 </style>

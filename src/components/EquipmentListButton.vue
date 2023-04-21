@@ -1,15 +1,11 @@
 <template>
   <template  v-if="item.type === 'group'">
-    <SettingsListLink
-      isButton
-      :arrow="false" @click="open = !open"
-      :class="['equipment-list-button', {
-        'equipment-list-button--open': open
-      }]"
-    >
-      <i class="bi-chevron-right" />
-      {{ item.name }}
-    </SettingsListLink>
+    <EquipmentListButtonRaw
+      :eq="item"
+      class="equipment-list-button"
+      @click="open = !open"
+      :groupOpen="open"
+    />
 
     <li :style="{
       '--height': item.equipment.length * 3 + 'rem'
@@ -38,7 +34,6 @@
 
 <script lang="ts" setup>
 import { Equipment } from '@/model/equipment'
-import SettingsListLink from '../components/SettingsListLink.vue'
 import EquipmentListButtonRaw from '../components/EquipmentListButtonRaw.vue'
 import { ref } from 'vue'
 
@@ -74,15 +69,16 @@ const open = ref(false)
     overflow: hidden;
     position: relative;
 
-    :deep(.settings-list-item__button) {
-      padding-left: 4rem;
+    :deep(.equipment-list-button__name-icon-container) {
+      padding-left: 1.3rem;
+      grid-template-columns: 1.5rem auto;
     }
 
     &::before {
       content: '';
       position: absolute;
       top: 0;
-      left: 1.95rem;
+      left: 1.9rem;
       bottom: 1rem;
       width: .2rem;
       background: r.$text-secondary;

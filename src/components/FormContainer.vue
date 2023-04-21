@@ -71,9 +71,5 @@ const props = defineProps<{
   :deep(p) {
     margin: 0;
   }
-
-  :deep(ul, ol) {
-    padding-left: 1.2rem;
-  }
 }
 </style>

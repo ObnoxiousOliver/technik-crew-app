@@ -144,7 +144,16 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
             title: 'Equipment bearbeiten',
             name: 'equipment-edit',
             path: '/equipment/:id/edit/:field?',
-            component: () => import('../views/equipment/EquipmentEditView.vue')
+            component: () => import('../views/equipment/EquipmentEditView.vue'),
+
+            children: [
+              {
+                title: 'Standort ändern',
+                name: 'equipment-edit-location',
+                path: '/equipment/:id/edit/location',
+                component: () => import('../views/equipment/EquipmentEditLocationView.vue')
+              }
+            ]
           },
           {
             title: 'Equipment Anzahl Teilen',
@@ -273,6 +282,23 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
         name: 'admins-who',
         path: '/admin/who',
         component: () => import('../views/WhoAreTheAdminsView.vue')
+      }
+    ]
+  },
+
+  // Help
+  {
+    title: 'Hilfe',
+    name: 'help',
+    path: '/help',
+    component: () => import('../views/help/HelpView.vue'),
+
+    children: [
+      {
+        title: 'Offline Modus',
+        name: 'help-offline',
+        pathName: '/offline',
+        component: () => import('../views/help/HelpOfflineView.vue')
       }
     ]
   },
