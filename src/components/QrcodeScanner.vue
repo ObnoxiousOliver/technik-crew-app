@@ -1,12 +1,17 @@
 <template>
   <div class="scanner">
-    <video ref="video" />
+    <video
+      ref="video"
+      autoplay
+      muted
+      playsinline
+    />
   </div>
 </template>
 
 <script lang="ts" setup>
 import { onBeforeUnmount, ref, watch } from 'vue'
-import { BarcodeFormat, BrowserMultiFormatReader, DecodeHintType } from '@zxing/library'
+import { BarcodeFormat, BrowserMultiFormatReader, DecodeHintType, Result } from '@zxing/library'
 import { AppError } from '@/model/error'
 
 const emit = defineEmits(['result'])
@@ -42,23 +47,23 @@ hints.set(DecodeHintType.POSSIBLE_FORMATS, formats)
 const reader = new BrowserMultiFormatReader(hints)
 const loading = ref(false)
 
-function handleResult (result) {
+function handleResult (result: Result) {
   emit('result', result)
 }
 
 let stream: MediaStream | null = null
 
 async function startScan () {
+  if (!video.value) return
+
   if (loading.value) {
-    await new Promise((resolve) => {
+    await new Promise<void>((resolve) => {
       const unhook = watch(loading, (val) => {
         if (!val) {
           unhook()
-          setTimeout(() => {
-            resolve()
-          })
+          resolve()
         }
-      })
+      }, { flush: 'post' })
     })
   }
 
@@ -76,19 +81,17 @@ async function startScan () {
         facingMode: 'environment'
       }
     })
-  } catch (err: MediaError) {
+  } catch (err) {
     loading.value = false
-    if (err.name === 'NotAllowedError') {
+
+    if ((err as DOMException).name === 'NotAllowedError') {
       throw new AppError('NOT_ALLOWED', 'Camera access is not allowed')
     } else {
       throw new AppError('NOT_SUPPORTED', 'MediaDevices.getUserMedia is not supported')
     }
   }
 
-  video.value.srcObject = stream
-  if (video.value.paused) video.value.play()
-
-  reader.decodeFromStream(stream, undefined, handleResult)
+  reader.decodeFromStream(stream, video.value, handleResult)
   loading.value = false
 }
 
