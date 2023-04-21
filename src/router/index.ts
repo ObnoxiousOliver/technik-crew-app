@@ -9,6 +9,7 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
     component: () => import('../views/auth/LoginView.vue'),
     requiresAuth: false,
     depth: -1,
+    offlineVisible: true,
 
     children: [
       // Reset password
@@ -57,6 +58,7 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
     name: 'wiki',
     component: () => import('../views/WikiView.vue'),
     requiresAuth: true,
+    offlineVisible: true,
 
     children: [
       {
@@ -87,6 +89,7 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
     name: 'events',
     component: () => import('../views/EventsView.vue'),
     requiresAuth: true,
+    offlineVisible: true,
 
     children: [
       {
@@ -110,7 +113,8 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
     name: 'dashboard',
     alias: '/',
     component: () => import('../views/DashboardView.vue'),
-    requiresAuth: true
+    requiresAuth: true,
+    offlineVisible: true
   },
 
   // Equipment
@@ -120,6 +124,7 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
     path: '/equipment',
     component: () => import('../views/equipment/EquipmentView.vue'),
     requiresAuth: true,
+    offlineVisible: true,
 
     children: [
       {
@@ -209,6 +214,7 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
     component: () => import('../views/settings/SettingsView.vue'),
     requiresAuth: true,
     backPath: '/dashboard',
+    offlineVisible: true,
     meta: {
       noRootTransition: true
     },
@@ -290,8 +296,8 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
   {
     title: 'Hilfe',
     name: 'help',
-    path: '/help',
     component: () => import('../views/help/HelpView.vue'),
+    offlineVisible: true,
 
     children: [
       {
@@ -310,6 +316,7 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
     component: () => import('../views/NotFoundView.vue'),
     depth: Infinity,
     backPath: null,
+    offlineVisible: true,
     meta: {
       noRootTransition: true
     }

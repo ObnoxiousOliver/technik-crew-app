@@ -11,7 +11,6 @@ export const useUsers = defineStore('users', () => {
 
   // Save users to local storage
   watch(users, () => {
-    console.log(users.value)
     localStorage.setItem('users', JSON.stringify(
       Object.keys(users.value).map((username) => [username, users.value[username].toDB()])
     ))
@@ -24,7 +23,6 @@ export const useUsers = defineStore('users', () => {
     })
 
   return {
-    users,
     getUserByUsername
   }
 })

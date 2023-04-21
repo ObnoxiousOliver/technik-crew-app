@@ -1,5 +1,6 @@
 import { getDefaultPermissions } from '@/model/permissions'
 import { User } from '@/model/user'
+import { useOffline } from '@/utilities/offline'
 import { getAuth } from 'firebase/auth'
 import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
@@ -44,6 +45,9 @@ export const useUser = defineStore('user', () => {
 
   let unsubscribe: (() => void) | null = null
   function setSubscription () {
+    if (useOffline().value) return
+
+    console.log('[User] Subscribing to user')
     if (unsubscribe) unsubscribe()
     if (!user.value) {
       permissions.value = getDefaultPermissions()
@@ -78,6 +82,15 @@ export const useUser = defineStore('user', () => {
       user.value = null
     }
   }
+
+  watch(useOffline(), (offline) => {
+    if (offline) {
+      unsubscribe?.()
+      unsubscribe = null
+    } else {
+      setSubscription()
+    }
+  })
 
   function reset () {
     if (unsubscribe) unsubscribe()
