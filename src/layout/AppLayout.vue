@@ -119,12 +119,12 @@ watch(isOffline, (offline) => {
 const route = useRoute()
 const bp = useBreakpoint()
 
-const showNavigation = computed(() => ['dashboard', 'wiki', 'events', 'equipment', 'settings'].includes(route.meta.root))
+const showNavigation = computed(() => ['dashboard', 'wiki', 'events', 'equipment', 'settings'].includes(route.meta.root as string))
 
 const toasts = ref<{
-  id: number
+  id: string
   msg: string
-}>([])
+}[]>([])
 onBeforeUnmount(useToast().onShow((msg) => {
   toasts.value.push({
     id: createId(),
@@ -152,8 +152,14 @@ body {
   background: r.$bg-primary;
   color: r.$text-primary;
   font-family: Rubik, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  user-select: none;
   overflow: hidden;
+  user-select: none;
+}
+
+input,
+textarea,
+[contenteditable] {
+  user-select: text;
 }
 
 $offlineIndicatorOutDelay: 1s;

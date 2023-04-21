@@ -65,8 +65,8 @@ onMounted(() => {
   }
 })
 
-function input (e: InputEvent) {
-  value.value = e.target.innerText
+function input (e: Event) {
+  value.value = (e.target as HTMLSpanElement).innerText
 }
 
 function paste (e: ClipboardEvent) {
@@ -124,6 +124,7 @@ function paste (e: ClipboardEvent) {
     resize: both;
     min-height: 1em;
     word-break: break-word;
+    user-select: text;
 
     &:focus {
       outline: none;
