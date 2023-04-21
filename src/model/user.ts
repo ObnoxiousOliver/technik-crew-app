@@ -1,5 +1,5 @@
 import { decryptEmail } from '@/utilities/auth'
-import { collection, doc, getDoc, getDocs, getFirestore, onSnapshot, query, setDoc, where } from 'firebase/firestore'
+import { DocumentChangeType, collection, doc, getDoc, getDocs, getFirestore, onSnapshot, query, setDoc, where } from 'firebase/firestore'
 import { TicketDB } from './ticket'
 import { PermissionsDB, Permission } from './permissions'
 import { getAuth } from 'firebase/auth'
@@ -203,5 +203,19 @@ export class User implements UserDB {
     })
 
     return users
+  }
+
+  static subscribe (onChange: (type: DocumentChangeType, user: User) => void) {
+    const db = getFirestore()
+
+    const unsubscribe = onSnapshot(collection(db, 'users'), snapshot => {
+      snapshot.docChanges().forEach(change => {
+        const userData = change.doc.data() as UserDB
+        const user = new User(userData)
+        onChange(change.type, user)
+      })
+    })
+
+    return unsubscribe
   }
 }

@@ -145,7 +145,7 @@ export class Equipment {
     addDoc(
       collection(db, 'equipment', this.id, 'history'),
       new HistoryState({
-        author: options.author ?? useUser().user?.username,
+        author: options.author ?? useUser().username,
         description: options.description,
         date: options.date,
         type: options.type ?? 'equipment',

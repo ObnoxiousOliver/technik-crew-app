@@ -17,7 +17,7 @@ export class HistoryState<T> implements HistoryStateDB<T> {
   content: T
 
   constructor (options: Partial<HistoryStateDB<T>> = {}) {
-    this.author = options.author ?? useUser().user?.username ?? 'Anonym'
+    this.author = options.author ?? useUser().username ?? 'Anonym'
     this.description = options.description ?? null
     this.date = options.date ?? Date.now()
     this.content = options.content ?? ({} as T)

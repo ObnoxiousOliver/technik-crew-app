@@ -1,5 +1,6 @@
 import Event, { EventDB } from '@/model/event'
 import { useOffline } from '@/utilities/offline'
+import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { defineStore } from 'pinia'
 import { ref, watch } from 'vue'
 
@@ -119,11 +120,20 @@ export const useEvents = defineStore('events', () => {
     })
   }
 
+  onAuthStateChanged(getAuth(), (user) => {
+    if (user) {
+      updateMonthSubscribtion(subscribingMonth.value)
+    } else {
+      unsubscribe?.()
+      unsubscribe = null
+    }
+  })
+
   watch(useOffline(), (offline) => {
     if (offline) {
       unsubscribe?.()
       unsubscribe = null
-    } else {
+    } else if (getAuth().currentUser) {
       updateMonthSubscribtion(subscribingMonth.value)
     }
   })

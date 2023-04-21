@@ -67,7 +67,7 @@ export const useEquipment = defineStore('equipment', () => {
     if (user) {
       if (unsubscribe) return
       subscribe()
-    } else {
+    } else if (getAuth().currentUser) {
       unsubscribe?.()
       unsubscribe = null
     }

@@ -88,7 +88,7 @@ export const useLocations = defineStore('locations', () => {
     if (offline) {
       unsubscribe?.()
       unsubscribe = null
-    } else {
+    } else if (getAuth().currentUser) {
       subscribe()
     }
   })
