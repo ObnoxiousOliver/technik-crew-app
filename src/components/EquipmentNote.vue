@@ -23,7 +23,7 @@
       </Btn>
     </div>
     <div ref="content" class="equipment-note__content">{{ note?.content }}</div>
-    <button class="equipment-note__view-more-btn" @click="viewMore = !viewMore" v-if="showViewMoreBtn" >
+    <button class="equipment-note__view-more-btn" @click="viewMore = !viewMore" v-if="showViewMoreBtn">
       {{ viewMore ? 'Weniger anzeigen' : 'Mehr anzeigen' }}
     </button>
   </div>

@@ -114,7 +114,12 @@
         <SettingsListLink :arrow="false" isButton @click="showResetEmailSheet = true">
           <i class="bi-send" /> Passwort zurücksetzen E-Mail senden
         </SettingsListLink>
-        <SettingsListLink :arrow="false" isButton danger @click="showDeleteUserSheet = true">
+        <SettingsListLink
+          :arrow="false"
+          isButton
+          danger
+          @click="showDeleteUserSheet = true"
+        >
           <i class="bi-person-slash" /> Benutzer löschen
         </SettingsListLink>
       </SettingsList>
@@ -146,10 +151,10 @@
             :disabled="user?.username !== deleteUserInput"
             class="danger"
           >
-            <i class="bi-person-slash"/><b>{{ user?.username }}</b> löschen
+            <i class="bi-person-slash" /><b>{{ user?.username }}</b> löschen
           </ActionSheetButton>
           <ActionSheetButton class="danger">
-            <i class="bi-x-lg"/>Abbrechen
+            <i class="bi-x-lg" />Abbrechen
           </ActionSheetButton>
         </template>
       </ActionSheet>
@@ -163,10 +168,10 @@
 
         <template #buttons>
           <ActionSheetButton @click="sendResetEmail">
-            <i class="bi-send"/>E-Mail an <b>{{ email }}</b> senden
+            <i class="bi-send" />E-Mail an <b>{{ email }}</b> senden
           </ActionSheetButton>
           <ActionSheetButton class="danger">
-            <i class="bi-x-lg"/>Abbrechen
+            <i class="bi-x-lg" />Abbrechen
           </ActionSheetButton>
         </template>
       </ActionSheet>
@@ -180,10 +185,10 @@
 
         <template #buttons>
           <ActionSheetButton @click="permissions[Permission.IsAdmin] = true">
-            <i class="bi-person-gear"/> <b>{{ user?.username }}</b> zum Admin machen
+            <i class="bi-person-gear" /> <b>{{ user?.username }}</b> zum Admin machen
           </ActionSheetButton>
           <ActionSheetButton class="danger">
-            <i class="bi-x-lg"/>Abbrechen
+            <i class="bi-x-lg" />Abbrechen
           </ActionSheetButton>
         </template>
       </ActionSheet>

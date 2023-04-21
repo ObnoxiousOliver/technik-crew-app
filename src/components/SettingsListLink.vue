@@ -1,8 +1,16 @@
 <template>
-  <li :class="['settings-list-item', {
-    'settings-list-item--danger': props.danger
-  }]">
-    <component :is="props.isButton ? 'button' : 'RouterLink'" class="settings-list-item__button" v-wave :to="props.to" @click="emit('click')">
+  <li
+    :class="['settings-list-item', {
+      'settings-list-item--danger': props.danger
+    }]"
+  >
+    <component
+      :is="props.isButton ? 'button' : 'RouterLink'"
+      class="settings-list-item__button"
+      v-wave
+      :to="props.to"
+      @click="emit('click')"
+    >
       <div class="settings-list-item__content">
         <slot />
       </div>

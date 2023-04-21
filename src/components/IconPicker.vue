@@ -17,7 +17,7 @@
     <div class="icon-list-controls">
       <FloatingLabelInput class="dark icon-list-search" label="Suche" v-model="query" />
       <Btn @click="query = ''">
-        <i class="bi-x"/>
+        <i class="bi-x" />
       </Btn>
     </div>
 
@@ -42,7 +42,7 @@
           }"
           :title="icon.name"
         >
-          <i :class="'bi-' + icon.name"/>
+          <i :class="'bi-' + icon.name" />
         </Btn>
       </li>
     </ul>

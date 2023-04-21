@@ -52,9 +52,11 @@
         <SettingsListDivider>
           Standort
         </SettingsListDivider>
-        <SettingsListLink :to="{
-          name: 'equipment-add-select-location'
-        }">
+        <SettingsListLink
+          :to="{
+            name: 'equipment-add-select-location'
+          }"
+        >
           <i class="bi-geo-alt"></i>
           {{ location?.name ?? 'Kein Standort ausgewählt' }}
         </SettingsListLink>

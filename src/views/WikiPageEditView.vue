@@ -32,7 +32,7 @@
 
       <template #buttons>
         <ActionSheetButton @click="back()" class="danger">
-          <i class="bi-trash"/>Verwerfen
+          <i class="bi-trash" />Verwerfen
         </ActionSheetButton>
         <ActionSheetButton @click="save()">
           <i class="bi-check-lg" />Speichern
@@ -73,7 +73,7 @@ async function save () {
 
 // TODO: Add beforeBack on navigation event
 const showConfirmBackSheet = ref(false)
-function beforeBack (back: () => void) {
+function beforeBack () {
   showConfirmBackSheet.value = true
 }
 </script>

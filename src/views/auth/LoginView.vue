@@ -1,6 +1,12 @@
 <template>
   <Page class="login-page" :navigation="false">
-    <img @click.prevent="logoClick" ref="logo" class="logo" src="../../assets/technik-crew-logo.svg" alt="Technik Crew Logo">
+    <img
+      @click.prevent="logoClick"
+      ref="logo"
+      class="logo"
+      src="../../assets/technik-crew-logo.svg"
+      alt="Technik Crew Logo"
+    >
     <FormContainer
       @submit.prevent="submit"
       class="form"

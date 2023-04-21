@@ -1,7 +1,9 @@
 <template>
-  <div :class="['settings-list-divider', {
-    'settings-list-divider--has-label': $slots.default
-  }]">
+  <div
+    :class="['settings-list-divider', {
+      'settings-list-divider--has-label': $slots.default
+    }]"
+  >
     <div class="settings-list-divider__stroke" />
     <span class="settings-list-divider__label" v-if="$slots.default">
       <slot />

@@ -13,12 +13,14 @@
       <input
         type="text"
         style="display: none;"
-        autocomplete="username" :value="ticketStore.currentTicket?.username"
+        autocomplete="username"
+        :value="ticketStore.currentTicket?.username"
       >
       <input
         type="text"
         style="display: none;"
-        autocomplete="email" :value="ticketStore.email"
+        autocomplete="email"
+        :value="ticketStore.email"
       >
       <FloatingLabelInput
         type="password"

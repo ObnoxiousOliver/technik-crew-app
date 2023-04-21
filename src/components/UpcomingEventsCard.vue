@@ -1,7 +1,7 @@
 <template>
   <DashboardCard class="upcoming-events">
     <template #title>
-      <i class="bi-calendar2-week"/>Nächste Termine
+      <i class="bi-calendar2-week" />Nächste Termine
     </template>
 
     <ul class="upcoming-events__list">

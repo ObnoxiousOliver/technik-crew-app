@@ -23,7 +23,7 @@
       >
         <slot name="title" />
       </span>
-      <slot name="btns"/>
+      <slot name="btns" />
       <Btn
         class="page__add-btn"
         v-if="props.addBtn"

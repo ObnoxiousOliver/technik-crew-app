@@ -1,11 +1,13 @@
 <!-- eslint-disable vue/no-mutating-props -->
 <template>
-  <div :class="['input', {
-    'input--disabled': disabled,
-    'input--has-before': !!$slots.before,
-    'input--has-after': !!$slots.after,
-    'input--focused': focused
-  }]">
+  <div
+    :class="['input', {
+      'input--disabled': disabled,
+      'input--has-before': !!$slots.before,
+      'input--has-after': !!$slots.after,
+      'input--focused': focused
+    }]"
+  >
     <div v-if="$slots.before" class="input__before">
       <slot name="before" />
     </div>

@@ -20,7 +20,7 @@
             transition: dragging ? 'none' : undefined
           }"
         >
-          <FocusTrap >
+          <FocusTrap>
             <div>
               <h2 v-if="$slots.title" class="action-sheet__title">
                 <slot name="title" />

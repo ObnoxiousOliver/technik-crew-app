@@ -4,7 +4,12 @@
       <i class="bi-geo-alt" />Standort wählen
     </template>
 
-    <LocationsList :locations="locations" search @click="select" hasNoLocationOption />
+    <LocationsList
+      :locations="locations"
+      search
+      @click="select"
+      hasNoLocationOption
+    />
 
     <Spinner v-if="locStore.loading" />
   </Page>

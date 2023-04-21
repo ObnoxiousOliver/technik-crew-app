@@ -21,8 +21,12 @@
           v-wave
           @click="emit('selectItem', item.name)"
         >
-          <i class="bi-clock-history" v-if="item.type === 'recent'"
-          /><i class="bi-search" v-if="item.type === 'suggestion'"
+          <i
+            class="bi-clock-history"
+            v-if="item.type === 'recent'"
+          /><i
+            class="bi-search"
+            v-if="item.type === 'suggestion'"
           />{{ item.name }}
         </button>
         <Btn
