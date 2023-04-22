@@ -3,35 +3,25 @@
     :class="['page', {
       'page--heading-hidden': navigation && !headingVisible,
       'page--no-navigation': !navigation,
-      'page--has-add-btn': props.addBtn,
+      'page--has-btns': $slots.btns,
       'page--opaque-titlebar': props.opaqueTitlebar,
       'page--pad-bottom': props.padBottom
     }]"
     ref="root"
   >
-    <nav v-if="props.navigation" class="page__navigation">
+    <nav class="page__navigation">
       <Btn
+        v-if="props.navigation"
         class="page__back-btn"
         @click="back"
         aria-label="Zurück"
       >
         <i class="bi-arrow-left" />
       </Btn>
-      <span
-        v-if="$slots.title"
-        class="page__navigation__title"
-      >
+      <span class="page__navigation__title">
         <slot name="title" />
       </span>
       <slot name="btns" />
-      <Btn
-        class="page__add-btn"
-        v-if="props.addBtn"
-        @click="props.addBtn"
-        aria-label="Hinzufügen"
-      >
-        <i class="bi-plus-lg" />
-      </Btn>
     </nav>
     <main ref="scroller" class="page__scroller scroller-padding">
       <h2
@@ -60,14 +50,6 @@ const props = defineProps({
   navigation: {
     type: Boolean,
     default: true
-  },
-  addBtn: {
-    type: Function,
-    default: undefined
-  },
-  buttons: {
-    type: Array,
-    default: () => []
   },
   beforeBack: {
     type: Function,
@@ -101,7 +83,8 @@ onBeforeUnmount(() => {
 
 const headingVisible = ref(true)
 function onScroll () {
-  headingVisible.value = scroller.value?.scrollTop <= 1 * parseFloat(getComputedStyle(document.documentElement).fontSize)
+  if (!scroller.value) return
+  headingVisible.value = scroller.value.scrollTop <= 1 * parseFloat(getComputedStyle(document.documentElement).fontSize)
 }
 
 defineExpose({
@@ -140,12 +123,6 @@ defineExpose({
     }
   }
 
-  &--has-add-btn {
-    .page__scroller {
-      padding-bottom: 6rem;
-    }
-  }
-
   &__scroller {
     position: absolute;
     inset: 0;
@@ -177,7 +154,6 @@ defineExpose({
         margin-right: .5em;
       }
     }
-
   }
 
   &__navigation {
@@ -186,6 +162,7 @@ defineExpose({
     display: flex;
     align-items: center;
     height: 4rem;
+    padding: 0 .5rem;
     background: linear-gradient(
       to bottom,
       r.$bg-primary 0%,
@@ -205,7 +182,10 @@ defineExpose({
       rgba(r.$bg-primary, 0.014) 96.1%,
       transparent 100%
     );
-    padding: 0 .5rem;
+
+    .page--no-navigation:not(.page--has-btns) & {
+      display: none;
+    }
 
     .page--opaque-titlebar & {
       background: r.$bg-primary;
@@ -239,14 +219,6 @@ defineExpose({
         margin-right: .5em;
       }
     }
-  }
-
-  &__back-btn {
-
-  }
-
-  &__add-btn {
-
   }
 }
 </style>

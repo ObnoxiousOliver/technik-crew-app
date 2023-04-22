@@ -1,7 +1,13 @@
 <template>
-  <Page :addBtn="() => router.push('/admin/tickets/create')">
+  <Page>
     <template #title>
       <i class="bi-ticket-perforated" />Tickets
+    </template>
+
+    <template #btns>
+      <Btn :to="{ name: 'ticket-create' }">
+        <i class="bi-plus-lg" />
+      </Btn>
     </template>
 
     <TicketBtn
@@ -28,25 +34,25 @@
 
     <ActionSheet v-model:show="showTicketSheet">
       <template #title>
-        {{ showTicketId }} ({{ showTicket.username }})
+        {{ showTicketId }} ({{ showTicket?.username }})
       </template>
 
-      <div v-if="showTicket.invalid">
+      <div v-if="showTicket?.invalid">
         Dieses Ticket wurde bereits eingelöst.
       </div>
       <table v-else class="table">
         <tbody>
           <tr>
             <td>Username</td>
-            <td>{{ showTicket.username }}</td>
+            <td>{{ showTicket?.username }}</td>
           </tr>
           <tr>
             <td>Vorname</td>
-            <td>{{ showTicket.firstname }}</td>
+            <td>{{ showTicket?.firstname }}</td>
           </tr>
           <tr>
             <td>Nachname</td>
-            <td>{{ showTicket.lastname }}</td>
+            <td>{{ showTicket?.lastname }}</td>
           </tr>
           <tr>
             <td>Geschlecht</td>
@@ -55,12 +61,12 @@
                 'male': 'männlich',
                 'female': 'weiblich',
                 'non-binary': 'divers'
-              }[showTicket.gender] }}
+              }[showTicket?.gender ?? 'non-binary'] }}
             </td>
           </tr>
           <tr>
             <td>Nur Nachname anzeigen</td>
-            <td>{{ showTicket.prefer_lastname ? 'Ja' : 'Nein' }}</td>
+            <td>{{ showTicket?.prefer_lastname ? 'Ja' : 'Nein' }}</td>
           </tr>
           <tr>
             <td>Anzeigename</td>
@@ -70,7 +76,7 @@
       </table>
 
       <template #buttons>
-        <ActionSheetButton v-if="!showTicket.invalid" @click="_invalidateTicket">
+        <ActionSheetButton v-if="!showTicket?.invalid" @click="_invalidateTicket">
           <i class="bi-file-x" />Ticket entwerten
         </ActionSheetButton>
         <ActionSheetButton class="danger" @click="_deleteTicket">
@@ -89,9 +95,7 @@ import { TicketDB } from '@/model/ticket'
 import { encryptTicket, invalidateTicket } from '@/utilities/auth'
 import { collection, deleteDoc, doc, getDocs, getFirestore } from '@firebase/firestore'
 import { computed, onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
 
-const router = useRouter()
 const db = getFirestore()
 const tickets = ref({} as { [key: string]: TicketDB })
 const sortedTickets = computed(() => {
@@ -118,11 +122,13 @@ const showTicketSheet = computed({
   }
 })
 const showTicket = computed(() => {
+  if (!showTicketId.value) return
   return { ...(tickets.value), ...invalidTickets.value }[showTicketId.value]
 })
 
 function _invalidateTicket () {
   if (!showTicketId.value) return
+  if (!showTicket.value) return
   invalidateTicket(showTicketId.value, showTicket.value.username)
   showTicketId.value = undefined
   updateTickets()
@@ -149,9 +155,9 @@ async function updateTickets () {
 
   snapshot.forEach((doc) => {
     if (doc.data().invalid) {
-      invalidTickets.value[atob(doc.id)] = doc.data()
+      invalidTickets.value[atob(doc.id)] = doc.data() as TicketDB
     } else {
-      tickets.value[atob(doc.id)] = doc.data()
+      tickets.value[atob(doc.id)] = doc.data() as TicketDB
     }
   })
 }

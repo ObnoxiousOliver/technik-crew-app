@@ -1,5 +1,6 @@
 import { Permission } from '@/model/permissions'
 import { createRouter } from './router'
+import { useDev } from '@/stores/developer'
 
 const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
   // Auth
@@ -19,7 +20,7 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
         path: '/reset-password',
         component: () => import('../views/auth/ResetPasswordView.vue'),
         requiresAuth: null,
-        depth: Infinity,
+        depth: 9999,
         meta: {
           noRootTransition: true
         }
@@ -138,12 +139,14 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
         name: 'equipment-details',
         path: '/equipment/:id',
         component: () => import('../views/equipment/EquipmentDetailsView.vue'),
+        offlineVisible: true,
         children: [
           {
             title: 'Equipment Verlauf',
             name: 'equipment-history',
             path: '/equipment/:id/history',
-            component: () => import('../views/equipment/EquipmentHistoryView.vue')
+            component: () => import('../views/equipment/EquipmentHistoryView.vue'),
+            offlineVisible: true
           },
           {
             title: 'Equipment bearbeiten',
@@ -207,7 +210,7 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
 
   // Settings
   {
-    depth: 99999,
+    depth: 999,
     title: 'Einstellungen',
     name: 'settings',
     path: '/settings',
@@ -241,6 +244,15 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
             component: () => import('../views/settings/profile/ProfileEmailView.vue')
           }
         ]
+      },
+
+      // Developer
+      {
+        title: 'Entwickler Einstellungen',
+        name: 'dev-settings',
+        pathName: '/dev',
+        validate: () => useDev().enabled,
+        component: () => import('../views/developer/DeveloperSettingsView.vue')
       },
 
       // Admin
@@ -280,14 +292,6 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
             requiresAuth: true
           }
         ]
-      },
-
-      // Who are the admins
-      {
-        title: 'Wer sind die Admins?',
-        name: 'admins-who',
-        path: '/admin/who',
-        component: () => import('../views/WhoAreTheAdminsView.vue')
       }
     ]
   },
@@ -298,13 +302,23 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
     name: 'help',
     component: () => import('../views/help/HelpView.vue'),
     offlineVisible: true,
+    depth: 99999,
 
     children: [
+      // Offline Modus
       {
         title: 'Offline Modus',
         name: 'help-offline',
         pathName: '/offline',
         component: () => import('../views/help/HelpOfflineView.vue')
+      },
+
+      // Who are the admins
+      {
+        title: 'Wer sind die Admins?',
+        name: 'help-admins',
+        pathName: '/admins',
+        component: () => import('../views/help/HelpAdminsView.vue')
       }
     ]
   },

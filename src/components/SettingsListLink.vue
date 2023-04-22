@@ -4,7 +4,7 @@
       'settings-list-item--danger': props.danger
     }]"
   >
-    <component
+    <Component
       :is="props.isButton ? 'button' : 'RouterLink'"
       class="settings-list-item__button"
       v-wave
@@ -14,8 +14,9 @@
       <div class="settings-list-item__content">
         <slot />
       </div>
-      <i v-if="props.arrow" class="settings-list-item__arrow bi-chevron-right" />
-    </component>
+      <i v-if="props.arrow === 'link'" class="settings-list-item__arrow bi-box-arrow-up-right" />
+      <i v-else-if="props.arrow" class="settings-list-item__arrow bi-chevron-right" />
+    </Component>
 
     <slot name="over" />
   </li>
@@ -28,7 +29,7 @@ const props = defineProps({
   to: [Object, String],
   danger: Boolean,
   isButton: Boolean,
-  arrow: { type: Boolean, default: () => true }
+  arrow: { type: [Boolean, String], default: () => true }
 })
 </script>
 

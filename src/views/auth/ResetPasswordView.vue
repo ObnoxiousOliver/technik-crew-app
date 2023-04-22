@@ -7,7 +7,14 @@
     <p>Bestätige die E-Mail Adresse deines Accounts, damir wir dir die E-Mail zum ändern deines Passworts senden können.</p>
     <p>Wenn du deine E-Mail nicht mehr kennst oder ändern willst wende dich an die Admins.</p>
     <p>
-      <RouterLink to="/admin/who">
+      <RouterLink
+        :to="{
+          name: 'help-admins',
+          query: {
+            back: route.fullPath
+          }
+        }"
+      >
         Wer sind die Admins?
       </RouterLink>
     </p>
@@ -35,6 +42,10 @@
 import { getAuth, sendPasswordResetEmail } from '@firebase/auth'
 import { ref } from 'vue'
 import FloatingLabelInput from '../../components/FloatingLabelInput.vue'
+import { useRoute } from 'vue-router'
+import { FirebaseError } from 'firebase/app'
+
+const route = useRoute()
 
 const email = ref('')
 const auth = getAuth()
@@ -55,7 +66,8 @@ async function submit () {
   try {
     await sendPasswordResetEmail(auth, email.value)
     success.value = true
-  } catch (err) {
+  } catch (error) {
+    const err = error as FirebaseError
     if (err.code === 'auth/user-not-found') {
       authError.value = 'Es gibt keinen Account mit dieser E-Mail Adresse'
     } else if (err.code === 'auth/invalid-email') {

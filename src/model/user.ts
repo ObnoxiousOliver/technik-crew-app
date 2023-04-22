@@ -192,11 +192,15 @@ export class User implements UserDB {
     })
   }
 
-  static async get () {
+  static async get (onlyAdmins = false) {
     const db = getFirestore()
 
+    const q = onlyAdmins
+      ? query(collection(db, 'users'), where('is_admin', '==', true))
+      : collection(db, 'users')
+
     const users: { [key: string]: User} = {}
-    const querySnapshot = await getDocs(collection(db, 'users'))
+    const querySnapshot = await getDocs(q)
     querySnapshot.docs.forEach(user => {
       const userData = user.data() as UserDB
       users[userData.username] = new User(userData)
@@ -205,10 +209,14 @@ export class User implements UserDB {
     return users
   }
 
-  static subscribe (onChange: (type: DocumentChangeType, user: User) => void) {
+  static subscribe (onChange: (type: DocumentChangeType, user: User) => void, onlyAdmins = false) {
     const db = getFirestore()
 
-    const unsubscribe = onSnapshot(collection(db, 'users'), snapshot => {
+    const q = onlyAdmins
+      ? query(collection(db, 'users'), where('is_admin', '==', true))
+      : collection(db, 'users')
+
+    const unsubscribe = onSnapshot(q, snapshot => {
       snapshot.docChanges().forEach(change => {
         const userData = change.doc.data() as UserDB
         const user = new User(userData)
