@@ -1,24 +1,12 @@
 import { useToast } from '@/utilities/toast'
 import { defineStore } from 'pinia'
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 export const useDev = defineStore('developer', () => {
-  const flags = ref<Record<string, [boolean, boolean]>>({})
+  const flags = ref<{
+    forceOfflineMode?: boolean
+  }>({})
   const enabled = ref(false)
-
-  function setFlag (key: string, value: boolean, activeInNormalMode = false) {
-    flags.value[key] = [value, activeInNormalMode]
-  }
-
-  function getFlag (key: string): boolean {
-    if (enabled.value) {
-      return flags.value[key]?.[0] ?? false
-    } else {
-      return flags.value[key]?.[1]
-        ? flags.value[key]?.[0] ?? false
-        : false
-    }
-  }
 
   function showDevToast (value: boolean) {
     const toast = useToast()
@@ -37,23 +25,28 @@ export const useDev = defineStore('developer', () => {
       enabled: enabled.value,
       flags: flags.value
     }))
-  })
+  }, { deep: true })
 
   const ls = JSON.parse(localStorage.getItem('dev') || '{}')
-  enabled.value = process.env.NODE_ENV === 'development' || ls.enabled || enabled.value
-  ls.flags && (flags.value = ls.flags)
+  enabled.value = process.env.NODE_ENV === 'development' || ls.enabled
+  if (ls.flags) {
+    Object.keys(flags.value).forEach((key: string) => {
+      (flags.value as Record<string, boolean>)[key] = !!ls.flags[key]
+    })
+  }
 
-  // Enable developer mode by pressing Ctrl + Shift + D
-  document.addEventListener('keydown', (e) => {
-    if (e.ctrlKey && e.shiftKey && e.key === 'D') {
-      e.preventDefault()
-      enabled.value = !enabled.value
-    }
-  })
+  if (process.env.NODE_ENV === 'development') {
+    // Enable developer mode by pressing Ctrl + Shift + D
+    document.addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.shiftKey && e.key === 'D') {
+        e.preventDefault()
+        enabled.value = !enabled.value
+      }
+    })
+  }
 
   return {
-    enabled,
-    setFlag,
-    getFlag
+    flags: computed(() => enabled.value ? flags.value : {}),
+    enabled
   }
 })

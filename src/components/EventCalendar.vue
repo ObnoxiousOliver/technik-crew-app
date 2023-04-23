@@ -1,5 +1,5 @@
 <template>
-  <calendar-view
+  <CalendarView
     :show-date="date"
     :startingDayOfWeek="1"
     :itemContentHeight="'1.4em'"
@@ -12,7 +12,7 @@
   >
     <template #header>
     </template>
-  </calendar-view>
+  </CalendarView>
 </template>
 
 <script lang="ts" setup>

@@ -1,6 +1,6 @@
 <template>
   <EditorPanel @itemClick="itemClick" />
-  <editor-content class="editor" :editor="editor" />
+  <EditorContent class="editor" :editor="editor" />
 </template>
 
 <script lang="ts" setup>

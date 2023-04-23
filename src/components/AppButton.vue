@@ -1,5 +1,5 @@
 <template>
-  <component
+  <Component
     :is="to ? 'router-link' : 'button'"
     v-wave
     :class="['btn', {
@@ -18,7 +18,7 @@
       <i class="btn__chip-x bi-x-lg" v-if="chip" />
       <slot />
     </div>
-  </component>
+  </Component>
 </template>
 
 <script lang="ts" setup>

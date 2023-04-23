@@ -1,5 +1,4 @@
-import { readonly, ref } from 'vue'
-import { dev, logNetwork } from './developer'
+import { computed, ref } from 'vue'
 import { useDev } from '../stores/developer'
 
 const isOffline = ref(!navigator.onLine)
@@ -17,8 +16,7 @@ window.addEventListener('keydown', (e) => {
   if (!useDev().enabled) return
 
   if (e.key === 'F9' && e.ctrlKey) {
-    isOffline.value = !isOffline.value
-    console.log(...dev(logNetwork), 'Offline mode', isOffline.value ? 'enabled' : 'disabled')
+    useDev().flags.forceOfflineMode = !useDev().flags.forceOfflineMode
   }
 })
 
@@ -33,5 +31,9 @@ window.enableOfflineMode = (v = !isOffline.value) => {
 }
 
 export function useOffline () {
-  return readonly(isOffline)
+  return computed(() => {
+    return useDev().flags.forceOfflineMode
+      ? true
+      : isOffline.value
+  })
 }

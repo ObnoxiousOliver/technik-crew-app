@@ -78,7 +78,7 @@ import SettingsListLink from '../../components/SettingsListLink.vue'
 import SettingsListDivider from '../../components/SettingsListDivider.vue'
 import { computed } from 'vue'
 import { Permission } from '@/model/permissions'
-import { useDevMode } from '@/utilities/developer'
+import { useDev } from '@/stores/developer'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { version } = require('../../../package.json')
@@ -97,7 +97,7 @@ async function logout () {
   }
 }
 
-const devMode = useDevMode()
+const devMode = useDev()
 
 let clicks = 0
 let timeout: number
@@ -109,7 +109,7 @@ function versionClick () {
 
   clicks++
   if (clicks >= 10) {
-    devMode.set(true)
+    devMode.enabled = true
     clicks = 0
   }
   clearTimeout(timeout)
@@ -125,14 +125,14 @@ function versionClick () {
 .settings {
   &__version {
     display: block;
-    width: stretch;
     text-align: left;
-    margin: -1.5rem -1.5rem .5rem;
+    margin: -1.5rem -.5rem .5rem;
     border-radius: 0;
-    padding: .5rem 1.5rem;
+    padding: .5rem;
     font-size: 0.8rem;
     font-weight: normal;
     color: r.$text-secondary;
+    border-radius: r.$radius;
   }
 }
 </style>

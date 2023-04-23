@@ -81,7 +81,7 @@
       <div v-if="showNetworkIndicator" class="network-indicator">
         <template v-if="isOffline">
           <i class="bi-wifi-off" />App ist im Offline-Modus
-          <RouterLink :to="{ name: 'help-offline' }">
+          <RouterLink :to="{ name: 'help-offline', query: { back: route.fullPath } }">
             Mehr Infos <i class="bi-arrow-right" />
           </RouterLink>
         </template>

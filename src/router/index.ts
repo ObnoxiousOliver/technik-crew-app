@@ -252,7 +252,8 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
         name: 'dev-settings',
         pathName: '/dev',
         validate: () => useDev().enabled,
-        component: () => import('../views/developer/DeveloperSettingsView.vue')
+        component: () => import('../views/developer/DeveloperSettingsView.vue'),
+        offlineVisible: true
       },
 
       // Admin

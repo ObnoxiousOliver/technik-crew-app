@@ -5,12 +5,20 @@
     </template>
 
     <p>
-      Die Admins sind die Leute, die die App betreiben und die Regeln festlegen.
-      Wenn du Fragen hast oder Probleme mit der App hast, kannst du dich an die Admins wenden.
+      Hast du ein Problem mit der App?
+      Willst du etwas vorschlagen oder kritisieren?
+      Dann kannst du dich an einen der Admins wenden.
+      Wir sind zwar nicht allwissende Götter,
+      aber wir sind kennen uns mit der App aus
+      und können dir mit machen Problemen helfen.
     </p>
 
     <p>
-      Die Admins sind:
+      Wende dich einfach an einen der Admins.
+      Wenn du uns in der Schule siehst,
+      kannst du uns gerne nerven
+      oder du kannst uns auf WhatsApp
+      oder Discord anschreiben.
     </p>
 
     <ul v-if="users.admins.length" class="admin-list">

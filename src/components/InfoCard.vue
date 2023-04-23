@@ -23,8 +23,8 @@
 
 <script lang="ts" setup>
 defineProps<{
-  title: string
-  desc: string
+  title?: string
+  desc?: string
 }>()
 </script>
 
@@ -49,7 +49,7 @@ defineProps<{
     font-size: 1.25rem;
     font-weight: 500;
 
-    & > :deep(i:first-child) {
+    & > :deep(i:first-child), & > :deep(span > i:first-child) {
       margin-right: .5rem;
     }
   }

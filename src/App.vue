@@ -66,8 +66,26 @@ h1, h2, h3, h4, h5, h6 {
   margin: 1.5rem 0 1rem;
 }
 
+code {
+  @include r.box;
+  border-radius: .5rem;
+  font-family: 'Rubik Mono One', monospace;
+  padding: .2rem .5rem;
+  margin: 0 .2rem;
+}
+
+.desktop-only {
+  .mobile & {
+    display: none;
+  }
+}
+
 .text-secondary {
   color: r.$text-secondary;
+}
+
+.text-small {
+  font-size: .8em;
 }
 
 .text-center {
@@ -80,6 +98,15 @@ h1, h2, h3, h4, h5, h6 {
 
 .prewrap {
   white-space: pre-wrap;
+}
+
+.bullet-list {
+  padding-inline-start: 1rem;
+  margin: 1rem 0;
+
+  li {
+    margin: 1rem 0;
+  }
 }
 
 :focus {
