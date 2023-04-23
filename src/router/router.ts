@@ -9,23 +9,24 @@ import { Component } from 'vue'
 import { createRouter as _createRouter, createWebHistory, RouteComponent, RouteLocationNormalized, RouteMeta, RouteRecordRaw, RouteRecordRedirectOption, RouterOptions } from 'vue-router'
 
 export interface AbstractRoute {
-  title?: string,
-  name: string,
-  pathName?: string,
-  path?: string,
-  component: RouteComponent,
+  title?: string
+  name: string
+  pathName?: string
+  path?: string
+  component?: RouteComponent
 
-  requiresAuth?: boolean | null,
-  requiresPermission?: Permission | Permission[],
+  requiresAuth?: boolean | null
+  requiresPermission?: Permission | Permission[]
 
-  children?: AbstractRoute[],
+  children?: AbstractRoute[]
 
-  depth?: number,
-  backPath?: string | null,
-  redirect?: RouteRecordRedirectOption,
-  alias?: string | string[],
+  depth?: number
+  backPath?: string | null
+  redirect?: RouteRecordRedirectOption
+  alias?: string | string[]
   meta?: RouteMeta
   offlineVisible?: boolean
+  validate?: (to: RouteLocationNormalized, from: RouteLocationNormalized) => boolean
 }
 
 export function compileRoutes (routes: AbstractRoute[]): RouteRecordRaw[] | null {
@@ -48,7 +49,8 @@ export function compileRoutes (routes: AbstractRoute[]): RouteRecordRaw[] | null
         redirect,
         alias,
         meta,
-        offlineVisible
+        offlineVisible,
+        validate
       } = route
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -63,6 +65,7 @@ export function compileRoutes (routes: AbstractRoute[]): RouteRecordRaw[] | null
           backPath: backPath !== null ? backPath ?? parentPath ?? null : null,
           root: parent?.meta?.root ?? parent?.name ?? name,
           offlineVisible: offlineVisible ?? false,
+          validate,
           ...meta
         }
       }
@@ -108,31 +111,48 @@ export function createRouter (routes: AbstractRoute[], options: Partial<RouterOp
   console.groupEnd()
 
   // Check if user is logged in
-  router.beforeEach(async (to, from, next) => {
-    // Check if page is available offline
-    if (useOffline().value) {
-      if (to.matched.some(record => record.meta.offlineVisible)) {
-        next()
-      } else if (from.matched.some(record => record.meta.offlineVisible)) {
-        next(from)
-      } else {
-        next({
-          path: '/'
-        })
-      }
+  router.beforeEach(async (to, from, _next) => {
+    function loggedIn () {
+      console.log(...dev(logRouter), 'User logged in')
 
-      return
+      // Check if page is available offline
+      if (useOffline().value) {
+        if (to.matched.some(record => record.meta.offlineVisible)) {
+          to.meta.offlineVisible = true
+          next()
+        } else if (from.matched.some(record => record.meta.offlineVisible)) {
+          _next(from)
+        } else {
+          _next({
+            path: '/'
+          })
+        }
+      } else {
+        next()
+      }
+    }
+
+    // Check if user is logged in
+    function next () {
+      if (typeof to.meta.validate === 'function') {
+        const valid = to.meta.validate(to, from)
+        if (valid === undefined || valid) {
+          _next()
+        } else {
+          _next(false)
+        }
+      } else {
+        _next()
+      }
     }
 
     if (to.matched.some(record => record.meta.requiresAuth)) {
       if (getAuth().currentUser) {
-        next()
-        console.log(...dev(logRouter), 'User logged in')
+        loggedIn()
       } else if (localStorage.getItem('last_auth') === 'true') {
-        next()
-        console.log(...dev(logRouter), 'User logged in')
+        loggedIn()
       } else {
-        next({
+        _next({
           path: '/login',
           query: { redirect: to.fullPath }
         })
@@ -140,10 +160,10 @@ export function createRouter (routes: AbstractRoute[], options: Partial<RouterOp
       }
     } else if (to.matched.some(record => record.meta.requiresNoAuth)) {
       if (getAuth().currentUser) {
-        next(from)
+        _next(false)
         console.log(...dev(logRouter), 'User logged in')
       } else if (localStorage.getItem('last_auth') === 'true') {
-        next(from)
+        _next(false)
         console.log(...dev(logRouter), 'User logged in')
       } else {
         next()
@@ -171,7 +191,7 @@ export function createRouter (routes: AbstractRoute[], options: Partial<RouterOp
         next()
         console.log(...dev(logRouter), 'User has permission')
       } else {
-        next(from)
+        next(false)
         console.log(...dev(logRouter), 'User has no permission')
       }
     } else {

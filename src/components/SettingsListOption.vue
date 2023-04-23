@@ -12,7 +12,9 @@
         <slot name="desc" />
       </div>
     </label>
-    <slot name="input" />
+    <div v-if="$slots.input" class="settings-list-option__input">
+      <slot name="input" />
+    </div>
   </li>
 </template>
 
@@ -29,6 +31,7 @@ const props = defineProps({
   display: flex;
   padding: 0 1.5rem;
   margin: 1rem 0;
+  gap: 1rem;
   align-items: center;
 
   &--has-desc {
@@ -37,6 +40,7 @@ const props = defineProps({
   }
 
   &__title {
+    margin-bottom: .5rem;
     :deep(i) {
       margin-right: .5rem;
     }
@@ -44,11 +48,15 @@ const props = defineProps({
 
   &__label {
     flex: 1 1 auto;
-    line-height: 1.5;
+    line-height: 1.25;
   }
 
   &__desc {
     color: r.$text-secondary;
+  }
+
+  &__input {
+    flex: 0 0 auto;
   }
 }
 </style>

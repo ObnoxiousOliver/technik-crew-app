@@ -1,6 +1,6 @@
 {
   "name": "technik-crew-app",
-  "version": "0.1.0",
+  "version": "0.1.0-dev",
   "private": true,
   "scripts": {
     "start": "vue-cli-service serve",
@@ -16,7 +16,6 @@
     "@tiptap/extension-underline": "^2.0.0-beta.209",
     "@tiptap/starter-kit": "^2.0.0-beta.209",
     "@tiptap/vue-3": "^2.0.0-beta.209",
-    "@types/hammerjs": "^2.0.41",
     "@vueuse/core": "^9.13.0",
     "@zxing/library": "^0.19.2",
     "bootstrap-icons": "^1.10.2",
@@ -37,6 +36,7 @@
   },
   "devDependencies": {
     "@types/crypto-js": "^4.1.1",
+    "@types/hammerjs": "^2.0.41",
     "@types/node": "^18.11.10",
     "@typescript-eslint/eslint-plugin": "^5.45.0",
     "@typescript-eslint/parser": "^5.45.0",

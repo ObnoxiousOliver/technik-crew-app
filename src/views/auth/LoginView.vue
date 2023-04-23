@@ -1,5 +1,11 @@
 <template>
   <Page class="login-page" :navigation="false">
+    <template #btns>
+      <Btn :to="{ name: 'help' }" aria-label="Hifle und Support">
+        <i class="bi-question-lg" />
+      </Btn>
+    </template>
+
     <img
       @click.prevent="logoClick"
       ref="logo"
@@ -7,7 +13,11 @@
       src="../../assets/technik-crew-logo.svg"
       alt="Technik Crew Logo"
     >
+
+    <OfflineMessage v-if="offline" notSupported />
+
     <FormContainer
+      v-else
       @submit.prevent="submit"
       class="form"
       :disabled="submitting"
@@ -29,9 +39,9 @@
         {{ authError }}
       </FormInfo>
 
-      <router-link class="reset-password" to="/reset-password">Passwort vergessen?</router-link>
+      <RouterLink class="reset-password" to="/reset-password">Passwort vergessen?</RouterLink>
       <LoginButton class="login-btn" type="submit">Login</LoginButton>
-      <router-link class="sign-up" to="/sign-up/code">Mit 6-stelligen Code registrieren</router-link>
+      <RouterLink class="sign-up" to="/sign-up/code">Mit 6-stelligen Code registrieren</RouterLink>
     </FormContainer>
   </Page>
 </template>
@@ -43,8 +53,13 @@ import { signIn } from '@/utilities/auth'
 
 import FloatingLabelInput from '../../components/FloatingLabelInput.vue'
 import LoginButton from '../../components/LoginButton.vue'
+import { FirebaseError } from 'firebase/app'
+import { useOffline } from '@/utilities/offline'
+import OfflineMessage from '@/components/OfflineMessage.vue'
 
 const router = useRouter()
+
+const offline = useOffline()
 
 const name = ref('')
 const password = ref('')
@@ -61,7 +76,8 @@ async function submit () {
   try {
     await signIn(name.value, password.value)
     router.push('/')
-  } catch (err) {
+  } catch (error) {
+    const err = error as FirebaseError
     if (err.code === 'auth/user-not-found') {
       authError.value = 'Dieser Benutzer existiert nicht'
     } else if (err.code === 'auth/wrong-password') {
@@ -89,15 +105,21 @@ function logoClick () {
     logo.value.style.transform = `scale(${scale}, 100)`
 
     setTimeout(() => {
+      if (!logo.value) return
+
       logo.value.style.transition = '0s'
       logo.value.style.transform = 'scale(0)'
 
       setTimeout(() => {
+        if (!logo.value) return
+
         logo.value.style.transition = 'transform .5s'
-        logo.value.style.transform = null
+        logo.value.style.transform = ''
 
         setTimeout(() => {
-          logo.value.style.transition = null
+          if (!logo.value) return
+
+          logo.value.style.transition = ''
           scale = 1
           triggered = false
         }, 500)

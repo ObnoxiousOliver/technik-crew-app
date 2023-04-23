@@ -1,11 +1,12 @@
 import { User, UserDB } from '@/model/user'
-import { watch, ref } from 'vue'
+import { watch, ref, computed, readonly } from 'vue'
 import { defineStore } from 'pinia'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { useOffline } from '@/utilities/offline'
 
 export const useUsers = defineStore('users', () => {
   const users = ref<Record<string, User>>({})
+  const admins = computed(() => Object.values(users.value).filter((user) => user.is_admin))
 
   function getUserByUsername (username: string) {
     return users.value[username] ?? null
@@ -25,10 +26,10 @@ export const useUsers = defineStore('users', () => {
     })
 
   let unsubscribe: (() => void) | null = null
-  async function subscribe () {
+  async function subscribe (onlyAdmins = false) {
     unsubscribe?.()
 
-    users.value = await User.get()
+    users.value = await User.get(onlyAdmins)
 
     unsubscribe = User.subscribe((type, user) => {
       switch (type) {
@@ -40,15 +41,14 @@ export const useUsers = defineStore('users', () => {
           delete users.value[user.username]
           break
       }
-    })
+    }, onlyAdmins)
   }
 
   onAuthStateChanged(getAuth(), (user) => {
     if (user) {
       subscribe()
     } else {
-      unsubscribe?.()
-      unsubscribe = null
+      subscribe(true)
     }
   })
 
@@ -56,12 +56,14 @@ export const useUsers = defineStore('users', () => {
     if (offline) {
       unsubscribe?.()
       unsubscribe = null
-    } else if (getAuth().currentUser) {
-      subscribe()
+    } else {
+      subscribe(!getAuth().currentUser)
     }
   })
 
   return {
+    users: readonly(users),
+    admins: readonly(admins),
     getUserByUsername
   }
 })

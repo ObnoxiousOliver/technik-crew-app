@@ -16,6 +16,7 @@ import FormGroup from './components/FormGroup.vue'
 import TextBox from './components/TextBox.vue'
 import Slider from './components/InputSlider.vue'
 import LocationDisplay from './components/LocationDisplay.vue'
+import InfoCard from './components/InfoCard.vue'
 import router from './router'
 import VWave from 'v-wave'
 import { FocusTrap } from 'focus-trap-vue'
@@ -64,6 +65,7 @@ createApp(App)
   .component('Textbox', TextBox)
   .component('Slider', Slider)
   .component('LocationDisplay', LocationDisplay)
+  .component('InfoCard', InfoCard)
   // .use(vfmPlugin())
   .use(VWave, {
     duration: 0.5

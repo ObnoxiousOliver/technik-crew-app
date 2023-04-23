@@ -208,6 +208,7 @@ function onPointerDown (e: PointerEvent) {
     padding: 0 1.5rem 1.5rem;
     overflow: auto;
     touch-action: none;
+    line-height: 1.25;
   }
 
   &__buttons {

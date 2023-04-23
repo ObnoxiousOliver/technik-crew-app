@@ -1,5 +1,5 @@
 <template>
-  <component
+  <Component
     :is="props.notAForm ? 'div' : 'form'"
     :class="['form', {
       'form--fill-page': props.fillPage,
@@ -15,7 +15,7 @@
     <Transition name="form__spinner">
       <Spinner v-if="props.disabled" class="form__spinner" />
     </Transition>
-  </component>
+  </Component>
 </template>
 
 <script lang="ts" setup>

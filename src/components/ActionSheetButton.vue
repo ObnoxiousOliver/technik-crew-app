@@ -1,5 +1,5 @@
 <template>
-  <component
+  <Component
     :is="to ? 'router-link' : 'button'"
     :to="to"
     v-wave
@@ -9,7 +9,7 @@
     }]"
   >
     <slot />
-  </component>
+  </Component>
 </template>
 
 <script lang="ts" setup>

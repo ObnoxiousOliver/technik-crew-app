@@ -41,7 +41,7 @@
     >
       <template v-if="Component">
         <Transition :name="route.meta.transitionName">
-          <component :is="Component" />
+          <Component :is="Component" />
         </Transition>
       </template>
     </RouterView>
@@ -76,12 +76,12 @@
     </div>
   </div>
 
-  <teleport to="body">
+  <Teleport to="body">
     <Transition name="network-indicator">
       <div v-if="showNetworkIndicator" class="network-indicator">
         <template v-if="isOffline">
           <i class="bi-wifi-off" />App ist im Offline-Modus
-          <RouterLink :to="{ name: 'help-offline' }">
+          <RouterLink :to="{ name: 'help-offline', query: { back: route.fullPath } }">
             Mehr Infos <i class="bi-arrow-right" />
           </RouterLink>
         </template>
@@ -90,7 +90,7 @@
         </template>
       </div>
     </Transition>
-  </teleport>
+  </Teleport>
 </template>
 
 <script lang="ts" setup>
@@ -103,11 +103,17 @@ import { useToast } from '@/utilities/toast'
 import { createId } from '@/utilities/id'
 import { useOffline } from '@/utilities/offline'
 
+const route = useRoute()
+
 const isOffline = useOffline()
-const showNetworkIndicator = ref(false)
+const _showNetworkIndicator = ref(false)
+const showNetworkIndicator = computed(() => {
+  if (route.meta.root === 'login') return false
+  return _showNetworkIndicator.value
+})
 
 watch(isOffline, (offline) => {
-  showNetworkIndicator.value = offline
+  _showNetworkIndicator.value = offline
 
   if (offline) {
     document.documentElement.classList.add('offline')
@@ -116,7 +122,6 @@ watch(isOffline, (offline) => {
   }
 }, { immediate: true, flush: 'post' })
 
-const route = useRoute()
 const bp = useBreakpoint()
 
 const showNavigation = computed(() => ['dashboard', 'wiki', 'events', 'equipment', 'settings'].includes(route.meta.root as string))
