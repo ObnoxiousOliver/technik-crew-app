@@ -3,7 +3,7 @@ import { addDoc, collection, doc, getDoc, getDocs, getFirestore, query, setDoc }
 import { HistoryState } from './history'
 
 export interface WikiPageDB {
-  icon: string
+  icon: string | null
   title: string
   content: JSONContent | null
 }
@@ -12,7 +12,7 @@ export class WikiPage {
   readonly id: string | null
   private page: WikiPageDB
 
-  public get icon (): string {
+  public get icon (): string | null {
     return this.page.icon
   }
 
@@ -27,7 +27,7 @@ export class WikiPage {
   private constructor (id: string | null, options: Partial<WikiPageDB>) {
     this.id = id
     this.page = {
-      icon: options.icon ?? 'bi-file-earmark-text',
+      icon: options.icon ?? null,
       title: options.title ?? 'Neue Seite',
       content: options.content ?? null
     }
