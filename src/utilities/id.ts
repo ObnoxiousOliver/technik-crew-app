@@ -1,4 +1,5 @@
-export const characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+// Base 64 characters
+export const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+_'
 
 export function createId (length = 8) {
   return Array(length)
