@@ -2,11 +2,13 @@ import { useUser } from '@/stores/user'
 import { addDoc, collection, deleteDoc, doc, DocumentChangeType, DocumentData, getDoc, getDocs, getFirestore, onSnapshot, query, QuerySnapshot, setDoc, where } from 'firebase/firestore'
 import { HistoryState } from './history'
 import { Location } from './location'
+import { getStorage, ref, uploadBytesResumable } from 'firebase/storage'
 
 export interface NoteDB {
   date: number
   content: string
   author: string
+  attachments: string[]
 }
 
 export type EquipmentType = 'computer' | 'cable' | 'instrument' | 'speaker' | 'light' | 'mixer' | 'microphone' | 'other'
@@ -218,18 +220,66 @@ export class Equipment {
     return unsubscribe
   }
 
-  async addNote (content: string) {
+  async addNote (
+    content: string,
+    attachments?: {
+      name: string,
+      file: File
+    }[],
+    onProgress?: (progress: {
+      file: string
+      progress: number
+      done: string[]
+      loaded: number
+      total: number
+    }) => void) {
     if (!this.id) {
       throw new Error('Cannot add notes on an equipment without an id')
     }
 
-    const db = getFirestore()
     const userStore = useUser()
+
+    if (!userStore.username) {
+      throw new Error('Cannot add notes without a username')
+    }
+
+    const db = getFirestore()
+    const storage = getStorage()
+
+    const attachmentRefs: string[] = []
+    if (attachments) {
+      let i = 0
+      const done: string[] = []
+      for (const attachment of attachments) {
+        const attachmentRef = ref(storage, `equipment/${this.id}/notes/${attachment.name}`)
+        attachmentRefs.push(attachmentRef.fullPath)
+
+        const uploadTask = uploadBytesResumable(attachmentRef, attachment.file)
+        if (onProgress) {
+          uploadTask.on('state_changed', (snapshot) => {
+            onProgress?.({
+              file: attachment.name,
+              progress: snapshot.bytesTransferred / snapshot.totalBytes,
+              done,
+              loaded: i,
+              total: attachments.length
+            })
+
+            if (snapshot.state === 'success') {
+              done.push(attachment.name)
+            }
+          })
+        }
+
+        i++
+      }
+    }
 
     const note: NoteDB = {
       date: Date.now(),
       content,
-      author: userStore.user?.username ?? 'Anonym'
+      author: userStore.username,
+      attachments: attachmentRefs
     }
 
     await addDoc(collection(db, 'equipment', this.id, 'notes'), note)
