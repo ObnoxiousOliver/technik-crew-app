@@ -32,15 +32,15 @@
       <RouterLink
         v-wave
         class="page-grid__item"
-        v-for="page in pages"
-        :key="page.id"
+        v-for="(page, i) in pages"
+        :key="page.id ?? i"
         :to="{
           name: 'wiki-page',
           params: { id: page.id }
         }"
       >
         <div class="page-grid__item__icon">
-          <span class="page-grid__item__icon__emoji" v-if="page.icon">
+          <span class="page-grid__item__icon__emoji" v-if="page.icon && isEmoji(page.icon)">
             <span class="page-grid__item__icon__emoji__glow">
               {{ page.icon }}
             </span>
@@ -74,15 +74,19 @@
 <script lang="ts" setup>
 import UserPage from '@/layout/UserPage.vue'
 import { onMounted, ref } from 'vue'
-import { WikiPage, WikiPageDB } from '../model/wiki'
+import { WikiPage } from '../model/wiki'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
-const pages = ref<WikiPageDB>([])
+const pages = ref<WikiPage[]>([])
+
+function isEmoji (s: string) {
+  return /\p{Extended_Pictographic}/ug.test(s)
+}
 
 const loading = ref(true)
 onMounted(async () => {
-  pages.value = await WikiPage.get()
+  pages.value = await WikiPage.get() as WikiPage[]
   loading.value = false
 })
 </script>
