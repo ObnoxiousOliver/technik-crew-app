@@ -2,7 +2,8 @@
   <div
     :class="['text-box', {
       'text-box--focused': focused,
-      'text-box--has-label': label
+      'text-box--has-label': label,
+      'text-box--mobile': useBreakpoint().inMobileOrTablet
     }]"
   >
     <div class="text-box__content">
@@ -33,6 +34,7 @@
 </template>
 
 <script lang="ts" setup>
+import { useBreakpoint } from '@/utilities/breakpoint'
 import { onMounted, ref, watch } from 'vue'
 
 const props = defineProps({
@@ -85,10 +87,9 @@ function paste (e: ClipboardEvent) {
 @use '../scss' as r;
 
 .text-box {
+  @include r.box;
   position: relative;
   display: grid;
-  background: r.$bg-secondary;
-  border-radius: r.$radius;
   // padding: .8rem 1rem 1rem;
   grid-template-columns: 1fr;
   grid-auto-columns: auto;
@@ -97,6 +98,10 @@ function paste (e: ClipboardEvent) {
 
   &--focused {
     box-shadow: r.$focus;
+  }
+
+  &--mobile.text-box--focused {
+    position: fixed;
   }
 
   &--has-label {
@@ -124,13 +129,14 @@ function paste (e: ClipboardEvent) {
   }
 
   &__area {
-    padding: 1rem;
+    padding: .75rem 1rem;
     display: block;
     width: 100%;
     resize: both;
     min-height: 100%;
     word-break: break-word;
     user-select: text;
+    line-height: 1.5;
 
     &:focus {
       outline: none;
@@ -156,7 +162,8 @@ function paste (e: ClipboardEvent) {
   &__placeholder {
     position: absolute;
     inset: 0;
-    padding: 1rem;
+    padding: .75rem 1rem;
+    line-height: 1.5;
     pointer-events: none;
     color: r.$text-secondary;
   }

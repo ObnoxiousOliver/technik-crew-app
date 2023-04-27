@@ -328,7 +328,7 @@ function expandSearch (value?: boolean, push = true) {
   }
 
   &__title {
-    z-index: 1;
+    z-index: 99;
     position: relative;
     display: flex;
     align-items: center;

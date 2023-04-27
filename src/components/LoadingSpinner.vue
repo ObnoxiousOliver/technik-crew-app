@@ -1,14 +1,18 @@
 <template>
   <div class="loading-spinner">
-    <div class="loading-spinner__spinner">
+    <GlowDiv class="loading-spinner__spinner">
       <div />
       <div />
       <div />
       <div />
       <div />
-    </div>
+    </GlowDiv>
   </div>
 </template>
+
+<script setup lang="ts">
+import GlowDiv from './GlowDiv.vue'
+</script>
 
 <style lang="scss" scoped>
 @use 'sass:math';
