@@ -20,16 +20,16 @@ module.exports = defineConfig({
   },
   configureWebpack: {
     devServer: {
-      // server: {
-      //   type: 'spdy',
-      //   options: {
-      //     // key: fs.readFileSync('./certs/localhost+1-key.pem'),
-      //     // cert: fs.readFileSync('./certs/localhost+1.pem')
-      //     key: fs.readFileSync('./certs/localhost-key.pem'),
-      //     cert: fs.readFileSync('./certs/localhost.pem')
-      //     // ca: fs.readFileSync('C:\\Users\\Oliver\\AppData\\Local\\mkcert\\rootCA.pem')
-      //   }
-      // }
+      server: {
+        type: 'spdy',
+        options: {
+          // key: fs.readFileSync('./certs/localhost+1-key.pem'),
+          // cert: fs.readFileSync('./certs/localhost+1.pem')
+          key: fs.readFileSync('./certs/localhost-key.pem'),
+          cert: fs.readFileSync('./certs/localhost.pem')
+          // ca: fs.readFileSync('C:\\Users\\Oliver\\AppData\\Local\\mkcert\\rootCA.pem')
+        }
+      }
     }
   }
 })
