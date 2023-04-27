@@ -2,7 +2,6 @@
   <div class="scanner">
     <video
       ref="video"
-      autoplay
       muted
       playsinline
     />
@@ -15,10 +14,6 @@ import { BarcodeFormat, BrowserMultiFormatReader, DecodeHintType, Result } from 
 import { AppError } from '@/model/error'
 
 const emit = defineEmits(['result'])
-const props = defineProps<{
-  // eslint-disable-next-line no-undef
-  constrains?: MediaTrackConstraints
-}>()
 
 const video = ref<HTMLVideoElement | null>(null)
 
@@ -76,18 +71,19 @@ async function startScan () {
   loading.value = true
   try {
     stream = await navigator.mediaDevices.getUserMedia({
-      video: props.constrains ?? {
-        aspectRatio: 1,
+      video: {
         facingMode: 'environment'
       }
     })
   } catch (err) {
     loading.value = false
 
+    console.error(err)
+
     if ((err as DOMException).name === 'NotAllowedError') {
       throw new AppError('NOT_ALLOWED', 'Camera access is not allowed')
     } else {
-      throw new AppError('NOT_SUPPORTED', 'MediaDevices.getUserMedia is not supported')
+      throw new AppError('UNKNOWN_ERR', (err as DOMException).message)
     }
   }
 

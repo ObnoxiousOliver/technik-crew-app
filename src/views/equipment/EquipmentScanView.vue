@@ -5,19 +5,12 @@
       '--width': rect.width + 'px',
       '--height': rect.height + 'px'
     }"
-    :class="[{
-      'equipment-scan--landscape': screenOrientation === 'landscape'
-    }]"
   >
     <QrCodeScanner
       ref="scanner"
       :class="['equipment-scan__scanner', {
         'equipment-scan__scanner--loading': scanner?.loading
       }]"
-      :constrains="{
-        aspectRatio,
-        facingMode: 'environment'
-      }"
       @result="result"
     />
 
@@ -46,7 +39,7 @@
             0 - 100 / rect.width / 2,
             16 + 100 / rect.width,
             16 + 100 / rect.width
-          ]"
+          ].join(' ')"
         >
           <path
             d="M 0 3 L 0 2 A 2 2 0 0 1 2 0 L 3 0 M 13 0 L 14 0 A 2 2 0 0 1 16 2 L 16 3 M 3 16 L 2 16 A 2 2 0 0 1 0 14 L 0 13 M 16 13 L 16 14 A 2 2 0 0 1 14 16 L 13 16"
@@ -71,10 +64,9 @@
 
 <script lang="ts" setup>
 import QrCodeScanner from '@/components/QrcodeScanner.vue'
-import { AppError } from '@/model/error'
 import { useEquipment } from '@/stores/equipment'
 import { Result } from '@zxing/library'
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 const emit = defineEmits(['scan'])
@@ -86,65 +78,19 @@ const props = defineProps<{
 const equipment = useEquipment()
 const router = useRouter()
 
-const scanner = ref<QrCodeScanner | null>(null)
-const rect = ref({
-  width: 1,
-  height: 1
-})
-const page = ref<HTMLElement | null>(null)
+const scanner = ref<{
+  loading: boolean
+  startScan:() => Promise<void>
+  pauseScan: () => void
+    } | null>(null)
 
-const screenOrientation = ref(screen.orientation.type.includes('landscape') ? 'landscape' : 'portrait')
-const aspectRatio = computed(() => Math.round(
-  (screenOrientation.value === 'landscape'
-    ? (rect.value.width / rect.value.height)
-    : (rect.value.height / rect.value.width)) *
-  100) / 100)
+const rect = ref({ width: 1, height: 1 })
 
-let currentAspectRatio = 0
-let timeout
-watch(aspectRatio, update)
+const page = ref<{ root: HTMLElement } | null>(null)
 
 const notSupported = ref(false)
 const notALlowed = ref(false)
 const err = computed(() => notSupported.value || notALlowed.value)
-function update () {
-  if (err.value) return
-
-  if (Math.abs(currentAspectRatio - aspectRatio.value) < 0.1) return
-  clearTimeout(timeout)
-  timeout = setTimeout(() => {
-    currentAspectRatio = aspectRatio.value
-    timeout = null
-
-    ;(scanner.value?.startScan() as Promise<void>)
-      .catch((err: AppError) => {
-        if (err.code === 'NOT_SUPPORTED') {
-          notSupported.value = true
-        } else if (err.code === 'NOT_ALLOWED') {
-          notALlowed.value = true
-        }
-      })
-  }, 100)
-}
-
-function updateScreenOrientation () {
-  screenOrientation.value = screen.orientation.type.includes('landscape') ? 'landscape' : 'portrait'
-}
-
-onMounted(() => {
-  screen.orientation.addEventListener('change', updateScreenOrientation)
-  const observer = new ResizeObserver(() => {
-    rect.value = page.value?.root?.getBoundingClientRect() ?? rect.value
-  })
-
-  observer.observe(page.value?.root)
-
-  onBeforeUnmount(() => {
-    screen.orientation.removeEventListener('change', updateScreenOrientation)
-    scanner.value?.pauseScan()
-    observer.disconnect()
-  })
-})
 
 function result (result: Result) {
   if (!result) return
@@ -157,6 +103,22 @@ function result (result: Result) {
 
   router.push({ name: 'equipment-details', params: { id: eq.id } })
 }
+
+onMounted(() => {
+  scanner.value?.startScan()
+
+  if (!page.value) return
+
+  const observer = new ResizeObserver(() => {
+    if (!page.value) return
+    const { width, height } = page.value.root.getBoundingClientRect()
+    rect.value = { width, height }
+  })
+
+  observer.observe(page.value.root)
+
+  onBeforeUnmount(() => observer.disconnect())
+})
 </script>
 
 <style lang="scss" scoped>

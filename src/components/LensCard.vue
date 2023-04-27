@@ -23,7 +23,7 @@
             0 - 100 / width / 2,
             16 + 100 / width,
             16 + 100 / width
-          ]"
+          ].join(' ')"
         >
           <path
             d="M 0 3 L 0 2 A 2 2 0 0 1 2 0 L 3 0 M 13 0 L 14 0 A 2 2 0 0 1 16 2 L 16 3 M 3 16 L 2 16 A 2 2 0 0 1 0 14 L 0 13 M 16 13 L 16 14 A 2 2 0 0 1 14 16 L 13 16"
@@ -86,7 +86,7 @@ import { AppError } from '@/model/error'
 
 const router = useRouter()
 const equipment = useEquipment()
-const scanner = ref<QrcodeScanner | null>(null)
+const scanner = ref<{ startScan:() => Promise<void>, pauseScan: () => void, loading: boolean } | null>(null)
 
 const root = ref<HTMLElement | null>(null)
 
@@ -98,6 +98,7 @@ watch(start, (val) => {
     scanner.value?.startScan().catch((err: AppError) => {
       start.value = false
       error.value = err
+      console.error(err)
     })
   } else {
     scanner.value?.pauseScan()
@@ -106,6 +107,8 @@ watch(start, (val) => {
 
 const width = ref(0)
 onMounted(() => {
+  if (!root.value) return
+
   const observer = new ResizeObserver(() => {
     width.value = root.value?.clientWidth ?? 0
   })
@@ -141,6 +144,10 @@ function result (result: Result) {
 
   &--active {
     height: var(--width);
+
+    &::before {
+      opacity: 0;
+    }
   }
 
   &__spinner {
@@ -155,34 +162,37 @@ function result (result: Result) {
     position: absolute;
     aspect-ratio: 1;
     inset: 20%;
-    // box-shadow: #000a 0 0 0 100vw;
-    // border-radius: 11.6%;
 
     svg {
       display: block;
-      // margin: -1.8px;
     }
   }
 
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(85.03% 131.43% at 17.64% 110.98%, #2430a3 0%, rgba(37, 59, 255, 0) 100%), radial-gradient(84.39% 143.51% at 100% 7.07%, rgba(95, 25, 128, 0.8) 0%, rgba(255, 91, 91, 0) 100%), r.$bg-secondary;
+    pointer-events: none;
+  }
+
   &__scanner {
-    background: radial-gradient(85.03% 131.43% at 17.64% 110.98%, #2430a3 0%, rgba(37, 59, 255, 0) 100%), radial-gradient(84.39% 143.51% at 100% 7.07%, rgba(95, 25, 128, 0.8) 0%, rgba(255, 91, 91, 0) 100%) ;
-    aspect-ratio: auto;
-    height: 100%;
+    will-change: filter;
+    filter: blur(1rem);
+    transition: filter .5s cubic-bezier(0.19, 1, 0.22, 1);
 
     :deep(video) {
-      will-change: filter;
-      transition: filter .5s, transform .5s cubic-bezier(0.19, 1, 0.22, 1);
-      filter: blur(1rem);
+      transform-origin: center 75%;
+      transition: transform .5s cubic-bezier(0.19, 1, 0.22, 1);
       transform: scale(2);
     }
 
     .lens-card--active & {
       background: none;
+      filter: none;
 
       :deep(video) {
-        transition: none;
-        filter: blur(0);
-        transform: scale(1);
+        transform: none;
       }
     }
   }
@@ -216,7 +226,6 @@ function result (result: Result) {
       font-size: 3rem;
       margin-bottom: 1rem;
     }
-
   }
 
   &__start-scan {
