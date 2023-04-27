@@ -4,10 +4,10 @@
   <Page v-else padBottom>
     <CenteredCard>
       <template #icon>
-        <i :class="typeInfo[equipment?.type]?.icon ?? typeInfo.other.icon" />
+        <i :class="typeInfo[equipment?.type ?? 'other']?.icon ?? typeInfo.other.icon" />
       </template>
       <template #title>
-        <span v-if="equipment?.amount > 1" class="equipment-details__amount">
+        <span v-if="(equipment?.amount ?? 1) > 1" class="equipment-details__amount">
           {{ equipment?.amount }}x
         </span>{{ equipment?.name }}
       </template>
@@ -40,8 +40,8 @@
       <SettingsListOption>
         <i class="bi-tag" />Typ
         <template #desc>
-          <i :class="typeInfo[equipment?.type]?.icon ?? typeInfo.other.icon" />
-          {{ typeInfo[equipment?.type]?.name ?? typeInfo.other.name }}
+          <i :class="typeInfo[equipment?.type ?? 'other']?.icon ?? typeInfo.other.icon" />
+          {{ typeInfo[equipment?.type ?? 'other']?.name ?? typeInfo.other.name }}
         </template>
       </SettingsListOption>
       <SettingsListOption>
@@ -101,7 +101,7 @@
         </template>
       </SettingsListLink>
 
-      <SettingsListDivider v-if="equipment?.amount > 1" />
+      <SettingsListDivider v-if="(equipment?.amount ?? 1) > 1" />
 
       <SettingsListLink
         :to="{
@@ -115,7 +115,7 @@
         <i class="bi-ui-radios-grid" />Anzahl ändern
       </SettingsListLink>
 
-      <template v-if="equipment.amount > 1">
+      <template v-if="(equipment?.amount ?? 1) > 1">
         <SettingsListLink
           :to="{
             name: 'equipment-split',
@@ -156,22 +156,15 @@
         Anmerkungen
       </SettingsListDivider>
     </SettingsList>
-    <Textbox
-      class="equipment-details__text-box"
-      placeholder="Anmerkung hinzufügen"
+
+    <CommentBox
       v-model="newNote"
-      @keydown.ctrl.enter="addNote"
-    >
-      <template #buttons>
-        <Btn
-          :disabled="newNote.length === 0"
-          class="btn--square"
-          @click="addNote"
-        >
-          <i class="bi-send"></i>
-        </Btn>
-      </template>
-    </Textbox>
+      @send="addNote"
+      @addFile="addFile"
+      @addImage="addImage"
+
+      class="equipment-details__comment-box"
+    />
 
     <Spinner v-if="loading" />
 
@@ -210,6 +203,7 @@
 </template>
 
 <script lang="ts" setup>
+import CommentBox from '@/components/CommentBox.vue'
 import SettingsList from '@/components/SettingsList.vue'
 import SettingsListLink from '@/components/SettingsListLink.vue'
 import SettingsListDivider from '@/components/SettingsListDivider.vue'
@@ -221,6 +215,7 @@ import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import CenteredCard from '@/components/CenteredCard.vue'
 import { useEquipment } from '@/stores/equipment'
+import { useFileDialog } from '@vueuse/core'
 // import QrCreator from 'qr-creator'
 
 const typeInfo = EquipmentTypeInfo
@@ -228,7 +223,7 @@ const typeInfo = EquipmentTypeInfo
 const route = useRoute()
 const eqStore = useEquipment()
 
-const equipment = computed(() => eqStore.findByID(route.params.id))
+const equipment = computed(() => eqStore.findByID(route.params.id as string))
 const notes = ref<Record<string, NoteDB>>({})
 const sortedNotes = computed(() => {
   const ids = Object.keys(notes.value)
@@ -273,7 +268,7 @@ onBeforeUnmount(() => {
 })
 
 const newNote = ref('')
-const noteOptions = ref(null)
+const noteOptions = ref<string | null>(null)
 const showNoteOptionsSheet = computed({
   get: () => noteOptions.value !== null,
   set: value => {
@@ -283,12 +278,33 @@ const showNoteOptionsSheet = computed({
   }
 })
 
+const imageDialog = useFileDialog({
+  accept: 'image/*',
+  multiple: true
+})
+
+const fileDialog = useFileDialog({
+  accept: '*',
+  multiple: true
+})
+
+async function addFile () {
+  if (!equipment.value) return
+  fileDialog.open()
+}
+
+async function addImage () {
+  if (!equipment.value) return
+  imageDialog.open()
+}
+
 async function addNote () {
   await equipment.value?.addNote(newNote.value.trim())
   newNote.value = ''
 }
 
 async function deleteNote () {
+  if (!noteOptions.value) return
   await equipment.value?.removeNote(noteOptions.value)
   noteOptions.value = null
 }
@@ -298,7 +314,7 @@ async function deleteNote () {
 @use '../../scss' as r;
 
 .equipment-details {
-  &__text-box {
+  &__comment-box {
     margin-top: 1rem;
     margin-bottom: 2rem;
   }

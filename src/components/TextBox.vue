@@ -90,7 +90,8 @@ function paste (e: ClipboardEvent) {
   background: r.$bg-secondary;
   border-radius: r.$radius;
   // padding: .8rem 1rem 1rem;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 1fr;
+  grid-auto-columns: auto;
 
   transition: box-shadow .2s;
 
@@ -100,6 +101,9 @@ function paste (e: ClipboardEvent) {
 
   &--has-label {
     .text-box {
+      &__content {
+        grid-row: span 1;
+      }
       &__area, &__placeholder {
         padding: 0 1rem 1rem;
       }
@@ -115,6 +119,8 @@ function paste (e: ClipboardEvent) {
 
   &__area-container {
     position: relative;
+    height: 100%;
+    min-height: 3rem;
   }
 
   &__area {
@@ -122,7 +128,7 @@ function paste (e: ClipboardEvent) {
     display: block;
     width: 100%;
     resize: both;
-    min-height: 1em;
+    min-height: 100%;
     word-break: break-word;
     user-select: text;
 
@@ -141,6 +147,10 @@ function paste (e: ClipboardEvent) {
     :deep(.btn) {
       background: none;
     }
+  }
+
+  &__content {
+    grid-row: span 2;
   }
 
   &__placeholder {
