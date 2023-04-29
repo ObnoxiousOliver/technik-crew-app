@@ -20,8 +20,9 @@ import GlowDiv from './GlowDiv.vue'
 
 $size: math.div(1em, 16) * 4;
 .loading-spinner {
+  margin: 2rem;
   &__spinner {
-    margin: 2rem auto;
+    margin: 0 auto;
     position: relative;
     width: 2em;
     height: 2em;

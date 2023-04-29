@@ -26,18 +26,32 @@
     <button class="equipment-note__view-more-btn" @click="viewMore = !viewMore" v-if="showViewMoreBtn">
       {{ viewMore ? 'Weniger anzeigen' : 'Mehr anzeigen' }}
     </button>
+
+    <div class="equipment-note__attachments" v-if="attachments.length">
+      <NoteAttachment
+        v-for="attachment in attachments"
+        :key="attachment.name"
+        :attachment="attachment"
+        @openImage="() => emit('openImage', attachment)"
+      />
+    </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { NoteDB } from '@/model/equipment'
 import { User } from '@/model/user'
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watchEffect } from 'vue'
 import { toDateString } from '@/utilities/date'
+import { getStorage, ref as storageRef, getMetadata, getDownloadURL } from 'firebase/storage'
+import NoteAttachment from './NoteAttachment.vue'
+import { FirebaseError } from 'firebase/app'
+import { logOnServer } from '@/utilities/log'
 
 const props = defineProps<{
-  note?: NoteDB
+  note: NoteDB
 }>()
+const emit = defineEmits(['openImage'])
 
 const content = ref<HTMLElement>()
 const noteEl = ref<HTMLElement>()
@@ -46,14 +60,60 @@ const height = ref()
 
 const author = ref()
 const date = computed(() => {
-  const date = new Date(props.note?.date)
+  const date = new Date(props.note.date)
   return toDateString(date)
 })
 
 const viewMore = ref(false)
 const showViewMoreBtn = ref(false)
 
+const storage = getStorage()
+const attachments = ref<{
+  type?: string
+  name: string
+  url?: string
+}[]>([])
+watchEffect(async (onCleanup) => {
+  let invalid = false
+
+  onCleanup(() => {
+    invalid = true
+  })
+
+  attachments.value = []
+  for (const attachment of props.note.attachments) {
+    const attachmentRef = storageRef(storage, attachment)
+    const meta = await getMetadata(attachmentRef)
+      .catch((err: FirebaseError) => {
+        if (err.code === 'storage/object-not-found') {
+          if (invalid) return
+          attachments.value.push({
+            name: attachment.split('/').pop() ?? attachment
+          })
+        } else if (err.code === 'storage/unauthorized') {
+          console.error('User doesn\'t have permission to access the object')
+        } else {
+          console.error(err)
+          logOnServer(err.code, err.message)
+        }
+      })
+
+    if (meta) {
+      const url = await getDownloadURL(attachmentRef)
+      if (invalid) return
+      attachments.value.push({
+        type: meta.contentType,
+        name: meta.name,
+        url
+      })
+    }
+  }
+})
+
 onMounted(async () => {
+  if (!noteEl.value) return
+  if (!content.value) return
+
   const observer = new ResizeObserver(() => {
     height.value = noteEl.value?.getBoundingClientRect().height
   })
@@ -134,6 +194,14 @@ onMounted(async () => {
     &:hover {
       color: r.$text-primary;
     }
+  }
+
+  &__attachments {
+    margin: .5rem -1.5rem 0;
+    padding: 0 1.5rem;
+    overflow-x: auto;
+    display: flex;
+    gap: .5rem;
   }
 }
 </style>

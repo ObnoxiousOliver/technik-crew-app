@@ -2,8 +2,7 @@
   <div
     :class="['text-box', {
       'text-box--focused': focused,
-      'text-box--has-label': label,
-      'text-box--mobile': useBreakpoint().inMobileOrTablet
+      'text-box--has-label': label
     }]"
   >
     <div class="text-box__content">
@@ -21,7 +20,7 @@
           @blur="focused = false"
           @input="input"
         />
-        <span class="text-box__placeholder" v-if="value.length === 0">
+        <span class="text-box__placeholder" v-if="value.trim().length === 0">
           {{ placeholder }}
         </span>
       </div>
@@ -34,7 +33,6 @@
 </template>
 
 <script lang="ts" setup>
-import { useBreakpoint } from '@/utilities/breakpoint'
 import { onMounted, ref, watch } from 'vue'
 
 const props = defineProps({
@@ -100,10 +98,6 @@ function paste (e: ClipboardEvent) {
     box-shadow: r.$focus;
   }
 
-  &--mobile.text-box--focused {
-    position: fixed;
-  }
-
   &--has-label {
     .text-box {
       &__content {
@@ -145,13 +139,14 @@ function paste (e: ClipboardEvent) {
 
   &__buttons {
     display: flex;
-    padding: .5rem .5rem .5rem 0;
+    padding: .25rem .25rem .25rem 0;
     margin-left: -1rem;
     grid-column: 2;
     grid-row: 1 / 3;
 
     :deep(.btn) {
-      background: none;
+      @include r.btnTransparent;
+      @include r.btnSquare(2.5rem)
     }
   }
 
@@ -166,6 +161,9 @@ function paste (e: ClipboardEvent) {
     line-height: 1.5;
     pointer-events: none;
     color: r.$text-secondary;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 </style>

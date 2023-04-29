@@ -26,6 +26,7 @@
     "focus-trap": "^7.2.0",
     "focus-trap-vue": "^4.0.1",
     "hammerjs": "^2.0.8",
+    "image-blob-reduce": "^4.1.0",
     "pinia": "^2.0.28",
     "qr-creator": "^1.0.0",
     "register-service-worker": "^1.7.2",
@@ -38,6 +39,7 @@
   "devDependencies": {
     "@types/crypto-js": "^4.1.1",
     "@types/hammerjs": "^2.0.41",
+    "@types/image-blob-reduce": "^4.1.1",
     "@types/node": "^18.11.10",
     "@typescript-eslint/eslint-plugin": "^5.45.0",
     "@typescript-eslint/parser": "^5.45.0",

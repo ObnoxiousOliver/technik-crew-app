@@ -233,7 +233,7 @@ function expandSearch (value?: boolean, push = true) {
   padding: 0 1.5rem;
 
   &__search {
-    z-index: 1;
+    z-index: 99;
     position: absolute;
     inset: 0 0 auto;
     overflow: hidden;
