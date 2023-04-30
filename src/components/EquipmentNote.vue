@@ -86,12 +86,17 @@ watchEffect(async (onCleanup) => {
     const meta = await getMetadata(attachmentRef)
       .catch((err: FirebaseError) => {
         if (err.code === 'storage/object-not-found') {
+          console.error('File doesn\'t exist')
           if (invalid) return
           attachments.value.push({
             name: attachment.split('/').pop() ?? attachment
           })
         } else if (err.code === 'storage/unauthorized') {
           console.error('User doesn\'t have permission to access the object')
+          if (invalid) return
+          attachments.value.push({
+            name: attachment.split('/').pop() ?? attachment
+          })
         } else {
           console.error(err)
           logOnServer(err.code, err.message)
@@ -197,7 +202,7 @@ onMounted(async () => {
   }
 
   &__attachments {
-    margin: .5rem -1.5rem 0;
+    margin: .5rem -1.5rem 2rem;
     padding: 0 1.5rem;
     overflow-x: auto;
     display: flex;

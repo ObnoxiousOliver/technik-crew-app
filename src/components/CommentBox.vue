@@ -49,8 +49,7 @@
         </Btn>
         <Btn
           square
-          :disabled="
-            value.trim().length <= 0 && (attachments?.length ?? 0) <= 0"
+          :disabled="sending || (value.trim().length <= 0 && (attachments?.length ?? 0) <= 0)"
           @click="emit('send')"
           aria-label="Senden"
         >
@@ -101,15 +100,7 @@
           <Spinner class="comment-box__attachment__loading" v-else />
         </template>
         <GlowDiv v-else class="comment-box__attachment__icon">
-          <i v-if="attachment.type?.startsWith('audio/')"                                              class="bi-file-earmark-music" />
-          <i v-else-if="attachment.type?.startsWith('video/')"                                         class="bi-file-earmark-play" />
-          <i v-else-if="attachment.type?.startsWith('application/pdf')"                                class="bi-file-earmark-pdf" />
-          <i v-else-if="attachment.type?.startsWith('application/zip')"                                class="bi-file-earmark-zip" />
-          <i v-else-if="attachment.type?.startsWith('application/vnd.openxmlformats-officedocument')"  class="bi-file-earmark-word" />
-          <i v-else-if="attachment.type?.startsWith('application/vnd.ms-excel')"                       class="bi-file-earmark-excel" />
-          <i v-else-if="attachment.type?.startsWith('application/vnd.ms-powerpoint')"                  class="bi-file-earmark-ppt" />
-          <i v-else-if="attachment.type?.startsWith('text/')"                                          class="bi-file-earmark-text" />
-          <i v-else                                                                                   class="bi-file-earmark" />
+          <FileTypeIcon :file="attachment" />
         </GlowDiv>
 
         <Btn
@@ -147,12 +138,14 @@ import { toByteString } from '../utilities/bytes'
 import reduce from 'image-blob-reduce'
 import GlowDiv from './GlowDiv.vue'
 import { compressableFileTypes } from '@/utilities/compress'
+import FileTypeIcon from './FileTypeIcon.vue'
 
 const breakpoint = useBreakpoint()
 
 const props = defineProps<{
   modelValue: string
   attachments?: File[]
+  sending: boolean
   compressing?: {
     done: number
     total: number
@@ -255,7 +248,7 @@ watchEffect(() => {
   }
 
   &__attachments {
-    margin: 0 -1.5rem;
+    margin: -1rem -1.5rem 1rem;
     padding: 0 1.5rem;
     display: flex;
     gap: 1rem;

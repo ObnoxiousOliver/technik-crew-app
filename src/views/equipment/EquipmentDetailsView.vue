@@ -164,13 +164,14 @@
       @addImage="addImage"
       @removeFile="removeFile"
 
+      :sending="sending"
       :compressing="compressing"
       :attachments="attachments"
 
       class="equipment-details__comment-box"
     />
 
-    <Spinner v-if="loading" />
+    <Spinner v-if="loading && sortedNotes.length <= 0" />
 
     <TransitionGroup v-else tag="div" name="equipment-details__note">
       <EquipmentNote
@@ -188,7 +189,7 @@
 
     <ActionSheet v-model:show="showNoteOptionsSheet">
       <template #buttons>
-        <ActionSheetButton
+        <!-- <ActionSheetButton
           :to="{
             name: 'equipment-note',
             params: {
@@ -198,7 +199,7 @@
           }"
         >
           <i class="bi-pencil" />Anmerkung bearbeiten
-        </ActionSheetButton>
+        </ActionSheetButton> -->
         <ActionSheetButton @click="deleteNote" class="danger">
           <i class="bi-trash" />Anmerkung löschen
         </ActionSheetButton>
@@ -394,8 +395,11 @@ async function removeFile (filename: string) {
   attachments.value = attachments.value.filter(f => f.name !== filename)
 }
 
+const sending = ref(false)
 async function addNote () {
   // Wait for compression to finish
+  sending.value = true
+
   if (compressing.value) {
     await new Promise<void>(resolve => {
       watchOnce(compressing, (val) => {
@@ -404,9 +408,13 @@ async function addNote () {
     })
   }
 
-  await equipment.value?.addNote(newNote.value.trim(), attachments.value)
-  newNote.value = ''
+  const msg = newNote.value.trim()
+  const attach = attachments.value.filter(f => f.size > 0)
   attachments.value = []
+  newNote.value = ''
+
+  await equipment.value?.addNote(msg, attach)
+  sending.value = false
 }
 
 async function deleteNote () {

@@ -6,6 +6,11 @@
       </span>
     </div>
     <img
+      class="note-attachment__img--blur"
+      :src="attachment.url"
+      aria-hidden="true"
+    />
+    <img
       class="note-attachment__img"
       :src="attachment.url"
       :alt="`Bild: ${attachment.name}`"
@@ -70,46 +75,47 @@ function download () {
   flex: 0 0 auto;
   @include r.box;
   position: relative;
-  height: 10rem;
-  width: fit-content;
-  max-width: 18rem;
-  min-width: 8rem;
-  padding: 1rem;
+  height: 15rem;
+  max-width: 20rem;
+  min-width: 10rem;
   overflow: hidden;
 
   &--is-image {
-    display: flex;
-    justify-self: start;
-    align-items: flex-start;
-    font-weight: normal;
-    padding: 0;
-    text-align: left;
-    min-width: 5rem;
+    padding: .5rem;
+    // Compensate for the padding
+    min-width: 9rem;
+
+    :deep(.btn__content) {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
     .note-attachment__name {
       background: linear-gradient(
         to bottom,
-        rgba(r.$bg-primary, (1.000 * 0.8)) 00.0%,
-        rgba(r.$bg-primary, (0.987 * 0.8)) 12.3%,
-        rgba(r.$bg-primary, (0.952 * 0.8)) 23.5%,
-        rgba(r.$bg-primary, (0.897 * 0.8)) 33.4%,
-        rgba(r.$bg-primary, (0.826 * 0.8)) 42.4%,
-        rgba(r.$bg-primary, (0.743 * 0.8)) 50.4%,
-        rgba(r.$bg-primary, (0.651 * 0.8)) 57.5%,
-        rgba(r.$bg-primary, (0.553 * 0.8)) 63.9%,
-        rgba(r.$bg-primary, (0.454 * 0.8)) 69.7%,
-        rgba(r.$bg-primary, (0.356 * 0.8)) 74.9%,
-        rgba(r.$bg-primary, (0.264 * 0.8)) 79.6%,
-        rgba(r.$bg-primary, (0.180 * 0.8)) 84.0%,
-        rgba(r.$bg-primary, (0.108 * 0.8)) 88.2%,
-        rgba(r.$bg-primary, (0.052 * 0.8)) 92.1%,
-        rgba(r.$bg-primary, (0.014 * 0.8)) 96.1%,
+        rgba(r.$bg-primary, (1.000 * 0.7)) 00.0%,
+        rgba(r.$bg-primary, (0.987 * 0.7)) 12.3%,
+        rgba(r.$bg-primary, (0.952 * 0.7)) 23.5%,
+        rgba(r.$bg-primary, (0.897 * 0.7)) 33.4%,
+        rgba(r.$bg-primary, (0.826 * 0.7)) 42.4%,
+        rgba(r.$bg-primary, (0.743 * 0.7)) 50.4%,
+        rgba(r.$bg-primary, (0.651 * 0.7)) 57.5%,
+        rgba(r.$bg-primary, (0.553 * 0.7)) 63.9%,
+        rgba(r.$bg-primary, (0.454 * 0.7)) 69.7%,
+        rgba(r.$bg-primary, (0.356 * 0.7)) 74.9%,
+        rgba(r.$bg-primary, (0.264 * 0.7)) 79.6%,
+        rgba(r.$bg-primary, (0.180 * 0.7)) 84.0%,
+        rgba(r.$bg-primary, (0.108 * 0.7)) 88.2%,
+        rgba(r.$bg-primary, (0.052 * 0.7)) 92.1%,
+        rgba(r.$bg-primary, (0.014 * 0.7)) 96.1%,
         transparent 100%
       );
     }
   }
 
   &__name {
+    z-index: 1;
     position: absolute;
     inset: 0 0 auto;
     padding: 1rem 1rem 2rem;
@@ -143,11 +149,25 @@ function download () {
   }
 
   &__img {
-    height: 10rem;
-    min-width: 100%;
-    max-width: 100%;
-    object-fit: cover;
+    position: relative;
+    margin: auto;
+    max-width: 20rem;
+    max-height: 15rem;
+    object-fit: contain;
     pointer-events: none;
+    border-radius: r.$radius - .5rem;
+
+    &--blur {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      filter: blur(1rem);
+      object-fit: cover;
+      transform: scale(1.1);
+      opacity: 0.4;
+      pointer-events: none;
+    }
   }
 }
 </style>

@@ -1,8 +1,8 @@
 import { useUser } from '@/stores/user'
-import { addDoc, collection, deleteDoc, doc, DocumentChangeType, DocumentData, getDoc, getDocs, getFirestore, onSnapshot, query, QuerySnapshot, setDoc, where } from 'firebase/firestore'
+import { addDoc, collection, deleteDoc, doc, DocumentChangeType, DocumentData, getDoc, getDocs, getFirestore, onSnapshot, query, QuerySnapshot, setDoc, updateDoc, where } from 'firebase/firestore'
 import { HistoryState } from './history'
 import { Location } from './location'
-import { getStorage, ref, uploadBytes } from 'firebase/storage'
+import { deleteObject, getStorage, ref, uploadBytes } from 'firebase/storage'
 
 export interface NoteDB {
   date: number
@@ -243,12 +243,21 @@ export class Equipment {
     const db = getFirestore()
     const storage = getStorage()
 
+    const note: NoteDB = {
+      date: Date.now(),
+      content,
+      author: userStore.username,
+      attachments: []
+    }
+
+    const noteRef = await addDoc(collection(db, 'equipment', this.id, 'notes'), note)
+
     const attachmentRefs: string[] = []
     if (attachments) {
       // let i = 0
       // const done: string[] = []
       for (const attachment of attachments) {
-        const attachmentRef = ref(storage, `equipment/${this.id}/attachments/${attachment.name}`)
+        const attachmentRef = ref(storage, `equipment/${this.id}/notes/${noteRef.id}/attachments/${attachment.name}`)
         attachmentRefs.push(attachmentRef.fullPath)
 
         await uploadBytes(attachmentRef, attachment)
@@ -275,14 +284,9 @@ export class Equipment {
       }
     }
 
-    const note: NoteDB = {
-      date: Date.now(),
-      content,
-      author: userStore.username,
+    await updateDoc(doc(db, 'equipment', this.id, 'notes', noteRef.id), {
       attachments: attachmentRefs
-    }
-
-    await addDoc(collection(db, 'equipment', this.id, 'notes'), note)
+    })
 
     await this.recordHistory({
       description: 'Anmerkung hinzugefügt',
@@ -306,6 +310,13 @@ export class Equipment {
     }
 
     await deleteDoc(doc(db, 'equipment', this.id, 'notes', id))
+
+    if (note.attachments) {
+      const storage = getStorage()
+      for (const attachment of note.attachments) {
+        await deleteObject(ref(storage, attachment))
+      }
+    }
 
     await this.recordHistory({
       description: 'Anmerkung entfernt',
