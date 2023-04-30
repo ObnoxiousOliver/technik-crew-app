@@ -20,7 +20,7 @@
           @blur="focused = false"
           @input="input"
         />
-        <span class="text-box__placeholder" v-if="value.length === 0">
+        <span class="text-box__placeholder" v-if="value.trim().length === 0">
           {{ placeholder }}
         </span>
       </div>
@@ -85,12 +85,12 @@ function paste (e: ClipboardEvent) {
 @use '../scss' as r;
 
 .text-box {
+  @include r.box;
   position: relative;
   display: grid;
-  background: r.$bg-secondary;
-  border-radius: r.$radius;
   // padding: .8rem 1rem 1rem;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 1fr;
+  grid-auto-columns: auto;
 
   transition: box-shadow .2s;
 
@@ -100,6 +100,9 @@ function paste (e: ClipboardEvent) {
 
   &--has-label {
     .text-box {
+      &__content {
+        grid-row: span 1;
+      }
       &__area, &__placeholder {
         padding: 0 1rem 1rem;
       }
@@ -115,16 +118,19 @@ function paste (e: ClipboardEvent) {
 
   &__area-container {
     position: relative;
+    height: 100%;
+    min-height: 3rem;
   }
 
   &__area {
-    padding: 1rem;
+    padding: .75rem 1rem;
     display: block;
     width: 100%;
     resize: both;
-    min-height: 1em;
+    min-height: 100%;
     word-break: break-word;
     user-select: text;
+    line-height: 1.5;
 
     &:focus {
       outline: none;
@@ -133,22 +139,31 @@ function paste (e: ClipboardEvent) {
 
   &__buttons {
     display: flex;
-    padding: .5rem .5rem .5rem 0;
+    padding: .25rem .25rem .25rem 0;
     margin-left: -1rem;
     grid-column: 2;
     grid-row: 1 / 3;
 
     :deep(.btn) {
-      background: none;
+      @include r.btnTransparent;
+      @include r.btnSquare(2.5rem)
     }
+  }
+
+  &__content {
+    grid-row: span 2;
   }
 
   &__placeholder {
     position: absolute;
     inset: 0;
-    padding: 1rem;
+    padding: .75rem 1rem;
+    line-height: 1.5;
     pointer-events: none;
     color: r.$text-secondary;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 </style>

@@ -1,12 +1,18 @@
 import { useUser } from '@/stores/user'
-import { addDoc, collection, deleteDoc, doc, DocumentChangeType, DocumentData, getDoc, getDocs, getFirestore, onSnapshot, query, QuerySnapshot, setDoc, where } from 'firebase/firestore'
+import { addDoc, collection, deleteDoc, doc, DocumentChangeType, DocumentData, getDoc, getDocs, getFirestore, onSnapshot, query, QuerySnapshot, setDoc, updateDoc, where } from 'firebase/firestore'
 import { HistoryState } from './history'
 import { Location } from './location'
+import { deleteObject, getStorage, ref, uploadBytes } from 'firebase/storage'
+import { compress, compressableFileTypes } from '@/utilities/compress'
 
 export interface NoteDB {
   date: number
   content: string
   author: string
+  attachments: {
+    path: string
+    thumbnailPath: string
+  }[]
 }
 
 export type EquipmentType = 'computer' | 'cable' | 'instrument' | 'speaker' | 'light' | 'mixer' | 'microphone' | 'other'
@@ -218,21 +224,92 @@ export class Equipment {
     return unsubscribe
   }
 
-  async addNote (content: string) {
+  async addNote (
+    content: string,
+    attachments?: File[]
+    /* onProgress?: (progress: {
+      file: string
+      progress: number
+      done: string[]
+      loaded: number
+      total: number
+    }) => void */) {
     if (!this.id) {
       throw new Error('Cannot add notes on an equipment without an id')
     }
 
-    const db = getFirestore()
     const userStore = useUser()
+
+    if (!userStore.username) {
+      throw new Error('Cannot add notes without a username')
+    }
+
+    const db = getFirestore()
+    const storage = getStorage()
 
     const note: NoteDB = {
       date: Date.now(),
       content,
-      author: userStore.user?.username ?? 'Anonym'
+      author: userStore.username,
+      attachments: []
     }
 
-    await addDoc(collection(db, 'equipment', this.id, 'notes'), note)
+    const noteRef = await addDoc(collection(db, 'equipment', this.id, 'notes'), note)
+
+    const attachmentRefs: {
+      path: string
+      thumbnailPath?: string
+    }[] = []
+    if (attachments) {
+      // let i = 0
+      // const done: string[] = []
+      for (const attachment of attachments) {
+        const attachmentRef = ref(storage, `equipment/${this.id}/notes/${noteRef.id}/attachments/${attachment.name}`)
+
+        await uploadBytes(attachmentRef, attachment)
+
+        if (compressableFileTypes.includes(attachment.type)) {
+          const attachmentThumbnailRef = ref(storage, `equipment/${this.id}/notes/${noteRef.id}/attachments/thumbnail_${attachment.name}`)
+
+          await uploadBytes(attachmentThumbnailRef, await compress(attachment, {
+            maxSize: 128
+          }))
+
+          attachmentRefs.push({
+            path: attachmentRef.fullPath,
+            thumbnailPath: attachmentThumbnailRef.fullPath
+          })
+        } else {
+          attachmentRefs.push({
+            path: attachmentRef.fullPath
+          })
+        }
+
+        // const uploadTask = uploadBytesResumable(attachmentRef, attachment)
+        // await new Promise<void>(resolve => {
+        //   uploadTask.on('state_changed', (snapshot) => {
+        //     onProgress?.({
+        //       file: attachment.name,
+        //       progress: snapshot.bytesTransferred / snapshot.totalBytes,
+        //       done,
+        //       loaded: i,
+        //       total: attachments.length
+        //     })
+
+        //     if (snapshot.state === 'success') {
+        //       done.push(attachment.name)
+        //       resolve()
+        //     }
+        //   })
+        // })
+
+        // i++
+      }
+    }
+
+    await updateDoc(doc(db, 'equipment', this.id, 'notes', noteRef.id), {
+      attachments: attachmentRefs
+    })
 
     await this.recordHistory({
       description: 'Anmerkung hinzugefügt',
@@ -256,6 +333,17 @@ export class Equipment {
     }
 
     await deleteDoc(doc(db, 'equipment', this.id, 'notes', id))
+
+    if (note.attachments) {
+      const storage = getStorage()
+      for (const attachment of note.attachments) {
+        await deleteObject(ref(storage, attachment.path))
+
+        if (attachment.thumbnailPath) {
+          await deleteObject(ref(storage, attachment.thumbnailPath))
+        }
+      }
+    }
 
     await this.recordHistory({
       description: 'Anmerkung entfernt',

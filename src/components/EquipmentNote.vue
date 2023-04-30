@@ -26,6 +26,15 @@
     <button class="equipment-note__view-more-btn" @click="viewMore = !viewMore" v-if="showViewMoreBtn">
       {{ viewMore ? 'Weniger anzeigen' : 'Mehr anzeigen' }}
     </button>
+
+    <div class="equipment-note__attachments" v-if="props.note.attachments.length">
+      <NoteAttachment
+        v-for="attachment in props.note.attachments"
+        :key="attachment.path"
+        :attachment="attachment"
+        @open="(e) => emit('open', e)"
+      />
+    </div>
   </div>
 </template>
 
@@ -34,10 +43,12 @@ import { NoteDB } from '@/model/equipment'
 import { User } from '@/model/user'
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { toDateString } from '@/utilities/date'
+import NoteAttachment from './NoteAttachment.vue'
 
 const props = defineProps<{
-  note?: NoteDB
+  note: NoteDB
 }>()
+const emit = defineEmits(['open'])
 
 const content = ref<HTMLElement>()
 const noteEl = ref<HTMLElement>()
@@ -46,7 +57,7 @@ const height = ref()
 
 const author = ref()
 const date = computed(() => {
-  const date = new Date(props.note?.date)
+  const date = new Date(props.note.date)
   return toDateString(date)
 })
 
@@ -54,6 +65,9 @@ const viewMore = ref(false)
 const showViewMoreBtn = ref(false)
 
 onMounted(async () => {
+  if (!noteEl.value) return
+  if (!content.value) return
+
   const observer = new ResizeObserver(() => {
     height.value = noteEl.value?.getBoundingClientRect().height
   })
@@ -134,6 +148,14 @@ onMounted(async () => {
     &:hover {
       color: r.$text-primary;
     }
+  }
+
+  &__attachments {
+    margin: .5rem -1.5rem 2rem;
+    padding: 0 1.5rem;
+    overflow-x: auto;
+    display: flex;
+    gap: .5rem;
   }
 }
 </style>

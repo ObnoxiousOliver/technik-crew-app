@@ -1,7 +1,8 @@
 <template>
   <div
     :class="['lens-card', {
-      'lens-card--active': start && !scanner?.loading
+      'lens-card--active': start && !scanner?.loading,
+      'lens-card--first-start': firstStart,
     }]"
     ref="root"
     :style="{
@@ -56,21 +57,25 @@
     </template>
     <template v-else-if="error">
       <div class="lens-card__error">
-        <i class="bi-exclamation-triangle" />
+        <GlowDiv>
+          <i class="bi-exclamation-triangle" />
 
-        <template v-if="error.code === 'NOT_SUPPORTED'">
-          Dein Gerät unterstützt leider keine Kamera.
-        </template>
+          <template v-if="error.code === 'NOT_SUPPORTED'">
+            Dein Gerät unterstützt leider keine Kamera.
+          </template>
 
-        <template v-else-if="error.code === 'NOT_ALLOWED'">
-          Du hast die Kamera nicht freigegeben.
-        </template>
+          <template v-else-if="error.code === 'NOT_ALLOWED'">
+            Du hast die Kamera nicht freigegeben.
+          </template>
+        </GlowDiv>
       </div>
     </template>
     <template v-else>
       <button @click="start = true" class="lens-card__start-scan">
-        <i class="bi-qr-code-scan" />
-        Tippe hier um zu die Kamera zu starten
+        <GlowDiv>
+          <i class="bi-qr-code-scan" />
+          Tippe hier um zu die Kamera zu starten
+        </GlowDiv>
       </button>
     </template>
   </div>
@@ -83,6 +88,7 @@ import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useEquipment } from '@/stores/equipment'
 import { useRouter } from 'vue-router'
 import { AppError } from '@/model/error'
+import GlowDiv from './GlowDiv.vue'
 
 const router = useRouter()
 const equipment = useEquipment()
@@ -93,13 +99,18 @@ const root = ref<HTMLElement | null>(null)
 const error = ref<AppError | null>(null)
 
 const start = ref(false)
+const firstStart = ref(true)
 watch(start, (val) => {
   if (val) {
-    scanner.value?.startScan().catch((err: AppError) => {
-      start.value = false
-      error.value = err
-      console.error(err)
-    })
+    scanner.value?.startScan()
+      .then(() => {
+        firstStart.value = false
+      })
+      .catch((err: AppError) => {
+        start.value = false
+        error.value = err
+        console.error(err)
+      })
   } else {
     scanner.value?.pauseScan()
   }
@@ -142,11 +153,25 @@ function result (result: Result) {
 
   transition: height .5s cubic-bezier(0.19, 1, 0.22, 1);
 
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: r.$bg-primary;
+    pointer-events: none;
+  }
+
   &--active {
     height: var(--width);
 
     &::before {
       opacity: 0;
+    }
+  }
+
+  &--first-start {
+    &::before {
+      background: radial-gradient(85.03% 131.43% at 17.64% 110.98%, #2430a3aa 0%, rgba(37, 59, 255, 0) 100%), radial-gradient(84.39% 143.51% at 100% 7.07%, rgba(95, 25, 128, 0.5) 0%, rgb(4, 1, 19) 100%);
     }
   }
 
@@ -168,18 +193,11 @@ function result (result: Result) {
     }
   }
 
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(85.03% 131.43% at 17.64% 110.98%, #2430a3 0%, rgba(37, 59, 255, 0) 100%), radial-gradient(84.39% 143.51% at 100% 7.07%, rgba(95, 25, 128, 0.8) 0%, rgba(255, 91, 91, 0) 100%), r.$bg-secondary;
-    pointer-events: none;
-  }
-
   &__scanner {
     will-change: filter;
     filter: blur(1rem);
-    transition: filter .5s cubic-bezier(0.19, 1, 0.22, 1);
+    opacity: 0.5;
+    transition: .5s cubic-bezier(0.19, 1, 0.22, 1);
 
     :deep(video) {
       transform-origin: center 75%;
@@ -188,6 +206,7 @@ function result (result: Result) {
     }
 
     .lens-card--active & {
+      opacity: 1;
       background: none;
       filter: none;
 
@@ -210,6 +229,10 @@ function result (result: Result) {
       text-align: center;
       font-size: .8rem;
     }
+  }
+
+  &__error {
+    color: r.$danger
   }
 
   &__error, &__start-scan {

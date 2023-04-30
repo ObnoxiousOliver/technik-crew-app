@@ -20,21 +20,13 @@ export const useEquipment = defineStore('equipment', () => {
     return equipment.value.find((e) => e.id === id)
   }
 
-  // Load equipment from local storage
-  watch(equipment, (eq) => {
-    localStorage.setItem('equipment', JSON.stringify(
-      eq.map((e) => [e.id, e.toDB()])
-    ))
-  }, { deep: true })
-  equipment.value = JSON.parse(localStorage.getItem('equipment') || '[]')
-    .map((e: [string, EquipmentDB]) => new Equipment(e[0], e[1]))
-
   // Subscribe to changes
   let unsubscribe: (() => void) | null = null
   function subscribe () {
-    console.log('[Equipment] Subscribing to equipment')
-
     unsubscribe?.()
+    if (useOffline().value) return
+
+    console.log('[Equipment] Subscribing to equipment')
 
     Equipment.get(undefined, null, false).then((eq) => {
       equipment.value = eq as Equipment[]
@@ -61,33 +53,15 @@ export const useEquipment = defineStore('equipment', () => {
       }
     })
   }
-  onAuthStateChanged(getAuth(), (user) => {
-    if (useOffline().value) return
-
-    if (user) {
-      if (unsubscribe) return
-      subscribe()
-    } else if (getAuth().currentUser) {
-      unsubscribe?.()
-      unsubscribe = null
-    }
-  })
-  // Unsubscribe if offline-mode is enabled
-  watch(useOffline(), (offline) => {
-    if (offline) {
-      unsubscribe?.()
-      unsubscribe = null
-    } else {
-      subscribe()
-    }
-  })
 
   // Subscribe to Notes
   const notes = ref({}) as Ref<Record<string, Record<string, NoteDB>>>
+  const notesLoading = ref(true)
 
   let unsubscribeNotes: (() => void) | null = null
-  function subscribeNotes (eq: Equipment | string, onChange: (notes: Record<string, NoteDB>) => void) {
+  async function subscribeNotes (eq: Equipment | string, onChange?: (notes: Record<string, NoteDB>) => void) {
     unsubscribeNotes?.()
+    if (useOffline().value) return
 
     const _eq: Equipment | undefined = typeof eq === 'string' ? findByID(eq) : eq
 
@@ -95,9 +69,13 @@ export const useEquipment = defineStore('equipment', () => {
     const id = _eq.id
     if (!id) throw new Error('Equipment has no ID')
 
+    notesLoading.value = true
     console.log('[Equipment] Subscribing to notes of', id)
 
-    onChange(notes.value[id] ?? {})
+    onChange?.(notes.value[id] ?? {})
+
+    await getNotes(_eq)
+    notesLoading.value = false
 
     unsubscribeNotes = _eq.subscribeNotes((type, note) => {
       console.log('[Equipment] Notes changed', type, note)
@@ -111,7 +89,7 @@ export const useEquipment = defineStore('equipment', () => {
         notes.value[id][note.id] = note.note
       }
 
-      onChange(notes.value[id])
+      onChange?.(notes.value[id])
     })
 
     return () => {
@@ -119,6 +97,28 @@ export const useEquipment = defineStore('equipment', () => {
       unsubscribeNotes = null
     }
   }
+  onAuthStateChanged(getAuth(), (user) => {
+    if (useOffline().value) return
+
+    if (user) {
+      if (unsubscribe) return
+      subscribe()
+    } else {
+      unsubscribe?.()
+      unsubscribe = null
+      unsubscribeNotes?.()
+      unsubscribeNotes = null
+    }
+  })
+  // Unsubscribe if offline-mode is enabled
+  watch(useOffline(), (offline) => {
+    if (offline) {
+      unsubscribe?.()
+      unsubscribe = null
+    } else {
+      subscribe()
+    }
+  })
 
   /**
    * Get notes of an equipment
@@ -174,6 +174,17 @@ export const useEquipment = defineStore('equipment', () => {
     })
   }
 
+  // Load equipment from local storage
+  watch([equipment, notes], () => {
+    localStorage.setItem('equipment', JSON.stringify(
+      equipment.value.map((e) => [e.id, e.toDB()])
+    ))
+    localStorage.setItem('equipment-notes', JSON.stringify(notes.value))
+  }, { deep: true })
+  equipment.value = JSON.parse(localStorage.getItem('equipment') || '[]')
+    .map((e: [string, EquipmentDB]) => new Equipment(e[0], e[1]))
+  notes.value = JSON.parse(localStorage.getItem('equipment-notes') || '{}')
+
   return {
     equipment,
     groups,
@@ -181,7 +192,9 @@ export const useEquipment = defineStore('equipment', () => {
     findByCode,
     findByID,
     subscribeNotes,
+    notesLoading,
     getNotes,
+    notes,
     split
   }
 })

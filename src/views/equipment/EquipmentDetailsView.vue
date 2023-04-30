@@ -1,13 +1,13 @@
 <template>
   <NotFoundView v-if="!equipment" />
 
-  <Page v-else padBottom>
+  <Page v-else padBottom :drop="onDrop">
     <CenteredCard>
       <template #icon>
-        <i :class="typeInfo[equipment?.type]?.icon ?? typeInfo.other.icon" />
+        <i :class="typeInfo[equipment?.type ?? 'other']?.icon ?? typeInfo.other.icon" />
       </template>
       <template #title>
-        <span v-if="equipment?.amount > 1" class="equipment-details__amount">
+        <span v-if="(equipment?.amount ?? 1) > 1" class="equipment-details__amount">
           {{ equipment?.amount }}x
         </span>{{ equipment?.name }}
       </template>
@@ -40,8 +40,8 @@
       <SettingsListOption>
         <i class="bi-tag" />Typ
         <template #desc>
-          <i :class="typeInfo[equipment?.type]?.icon ?? typeInfo.other.icon" />
-          {{ typeInfo[equipment?.type]?.name ?? typeInfo.other.name }}
+          <i :class="typeInfo[equipment?.type ?? 'other']?.icon ?? typeInfo.other.icon" />
+          {{ typeInfo[equipment?.type ?? 'other']?.name ?? typeInfo.other.name }}
         </template>
       </SettingsListOption>
       <SettingsListOption>
@@ -101,7 +101,7 @@
         </template>
       </SettingsListLink>
 
-      <SettingsListDivider v-if="equipment?.amount > 1" />
+      <SettingsListDivider v-if="(equipment?.amount ?? 1) > 1" />
 
       <SettingsListLink
         :to="{
@@ -115,7 +115,7 @@
         <i class="bi-ui-radios-grid" />Anzahl ändern
       </SettingsListLink>
 
-      <template v-if="equipment.amount > 1">
+      <template v-if="(equipment?.amount ?? 1) > 1">
         <SettingsListLink
           :to="{
             name: 'equipment-split',
@@ -156,24 +156,22 @@
         Anmerkungen
       </SettingsListDivider>
     </SettingsList>
-    <Textbox
-      class="equipment-details__text-box"
-      placeholder="Anmerkung hinzufügen"
-      v-model="newNote"
-      @keydown.ctrl.enter="addNote"
-    >
-      <template #buttons>
-        <Btn
-          :disabled="newNote.length === 0"
-          class="btn--square"
-          @click="addNote"
-        >
-          <i class="bi-send"></i>
-        </Btn>
-      </template>
-    </Textbox>
 
-    <Spinner v-if="loading" />
+    <CommentBox
+      v-model="newNote"
+      @send="addNote"
+      @addFile="addFile"
+      @addImage="addImage"
+      @removeFile="removeFile"
+
+      :sending="sending"
+      :compressing="compressing"
+      :attachments="attachments"
+
+      class="equipment-details__comment-box"
+    />
+
+    <Spinner v-if="loading && sortedNotes.length <= 0" />
 
     <TransitionGroup v-else tag="div" name="equipment-details__note">
       <EquipmentNote
@@ -181,6 +179,7 @@
         :key="id"
         :note="notes[id]"
         @options="noteOptions = id"
+        @open="open"
       />
     </TransitionGroup>
 
@@ -190,7 +189,7 @@
 
     <ActionSheet v-model:show="showNoteOptionsSheet">
       <template #buttons>
-        <ActionSheetButton
+        <!-- <ActionSheetButton
           :to="{
             name: 'equipment-note',
             params: {
@@ -200,7 +199,7 @@
           }"
         >
           <i class="bi-pencil" />Anmerkung bearbeiten
-        </ActionSheetButton>
+        </ActionSheetButton> -->
         <ActionSheetButton @click="deleteNote" class="danger">
           <i class="bi-trash" />Anmerkung löschen
         </ActionSheetButton>
@@ -210,6 +209,7 @@
 </template>
 
 <script lang="ts" setup>
+import CommentBox from '@/components/CommentBox.vue'
 import SettingsList from '@/components/SettingsList.vue'
 import SettingsListLink from '@/components/SettingsListLink.vue'
 import SettingsListDivider from '@/components/SettingsListDivider.vue'
@@ -217,10 +217,14 @@ import SettingsListOption from '@/components/SettingsListOption.vue'
 import EquipmentNote from '../../components/EquipmentNote.vue'
 import NotFoundView from '@/views/NotFoundView.vue'
 import { EquipmentTypeInfo, NoteDB } from '@/model/equipment'
-import { computed, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, ref, watch, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 import CenteredCard from '@/components/CenteredCard.vue'
 import { useEquipment } from '@/stores/equipment'
+import { useFileDialog, watchOnce } from '@vueuse/core'
+import { compress } from '@/utilities/compress'
+import { createId } from '@/utilities/id'
+import { useToast } from '@/utilities/toast'
 // import QrCreator from 'qr-creator'
 
 const typeInfo = EquipmentTypeInfo
@@ -228,8 +232,8 @@ const typeInfo = EquipmentTypeInfo
 const route = useRoute()
 const eqStore = useEquipment()
 
-const equipment = computed(() => eqStore.findByID(route.params.id))
-const notes = ref<Record<string, NoteDB>>({})
+const equipment = computed(() => eqStore.findByID(route.params.id as string))
+const notes = computed(() => eqStore.notes[route.params.id as string] ?? {})
 const sortedNotes = computed(() => {
   const ids = Object.keys(notes.value)
   ids.sort((a, b) => {
@@ -252,28 +256,23 @@ const sortedNotes = computed(() => {
 //   }, qrcodeCanvas.value)
 // }, { immediate: true })
 
-const loading = ref(true)
+const loading = computed(() => eqStore.notesLoading)
 let unsubscribe: (() => void) | undefined
-watch(equipment, () => {
+watchEffect(async () => {
   unsubscribe?.()
-  notes.value = {}
-
   if (equipment.value) {
     if (equipment.value?.name) document.title = equipment.value?.name
 
-    unsubscribe = eqStore.subscribeNotes(equipment.value, (note) => {
-      loading.value = false
-      notes.value = note
-    })
+    unsubscribe = await eqStore.subscribeNotes(equipment.value)
   }
-}, { immediate: true })
+})
 
 onBeforeUnmount(() => {
   unsubscribe?.()
 })
 
 const newNote = ref('')
-const noteOptions = ref(null)
+const noteOptions = ref<string | null>(null)
 const showNoteOptionsSheet = computed({
   get: () => noteOptions.value !== null,
   set: value => {
@@ -283,14 +282,149 @@ const showNoteOptionsSheet = computed({
   }
 })
 
+const imageDialog = useFileDialog({
+  accept: 'image/*',
+  multiple: true
+})
+
+const fileDialog = useFileDialog({
+  accept: '*',
+  multiple: true
+})
+
+const dropedFiles = ref<File[]>([])
+function onDrop (files: File[] | null) {
+  if (!files) return
+  dropedFiles.value = files
+}
+
+const attachments = ref<File[]>([])
+const maxFilesize = 10 * 1024 * 1024 // 10 MB
+const compressing = ref<{
+  done: number
+  total: number
+  files: string[]
+} | null>(null)
+watch([imageDialog.files, fileDialog.files, dropedFiles], async () => {
+  async function computeFile (file: File, filename: string) {
+    // Replace all non-alphanumeric characters with underscores
+    // and append a random string to the filename to prevent duplicates
+    if (attachments.value.find(f => f.name === filename)) return
+
+    try {
+      file = await compress(file)
+    } catch (err) {
+      console.error(err)
+      useToast().show('Fehler beim Komprimieren der Datei: ' + file.name)
+      return
+    }
+
+    file = new File([file], filename, {
+      type: file.type
+    })
+
+    return file
+  }
+
+  const files: File[] = []
+  if (fileDialog.files.value) {
+    for (let i = 0; i < fileDialog.files.value.length; i++) {
+      const file = fileDialog.files.value.item(i)
+      file && files.push(file)
+    }
+  }
+
+  if (imageDialog.files.value) {
+    for (let i = 0; i < imageDialog.files.value.length; i++) {
+      const file = imageDialog.files.value.item(i)
+      file && files.push(file)
+    }
+  }
+
+  dropedFiles.value.forEach(file => files.push(file))
+
+  const attachmentSize = [...attachments.value]
+    .reduce((acc, file) => acc + file.size, 0)
+
+  const newAttachments: File[] = []
+
+  const filenames = files.map(file => {
+    const extention = file.name.split('.').pop()?.toLowerCase()
+    const filename = file.name.split('.').slice(0, -1).join('.').replace(/[^a-zA-Z0-9_-]/g, '_')
+    return `${filename}-${createId(4)}.${extention}`
+  })
+  for (let i = 0; i < files.length; i++) {
+    compressing.value = {
+      done: i,
+      total: files.length,
+      files: filenames
+    }
+
+    const file = await computeFile(files[i], filenames[i])
+    if (!file) continue
+
+    if (attachmentSize + file.size < maxFilesize) {
+      newAttachments.push(file)
+    } else {
+      useToast().show('⚠️Das Limit von 10 MB wurde erreicht.')
+      break
+    }
+  }
+  compressing.value = null
+
+  attachments.value.push(...newAttachments)
+
+  fileDialog.reset()
+  imageDialog.reset()
+  if (dropedFiles.value.length > 0) {
+    dropedFiles.value = []
+  }
+}, { deep: true })
+
+async function addFile () {
+  if (!equipment.value) return
+  fileDialog.open()
+}
+
+async function addImage () {
+  if (!equipment.value) return
+  imageDialog.open()
+}
+
+async function removeFile (filename: string) {
+  attachments.value = attachments.value.filter(f => f.name !== filename)
+}
+
+const sending = ref(false)
 async function addNote () {
-  await equipment.value?.addNote(newNote.value.trim())
+  // Wait for compression to finish
+  sending.value = true
+
+  if (compressing.value) {
+    await new Promise<void>(resolve => {
+      watchOnce(compressing, (val) => {
+        if (!val) resolve()
+      })
+    })
+  }
+
+  const msg = newNote.value.trim()
+  const attach = attachments.value.filter(f => f.size > 0)
+  attachments.value = []
   newNote.value = ''
+
+  await equipment.value?.addNote(msg, attach)
+  sending.value = false
 }
 
 async function deleteNote () {
+  if (!noteOptions.value) return
   await equipment.value?.removeNote(noteOptions.value)
   noteOptions.value = null
+}
+
+function open (url: string) {
+  window.open(url, '_blank')
 }
 </script>
 
@@ -298,7 +432,7 @@ async function deleteNote () {
 @use '../../scss' as r;
 
 .equipment-details {
-  &__text-box {
+  &__comment-box {
     margin-top: 1rem;
     margin-bottom: 2rem;
   }

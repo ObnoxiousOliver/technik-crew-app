@@ -35,12 +35,23 @@
       </h2>
       <slot />
     </main>
+
+    <div
+      v-if="isOverDropZone"
+      class="page__dropzone"
+    >
+      <i class="bi-upload page__dropzone__icon" />
+      <slot name="dropMessage">
+        Dateien hier ablegen
+      </slot>
+    </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { back as _back } from '@/router'
+import { useDropZone } from '@vueuse/core'
 
 const scroller = ref(null as null | HTMLElement)
 
@@ -62,8 +73,15 @@ const props = defineProps({
   padBottom: {
     type: Boolean,
     default: false
-  }
+  },
+  drop: Function
 })
+
+const { isOverDropZone } = props.drop
+  ? useDropZone(root, props.drop as (files: File[] | null) => void)
+  : {
+      isOverDropZone: ref(false)
+    }
 
 function back () {
   if (props.beforeBack) {
@@ -218,6 +236,23 @@ defineExpose({
       :deep(i) {
         margin-right: .5em;
       }
+    }
+  }
+
+  &__dropzone {
+    z-index: 99999;
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-flow: column nowrap;
+    gap: 1rem;
+    align-items: center;
+    justify-content: center;
+    background: rgba(r.$bg-primary, 0.2);
+    backdrop-filter: blur(1rem);
+
+    &__icon {
+      font-size: 4rem;
     }
   }
 }
