@@ -27,12 +27,12 @@
       {{ viewMore ? 'Weniger anzeigen' : 'Mehr anzeigen' }}
     </button>
 
-    <div class="equipment-note__attachments" v-if="attachments.length">
+    <div class="equipment-note__attachments" v-if="props.note.attachments.length">
       <NoteAttachment
-        v-for="attachment in attachments"
-        :key="attachment.name"
+        v-for="attachment in props.note.attachments"
+        :key="attachment.path"
         :attachment="attachment"
-        @openImage="() => emit('openImage', attachment)"
+        @open="(e) => emit('open', e)"
       />
     </div>
   </div>
@@ -41,17 +41,14 @@
 <script lang="ts" setup>
 import { NoteDB } from '@/model/equipment'
 import { User } from '@/model/user'
-import { computed, onBeforeUnmount, onMounted, ref, watchEffect } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { toDateString } from '@/utilities/date'
-import { getStorage, ref as storageRef, getMetadata, getDownloadURL } from 'firebase/storage'
 import NoteAttachment from './NoteAttachment.vue'
-import { FirebaseError } from 'firebase/app'
-import { logOnServer } from '@/utilities/log'
 
 const props = defineProps<{
   note: NoteDB
 }>()
-const emit = defineEmits(['openImage'])
+const emit = defineEmits(['open'])
 
 const content = ref<HTMLElement>()
 const noteEl = ref<HTMLElement>()
@@ -66,54 +63,6 @@ const date = computed(() => {
 
 const viewMore = ref(false)
 const showViewMoreBtn = ref(false)
-
-const storage = getStorage()
-const attachments = ref<{
-  type?: string
-  name: string
-  url?: string
-}[]>([])
-watchEffect(async (onCleanup) => {
-  let invalid = false
-
-  onCleanup(() => {
-    invalid = true
-  })
-
-  attachments.value = []
-  for (const attachment of props.note.attachments) {
-    const attachmentRef = storageRef(storage, attachment)
-    const meta = await getMetadata(attachmentRef)
-      .catch((err: FirebaseError) => {
-        if (err.code === 'storage/object-not-found') {
-          console.error('File doesn\'t exist')
-          if (invalid) return
-          attachments.value.push({
-            name: attachment.split('/').pop() ?? attachment
-          })
-        } else if (err.code === 'storage/unauthorized') {
-          console.error('User doesn\'t have permission to access the object')
-          if (invalid) return
-          attachments.value.push({
-            name: attachment.split('/').pop() ?? attachment
-          })
-        } else {
-          console.error(err)
-          logOnServer(err.code, err.message)
-        }
-      })
-
-    if (meta) {
-      const url = await getDownloadURL(attachmentRef)
-      if (invalid) return
-      attachments.value.push({
-        type: meta.contentType,
-        name: meta.name,
-        url
-      })
-    }
-  }
-})
 
 onMounted(async () => {
   if (!noteEl.value) return

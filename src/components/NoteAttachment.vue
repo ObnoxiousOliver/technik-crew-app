@@ -1,19 +1,27 @@
 <template>
-  <Btn @click="emit('openImage')" v-if="isImage" class="note-attachment note-attachment--is-image">
+  <div v-if="loading" class="note-attachment">
     <div class="note-attachment__name">
       <span class="note-attachment__name__name">
-        {{ attachment.name.split('.').slice(0, -1).join('.') }}</span><span class="note-attachment__name__extention">.{{ attachment.name.split('.').pop() }}
+        {{ name.split('.').slice(0, -1).join('.') }}</span><span class="note-attachment__name__extention">.{{ name.split('.').pop() }}
       </span>
     </div>
-    <img
-      class="note-attachment__img--blur"
-      :src="attachment.url"
+    <Spinner class="note-attachment__loading" />
+  </div>
+  <Btn @click="open" v-else-if="hasThumbnail" class="note-attachment note-attachment--has-thumbnail">
+    <div class="note-attachment__name">
+      <span class="note-attachment__name__name">
+        {{ name.split('.').slice(0, -1).join('.') }}</span><span class="note-attachment__name__extention">.{{ name.split('.').pop() }}
+      </span>
+    </div>
+    <!-- <img
+      class="note-attachment__thumbnail--blur"
+      :src="attachment.thumbnail"
       aria-hidden="true"
-    />
+    /> -->
     <img
-      class="note-attachment__img"
-      :src="attachment.url"
-      :alt="`Bild: ${attachment.name}`"
+      class="note-attachment__thumbnail"
+      :src="thumbnailUrl"
+      :alt="`Bild: ${name}`"
     />
   </Btn>
   <div
@@ -24,12 +32,18 @@
   >
     <div class="note-attachment__name">
       <span class="note-attachment__name__name">
-        {{ attachment.name.split('.').slice(0, -1).join('.') }}</span><span class="note-attachment__name__extention">.{{ attachment.name.split('.').pop() }}
+        {{ name.split('.').slice(0, -1).join('.') }}</span><span class="note-attachment__name__extention">.{{ name.split('.').pop() }}
       </span>
     </div>
     <GlowDiv class="note-attachment__icon">
       <i v-if="notFound" class="bi-file-earmark-x" />
-      <FileTypeIcon v-else :file="attachment" />
+      <FileTypeIcon
+        v-else
+        :file="{
+          name: name,
+          type: meta?.contentType
+        }"
+      />
     </GlowDiv>
     <Btn
       v-if="!notFound"
@@ -45,26 +59,70 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import FileTypeIcon from './FileTypeIcon.vue'
 import GlowDiv from './GlowDiv.vue'
-import { compressableFileTypes } from '@/utilities/compress'
+import { FullMetadata, getDownloadURL, getMetadata, getStorage, ref as storageRef } from 'firebase/storage'
+import { FirebaseError } from 'firebase/app'
+import { logOnServer } from '@/utilities/log'
+
+const storage = getStorage()
 
 const props = defineProps<{
   attachment: {
-    type?: string
-    name: string
-    url?: string
+    path: string
+    thumbnailPath?: string
   }
 }>()
 
-const emit = defineEmits(['openImage'])
+const emit = defineEmits(['open'])
 
-const notFound = computed(() => !props.attachment.url)
-const isImage = computed(() => props.attachment.type && compressableFileTypes.includes(props.attachment.type))
+const loading = ref(true)
+
+const meta = ref<FullMetadata>()
+const thumbnailUrl = ref<string>()
+const url = ref<string>()
+
+const name = computed(() =>
+  meta.value?.name ??
+  props.attachment.path.split('/').pop() ??
+  props.attachment.path)
+
+;(async function init () {
+  meta.value = await getMetadata(storageRef(storage, props.attachment.path))
+    .catch((error) => {
+      const err = error as FirebaseError
+      if (err.code === 'storage/object-not-found') {
+        console.error('Attachment not found', props.attachment.path)
+        return undefined
+      } else if (err.code === 'storage/unauthorized') {
+        console.error('Unauthorized to access attachment', props.attachment.path)
+        return undefined
+      } else {
+        console.error('Error while loading attachment', props.attachment.path, err)
+        logOnServer('Error while loading attachment', props.attachment.path, err.message)
+      }
+    })
+
+  url.value = await getDownloadURL(storageRef(storage, props.attachment.path))
+
+  if (props.attachment.thumbnailPath) {
+    const url = await getDownloadURL(storageRef(storage, props.attachment.thumbnailPath))
+    thumbnailUrl.value = url
+  }
+
+  loading.value = false
+})()
+
+const notFound = computed(() => !meta.value)
+const hasThumbnail = computed(() => !!props.attachment.thumbnailPath)
+
+async function open () {
+  emit('open', url.value)
+}
 
 function download () {
-  window.open(props.attachment.url, '_blank')
+  window.open(url.value, '_blank')
 }
 </script>
 
@@ -80,16 +138,16 @@ function download () {
   min-width: 10rem;
   overflow: hidden;
 
-  &--is-image {
-    padding: .5rem;
+  &--has-thumbnail {
+    padding: 0;
     // Compensate for the padding
-    min-width: 9rem;
+    // min-width: 9rem;
 
-    :deep(.btn__content) {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+    // :deep(.btn__content) {
+    //   display: flex;
+    //   align-items: center;
+    //   justify-content: center;
+    // }
 
     .note-attachment__name {
       background: linear-gradient(
@@ -143,19 +201,29 @@ function download () {
     font-size: 2.5rem;
   }
 
+  &__loading {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
   &__download-btn {
     position: absolute;
     inset: auto .5rem .5rem auto;
   }
 
-  &__img {
-    position: relative;
-    margin: auto;
+  &__thumbnail {
+    // position: relative;
+    // margin: auto;
+    width: stretch;
+    height: 15rem;
     max-width: 20rem;
     max-height: 15rem;
-    object-fit: contain;
+    object-fit: cover;
     pointer-events: none;
-    border-radius: r.$radius - .5rem;
+    // border-radius: r.$radius - .5rem;
 
     &--blur {
       position: absolute;

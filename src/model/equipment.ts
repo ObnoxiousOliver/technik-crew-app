@@ -3,12 +3,16 @@ import { addDoc, collection, deleteDoc, doc, DocumentChangeType, DocumentData, g
 import { HistoryState } from './history'
 import { Location } from './location'
 import { deleteObject, getStorage, ref, uploadBytes } from 'firebase/storage'
+import { compress, compressableFileTypes } from '@/utilities/compress'
 
 export interface NoteDB {
   date: number
   content: string
   author: string
-  attachments: string[]
+  attachments: {
+    path: string
+    thumbnailPath: string
+  }[]
 }
 
 export type EquipmentType = 'computer' | 'cable' | 'instrument' | 'speaker' | 'light' | 'mixer' | 'microphone' | 'other'
@@ -252,15 +256,34 @@ export class Equipment {
 
     const noteRef = await addDoc(collection(db, 'equipment', this.id, 'notes'), note)
 
-    const attachmentRefs: string[] = []
+    const attachmentRefs: {
+      path: string
+      thumbnailPath?: string
+    }[] = []
     if (attachments) {
       // let i = 0
       // const done: string[] = []
       for (const attachment of attachments) {
         const attachmentRef = ref(storage, `equipment/${this.id}/notes/${noteRef.id}/attachments/${attachment.name}`)
-        attachmentRefs.push(attachmentRef.fullPath)
 
         await uploadBytes(attachmentRef, attachment)
+
+        if (compressableFileTypes.includes(attachment.type)) {
+          const attachmentThumbnailRef = ref(storage, `equipment/${this.id}/notes/${noteRef.id}/attachments/thumbnail_${attachment.name}`)
+
+          await uploadBytes(attachmentThumbnailRef, await compress(attachment, {
+            maxSize: 128
+          }))
+
+          attachmentRefs.push({
+            path: attachmentRef.fullPath,
+            thumbnailPath: attachmentThumbnailRef.fullPath
+          })
+        } else {
+          attachmentRefs.push({
+            path: attachmentRef.fullPath
+          })
+        }
 
         // const uploadTask = uploadBytesResumable(attachmentRef, attachment)
         // await new Promise<void>(resolve => {
@@ -314,7 +337,11 @@ export class Equipment {
     if (note.attachments) {
       const storage = getStorage()
       for (const attachment of note.attachments) {
-        await deleteObject(ref(storage, attachment))
+        await deleteObject(ref(storage, attachment.path))
+
+        if (attachment.thumbnailPath) {
+          await deleteObject(ref(storage, attachment.thumbnailPath))
+        }
       }
     }
 

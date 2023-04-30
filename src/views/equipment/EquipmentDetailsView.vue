@@ -179,7 +179,7 @@
         :key="id"
         :note="notes[id]"
         @options="noteOptions = id"
-        @openImage="openImage"
+        @open="open"
       />
     </TransitionGroup>
 
@@ -423,11 +423,8 @@ async function deleteNote () {
   noteOptions.value = null
 }
 
-function openImage (attachment: {
-  name: string
-  url: string
-}) {
-  window.open(attachment.url, '_blank')
+function open (url: string) {
+  window.open(url, '_blank')
 }
 </script>
 
