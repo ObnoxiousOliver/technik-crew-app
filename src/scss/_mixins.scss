@@ -1,0 +1,43 @@
+@use './vars' as v;
+
+@mixin btnTransparent ($hover: true) {
+  background-color: transparent;
+  color: v.$text-primary;
+
+  @if ($hover) {
+    &:hover:not(:disabled) {
+      background-color: transparent;
+    }
+  }
+}
+
+@mixin btnSquare ($size: 3rem) {
+  width: $size;
+  height: $size;
+  padding: 0;
+}
+
+@mixin btnSmall {
+  font-size: .8rem;
+  padding: 0.5rem .8rem;
+}
+
+@mixin btnChip {
+  @include btnSmall;
+  @include btnTransparent(false);
+  box-shadow: v.$bg-stroke 0 0 0 .1rem inset;
+  
+  &:hover:not(:disabled) {
+    background-color: lighter(v.$bg-secondary, 5);
+    box-shadow: transparent 0 0 0 .1rem inset;
+  }
+  
+  &:focus-visible {
+    box-shadow: v.$focus;
+  }
+}
+
+@mixin box {
+  border-radius: v.$radius;
+  background: v.$bg-secondary;
+}
