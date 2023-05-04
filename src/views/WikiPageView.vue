@@ -5,7 +5,9 @@
         {{ page?.icon }}
       </span>
       <i v-else class="bi-file-earmark-text" />
-      {{ page?.title }}
+      <span class="text-transform-normal">
+        {{ page?.title }}
+      </span>
     </template>
 
     <template #btns>

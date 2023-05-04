@@ -1,6 +1,7 @@
 <template>
-  <Page opaqueTitlebar>
+  <Page>
     <template #title>
+      <!-- <i class="bi-pencil-square" /> -->
       <span v-if="page?.icon">
         {{ page?.icon }}
       </span>
@@ -61,17 +62,7 @@ WikiPage.get(route.params.id as string)
 <style lang="scss" scoped>
 .wiki-page-edit {
   &__editor {
-    // :deep(.editor-panel) {
-    //   position: sticky;
-    //   top: 0;
-    // }
 
-    // :deep(.editor) {
-    //   .ProseMirror {
-    //     min-height: calc(100vh - 20rem);
-    //     padding-bottom: 10rem;
-    //   }
-    // }
   }
 }
 </style>

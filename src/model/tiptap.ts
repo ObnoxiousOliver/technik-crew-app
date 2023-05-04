@@ -1,5 +1,4 @@
 import StarterKit from '@tiptap/starter-kit'
-import { ListItem } from '@tiptap/extension-list-item'
 import { Underline } from '@tiptap/extension-underline'
 import { Subscript } from '@tiptap/extension-subscript'
 import { Superscript } from '@tiptap/extension-superscript'
@@ -13,7 +12,6 @@ export const schema = [
     horizontalRule: false,
     blockquote: false
   }),
-  ListItem,
   Underline,
   Subscript,
   Superscript

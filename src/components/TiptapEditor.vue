@@ -1,11 +1,12 @@
 <template>
-  <EditorContent class="tiptap-editor" :editor="editor" />
+  <div ref="editorEl" class="tiptap-editor" />
 </template>
 
 <script lang="ts" setup>
 import { schema } from '@/model/tiptap'
-import { EditorContent, HTMLContent, JSONContent, useEditor } from '@tiptap/vue-3'
+import { Editor, HTMLContent, JSONContent } from '@tiptap/vue-3'
 import { useVModel } from '@vueuse/core'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 
 const emit = defineEmits(['update:json', 'update:html'])
 const props = defineProps<{
@@ -16,14 +17,19 @@ const props = defineProps<{
 const json = useVModel(props, 'json', emit)
 const html = useVModel(props, 'html', emit)
 
-const editor = useEditor({
-  content: json.value ?? html.value ?? {},
-  extensions: schema,
-  autofocus: true,
-  onUpdate (ctx) {
-    json.value = ctx.editor.getJSON()
-    html.value = ctx.editor.getHTML()
-  }
+const editorEl = ref<HTMLElement>()
+
+let editor: Editor
+onMounted(() => {
+  editor = new Editor({
+    element: editorEl.value,
+    content: json.value ?? html.value ?? {},
+    extensions: schema
+  })
+})
+
+onBeforeUnmount(() => {
+  editor.destroy()
 })
 </script>
 
@@ -33,7 +39,7 @@ const editor = useEditor({
 .tiptap-editor {
   :deep() {
     .ProseMirror {
-      // min-height: calc(100vh - 40rem);
+      min-height: calc(100vh - 40rem);
       // padding: 1rem 1.5rem;
       // margin: 0 -1.5rem;
 
@@ -41,10 +47,10 @@ const editor = useEditor({
         outline: none;
       }
 
-      * {
-        margin: 0;
-        padding: 0;
-      }
+      // * {
+      //   margin: 0;
+      //   padding: 0;
+      // }
 
       p {
         margin-bottom: 0.5rem;
