@@ -1,98 +1,70 @@
 <template>
-  <EditorPanel @itemClick="itemClick" />
-  <EditorContent class="editor" :editor="editor" />
+  <EditorContent class="tiptap-editor" :editor="editor" />
 </template>
 
 <script lang="ts" setup>
-import EditorPanel from '@/components/EditorPanel.vue'
-import { useEditor, EditorContent } from '@tiptap/vue-3'
-import { onMounted } from 'vue'
-import { schema } from '../model/tiptap'
+import { schema } from '@/model/tiptap'
+import { EditorContent, HTMLContent, JSONContent, useEditor } from '@tiptap/vue-3'
+import { useVModel } from '@vueuse/core'
 
-const props = defineProps({
-  modelValue: {
-    type: [Object, String]
-  }
-})
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:json', 'update:html'])
+const props = defineProps<{
+  json?: JSONContent
+  html?: HTMLContent
+}>()
+
+const json = useVModel(props, 'json', emit)
+const html = useVModel(props, 'html', emit)
 
 const editor = useEditor({
-  content: props.modelValue ?? '',
-  extensions: schema
-})
-
-function itemClick (name: string) {
-  if (name.match(/h\d/)) {
-    console.log()
-    editor.value.chain().focus().setHeading({ level: parseInt(name.replace('h', '')) }).run()
-    return
+  content: json.value ?? html.value ?? {},
+  extensions: schema,
+  autofocus: true,
+  onUpdate (ctx) {
+    json.value = ctx.editor.getJSON()
+    html.value = ctx.editor.getHTML()
   }
-  if (name === 'codeBlock') {
-    editor.value.chain().focus().toggleCodeBlock().run()
-    return
-  }
-  if (name === 'ol') {
-    editor.value.chain().focus().toggleOrderedList().run()
-    return
-  }
-  if (name === 'ul') {
-    editor.value.chain().focus().toggleBulletList().run()
-    return
-  }
-  if (name === 'indentLeft') {
-    editor.value.chain().focus().sinkListItem('listItem').run()
-    return
-  }
-  if (name === 'indentRight') {
-    editor.value.chain().focus().liftListItem('listItem').run()
-    return
-  }
-
-  editor.value.chain().focus().toggleMark(name).run()
-}
-
-onMounted(() => {
-  emit('update:modelValue', editor.value.getJSON())
-  editor.value.on('update', ({ editor }) => {
-    emit('update:modelValue', editor.getJSON())
-  })
 })
 </script>
 
 <style lang="scss" scoped>
 @use '../scss' as r;
 
-.editor {
-  background: r.$bg-secondary;
-  border-radius: 0 0 r.$radius r.$radius;
-
-  :deep(.ProseMirror) {
-    padding: 1rem;
-
-    &:focus {
-      outline: none;
-    }
-  }
-
+.tiptap-editor {
   :deep() {
-    p {
-      margin-bottom: 0;
-    }
+    .ProseMirror {
+      // min-height: calc(100vh - 40rem);
+      // padding: 1rem 1.5rem;
+      // margin: 0 -1.5rem;
 
-    h1, h2, h3 {
-      margin-top: 0;
-      margin-bottom: 0.5rem;
-    }
+      &:focus-visible {
+        outline: none;
+      }
 
-    code:not(pre code), pre {
-      background-color: r.$bg-stroke;
-      padding: 0.2rem 0.4rem;
-      border-radius: 0.2rem;
-    }
+      * {
+        margin: 0;
+        padding: 0;
+      }
 
-    ol, ul {
-      margin-top: 0;
-      padding-inline-start: 1rem;
+      p {
+        margin-bottom: 0.5rem;
+      }
+
+      ol, ul {
+        // margin: 1rem 0;
+        padding-left: 1rem;
+      }
+
+      h1, h2, h3 {
+        font-weight: 600;
+        margin-bottom: .5rem;
+      }
+
+      @for $i from 1 through 3 {
+        h#{$i} {
+          font-size: 2rem + 0.5rem - $i * .3rem;
+        }
+      }
     }
   }
 }

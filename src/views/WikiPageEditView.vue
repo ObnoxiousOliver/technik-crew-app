@@ -1,14 +1,5 @@
 <template>
-  <Page
-    opaqueTitlebar
-    :beforeBack="beforeBack"
-    :buttons="[
-      {
-        icon: 'bi-check-lg',
-        onClick: () => save()
-      }
-    ]"
-  >
+  <Page opaqueTitlebar>
     <template #title>
       <span v-if="page?.icon">
         {{ page?.icon }}
@@ -19,11 +10,9 @@
 
     <Spinner v-if="loading" />
 
-    <div class="wiki-page-edit__editor" v-else>
-      <TiptapEditor v-model="content" />
-    </div>
+    <TiptapEditor v-else v-model:json="content" />
 
-    <ActionSheet v-model:show="showConfirmBackSheet">
+    <!-- <ActionSheet v-model:show="showConfirmBackSheet">
       <template #title>
         Ungespeicherte Änderungen
       </template>
@@ -41,57 +30,48 @@
           <i class="bi-x-lg" />Abbrechen
         </ActionSheetButton>
       </template>
-    </ActionSheet>
+    </ActionSheet> -->
   </Page>
 </template>
 
 <script lang="ts" setup>
 import TiptapEditor from '@/components/TiptapEditor.vue'
 import { WikiPage } from '@/model/wiki'
-import { JSONContent } from '@tiptap/core'
-import { ref, onMounted } from 'vue'
+import { JSONContent } from '@tiptap/vue-3'
+import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { back } from '../router'
 
 const route = useRoute()
 const router = useRouter()
-const page = ref<WikiPage>()
-
-const content = ref<JSONContent>(null)
 
 const loading = ref(true)
-onMounted(async () => {
-  page.value = await WikiPage.get(route.params.id)
-  content.value = page.value.content
-  loading.value = false
-})
 
-async function save () {
-  await page.value.setContent(content.value)
-  await router.push({ name: 'wiki-page', params: { id: page.value.id } })
-}
+const page = ref<WikiPage>()
+const content = ref<JSONContent>({})
 
-// TODO: Add beforeBack on navigation event
-const showConfirmBackSheet = ref(false)
-function beforeBack () {
-  showConfirmBackSheet.value = true
-}
+WikiPage.get(route.params.id as string)
+  .then(p => {
+    page.value = p as WikiPage
+    content.value = (p as WikiPage).content ?? {}
+    loading.value = false
+  })
+
 </script>
 
 <style lang="scss" scoped>
 .wiki-page-edit {
   &__editor {
-    :deep(.editor-panel) {
-      position: sticky;
-      top: 0;
-    }
+    // :deep(.editor-panel) {
+    //   position: sticky;
+    //   top: 0;
+    // }
 
-    :deep(.editor) {
-      .ProseMirror {
-        min-height: calc(100vh - 20rem);
-        padding-bottom: 10rem;
-      }
-    }
+    // :deep(.editor) {
+    //   .ProseMirror {
+    //     min-height: calc(100vh - 20rem);
+    //     padding-bottom: 10rem;
+    //   }
+    // }
   }
 }
 </style>
