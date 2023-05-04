@@ -4,6 +4,7 @@ const fs = require('fs')
 
 module.exports = defineConfig({
   transpileDependencies: true,
+  productionSourceMap: false,
   pwa: {
     manifestOptions: {
       icons
