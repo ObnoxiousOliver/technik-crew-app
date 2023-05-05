@@ -22,7 +22,7 @@ import VWave from 'v-wave'
 import { FocusTrap } from 'focus-trap-vue'
 import { initializeApp } from 'firebase/app'
 import { getAuth } from 'firebase/auth'
-import { getFirestore } from 'firebase/firestore'
+import { enableMultiTabIndexedDbPersistence, getFirestore } from 'firebase/firestore'
 import { getStorage } from 'firebase/storage'
 import { createPinia } from 'pinia'
 import 'bootstrap-icons/font/bootstrap-icons.scss'
@@ -40,8 +40,8 @@ const firebaseConfig = {
 }
 const app = initializeApp(firebaseConfig)
 getAuth(app)
-getFirestore(app)
 getStorage(app)
+enableMultiTabIndexedDbPersistence(getFirestore(app))
 // #endregion
 
 // #region Create a Pinia instance
