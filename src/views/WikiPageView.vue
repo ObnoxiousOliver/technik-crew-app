@@ -36,24 +36,22 @@
 
 <script lang="ts" setup>
 import { schema } from '@/model/tiptap'
-import { WikiPage } from '@/model/wiki'
+import { useWiki } from '@/stores/wiki'
 import { generateHTML } from '@tiptap/vue-3'
 import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
 const router = useRouter()
-const page = ref<WikiPage>()
+const wiki = useWiki()
+
+const page = computed(() => wiki.getPageFromId(route.params.id as string))
+const pageIndex = ref(0)
 
 const content = computed(() => {
   if (!page.value?.content) return null
-  return generateHTML(page.value?.content, schema)
+  return generateHTML(page.value?.content[pageIndex.value].content, schema)
 })
-
-WikiPage.get(route.params.id)
-  .then(p => {
-    page.value = p
-  })
 </script>
 
 <style lang="scss" scoped>
@@ -61,9 +59,20 @@ WikiPage.get(route.params.id)
 
 .content {
   word-break: break-word;
+  user-select: text;
 
   &--placeholder {
     color: r.$text-secondary;
+  }
+
+  :deep() {
+    ul {
+      padding-left: 1.5rem;
+    }
+
+    p {
+      padding-bottom: 1px;
+    }
   }
 }
 </style>

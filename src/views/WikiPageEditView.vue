@@ -37,26 +37,36 @@
 
 <script lang="ts" setup>
 import TiptapEditor from '@/components/TiptapEditor.vue'
-import { WikiPage } from '@/model/wiki'
+import { useWiki } from '@/stores/wiki'
 import { JSONContent } from '@tiptap/vue-3'
-import { ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { storeToRefs } from 'pinia'
+import { computed, ref, watchEffect } from 'vue'
+import { useRoute } from 'vue-router'
 
 const route = useRoute()
-const router = useRouter()
 
-const loading = ref(true)
+const wiki = useWiki()
 
-const page = ref<WikiPage>()
-const content = ref<JSONContent>({})
+const { loading } = storeToRefs(wiki)
 
-WikiPage.get(route.params.id as string)
-  .then(p => {
-    page.value = p as WikiPage
-    content.value = (p as WikiPage).content ?? {}
-    loading.value = false
-  })
+const page = computed(() => wiki.getPageFromId(route.params.id as string))
+const pageIndex = ref(0)
+const tabs = ref<{
+  title: string,
+  content: JSONContent[]
+}[]>()
+const content = computed<JSONContent>(() => {
+  if (!tabs.value) return {}
+  return tabs.value[pageIndex.value].content
+})
 
+// Update content when page changes or pageIndex changes
+watchEffect(() => {
+  tabs.value = (page.value?.content as {
+    title: string,
+    content: JSONContent[]
+  }[]) ?? []
+})
 </script>
 
 <style lang="scss" scoped>

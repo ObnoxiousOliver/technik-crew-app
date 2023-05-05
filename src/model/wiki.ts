@@ -2,10 +2,15 @@ import { JSONContent } from '@tiptap/vue-3'
 import { addDoc, collection, doc, getDoc, getDocs, getFirestore, query, setDoc } from 'firebase/firestore'
 import { HistoryState } from './history'
 
+export interface WikiPageTabDB {
+  title: string | null
+  content: JSONContent
+}
+
 export interface WikiPageDB {
   icon: string | null
   title: string
-  content: JSONContent | null
+  content: WikiPageTabDB[] | JSONContent | null
 }
 
 export class WikiPage {
@@ -20,11 +25,21 @@ export class WikiPage {
     return this.page.title
   }
 
-  public get content (): JSONContent | null {
-    return this.page.content
+  public get content (): WikiPageTabDB[] | null {
+    if (Array.isArray(this.page.content)) {
+      return this.page.content
+    } else if (this.page.content) {
+      // Return the content as a single tab
+      return [{
+        title: null,
+        content: this.page.content
+      }]
+    } else {
+      return null
+    }
   }
 
-  private constructor (id: string | null, options: Partial<WikiPageDB>) {
+  constructor (id: string | null, options: Partial<WikiPageDB>) {
     this.id = id
     this.page = {
       icon: options.icon ?? null,
@@ -34,7 +49,11 @@ export class WikiPage {
   }
 
   toDB (): WikiPageDB {
-    return this.page
+    return {
+      icon: this.icon,
+      title: this.title,
+      content: this.content
+    }
   }
 
   async recordHistory <T> (options: Partial<{
@@ -100,11 +119,21 @@ export class WikiPage {
     return page
   }
 
+  /**
+   * Cached wiki pages
+   */
   static cachedPages: {
     // eslint-disable-next-line no-use-before-define
     [id: string]: WikiPage
   } = {}
 
+  /**
+   * Get a wiki page from the database
+   * @param id Optional id of the page to get (if not provided, all pages will be returned)
+   * @param useCache Whether to use the cached version of the page
+   * @returns The wiki page
+   * @deprecated Use the store instead
+   */
   static async get (id?: string, useCache = true) {
     if (useCache) {
       if (id && this.cachedPages[id]) {
