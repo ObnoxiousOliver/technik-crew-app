@@ -23,8 +23,12 @@ let editor: Editor
 onMounted(() => {
   editor = new Editor({
     element: editorEl.value,
-    content: json.value ?? html.value ?? {},
-    extensions: schema
+    content: json.value ?? html.value ?? '',
+    extensions: schema,
+    onUpdate: ({ editor }) => {
+      json.value = editor.getJSON()
+      html.value = editor.getHTML()
+    }
   })
 })
 

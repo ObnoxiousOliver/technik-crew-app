@@ -88,7 +88,7 @@ export class WikiPage {
     return HistoryState.get('wiki', this.id)
   }
 
-  async setContent (content: JSONContent) {
+  async setContent (content: WikiPageTabDB[]) {
     this.page.content = content
     await this.save()
   }

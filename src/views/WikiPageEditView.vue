@@ -9,9 +9,42 @@
       {{ page?.title }}
     </template>
 
+    <template #btns>
+      <Btn @click="save">
+        <i class="bi-check2" />
+      </Btn>
+    </template>
+
     <Spinner v-if="loading" />
 
-    <TiptapEditor v-else v-model:json="content" />
+    <template v-else>
+      <Btn
+        v-for="(tab, i) in tabs"
+        :key="i"
+        @click="pageIndex = i"
+      >
+        {{ tab.title ?? 'Tab ' + (i + 1) }}
+      </Btn>
+      <Btn
+        @click="addTab"
+      >
+        <i class="bi-plus-lg" />
+      </Btn>
+
+      <KeepAlive
+        v-for="(tab, i) in tabs"
+        :key="i"
+      >
+        <TiptapEditor
+          v-if="pageIndex === i"
+          :json="tab.content"
+          @update:json="val => {
+            c.log(val)
+            tabs![i].content = val
+          }"
+        />
+      </KeepAlive>
+    </template>
 
     <!-- <ActionSheet v-model:show="showConfirmBackSheet">
       <template #title>
@@ -37,11 +70,13 @@
 
 <script lang="ts" setup>
 import TiptapEditor from '@/components/TiptapEditor.vue'
+import { WikiPageTabDB } from '@/model/wiki'
 import { useWiki } from '@/stores/wiki'
-import { JSONContent } from '@tiptap/vue-3'
 import { storeToRefs } from 'pinia'
 import { computed, ref, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
+
+const c = window.console
 
 const route = useRoute()
 
@@ -51,22 +86,26 @@ const { loading } = storeToRefs(wiki)
 
 const page = computed(() => wiki.getPageFromId(route.params.id as string))
 const pageIndex = ref(0)
-const tabs = ref<{
-  title: string,
-  content: JSONContent[]
-}[]>()
-const content = computed<JSONContent>(() => {
-  if (!tabs.value) return {}
-  return tabs.value[pageIndex.value].content
+const tabs = ref<WikiPageTabDB[]>()
+
+// Update tabs when page changes
+watchEffect(() => {
+  const clone = (value: object) => JSON.parse(JSON.stringify(value))
+  tabs.value = clone(page.value?.content ?? []) as WikiPageTabDB[]
 })
 
-// Update content when page changes or pageIndex changes
-watchEffect(() => {
-  tabs.value = (page.value?.content as {
-    title: string,
-    content: JSONContent[]
-  }[]) ?? []
-})
+function addTab () {
+  tabs.value?.push({
+    title: null,
+    content: {}
+  })
+  pageIndex.value = (tabs.value?.length ?? 1) - 1
+}
+
+function save () {
+  if (!tabs.value) return
+  page.value?.setContent(tabs.value)
+}
 </script>
 
 <style lang="scss" scoped>

@@ -23,14 +23,26 @@
 
     <Spinner v-if="!page" />
 
-    <div v-else>
+    <template v-else>
+
+      <Btn
+        v-for="(tab, i) in page.content"
+        :key="tab.title"
+        :class="{
+          'btn--active': pageIndex === i
+        }"
+        @click="pageIndex = i"
+      >
+        {{ tab.title ?? 'Tab ' + (i + 1) }}
+      </Btn>
+
       <div v-if="content" class="content" v-html="content" />
       <div v-else class="content--placeholder">
         <p>
           Kein Inhalt
         </p>
       </div>
-    </div>
+    </template>
   </Page>
 </template>
 
@@ -49,8 +61,14 @@ const page = computed(() => wiki.getPageFromId(route.params.id as string))
 const pageIndex = ref(0)
 
 const content = computed(() => {
-  if (!page.value?.content) return null
-  return generateHTML(page.value?.content[pageIndex.value].content, schema)
+  console.log(page.value?.content?.[pageIndex.value])
+  if (!page.value?.content?.[pageIndex.value]) return null
+  try {
+    return generateHTML(page.value.content[pageIndex.value].content, schema)
+  } catch (err) {
+    console.error(err)
+    return null
+  }
 })
 </script>
 
