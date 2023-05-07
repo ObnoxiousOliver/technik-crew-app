@@ -38,6 +38,8 @@ import { TicketDB } from '@/model/ticket'
 import { doc, getDoc, getFirestore } from '@firebase/firestore'
 import { logOnServer } from '@/utilities/log'
 import CodeInput from '@/components/CodeInput.vue'
+import FormContainer from '@/components/FormContainer.vue'
+import FormInfo from '@/components/FormInfo.vue'
 
 const router = useRouter()
 const route = useRoute()

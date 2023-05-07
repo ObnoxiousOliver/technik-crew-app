@@ -70,7 +70,7 @@
           </tr>
           <tr>
             <td>Anzeigename</td>
-            <td><Username :user="showTicket" /></td>
+            <td><UsernameDisplay :user="showTicket" /></td>
           </tr>
         </tbody>
       </table>
@@ -95,6 +95,9 @@ import { TicketDB } from '@/model/ticket'
 import { encryptTicket, invalidateTicket } from '@/utilities/auth'
 import { collection, deleteDoc, doc, getDocs, getFirestore } from '@firebase/firestore'
 import { computed, onMounted, ref } from 'vue'
+import UsernameDisplay from '@/components/UsernameDisplay.vue'
+import ActionSheet from '@/components/ActionSheet.vue'
+import ActionSheetButton from '@/components/ActionSheetButton.vue'
 
 const db = getFirestore()
 const tickets = ref({} as { [key: string]: TicketDB })

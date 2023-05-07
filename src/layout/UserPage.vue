@@ -100,6 +100,7 @@
 </template>
 
 <script lang="ts" setup>
+import InputField from '@/components/InputField.vue'
 import SearchMenu from '@/components/SearchMenu.vue'
 import { back } from '@/router'
 import { onActivated, onDeactivated, ref, watch } from 'vue'

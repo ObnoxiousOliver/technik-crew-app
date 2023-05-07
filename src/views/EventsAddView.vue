@@ -28,13 +28,13 @@
         <label for="oneday">
           Eintägig
         </label>
-        <Toggle id="oneday" v-model="oneday" />
+        <ToggleSwitch id="oneday" v-model="oneday" />
       </FormGroup>
       <FormGroup inline>
         <label for="wholeday">
           Ganztägig
         </label>
-        <Toggle id="wholeday" v-model="wholeday" />
+        <ToggleSwitch id="wholeday" v-model="wholeday" />
       </FormGroup>
       <FormGroup>
         <FormGroup inline>
@@ -168,6 +168,12 @@ import { computed, onBeforeMount, ref, watch } from 'vue'
 import { useEvents } from '@/stores/events'
 import { EventColors } from '@/model/event'
 import { back } from '@/router'
+import ToggleSwitch from '@/components/ToggleSwitch.vue'
+import ActionSheet from '@/components/ActionSheet.vue'
+import ActionSheetButton from '@/components/ActionSheetButton.vue'
+import FormContainer from '@/components/FormContainer.vue'
+import FormGroup from '@/components/FormGroup.vue'
+import FormInfo from '@/components/FormInfo.vue'
 
 const events = useEvents()
 const color = ref<EventColors>('gray')

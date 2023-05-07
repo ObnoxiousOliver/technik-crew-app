@@ -1,7 +1,7 @@
 <template>
   <Page>
     <template #title>
-      Guten morgen, <Username :user="ticketStore.currentTicket" :full="true" />!
+      Guten morgen, <UsernameDisplay :user="ticketStore.currentTicket" :full="true" />!
     </template>
     <form @submit.prevent="submit" class="sign-up-email__form">
       <div>
@@ -42,6 +42,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import FloatingLabelInput from '@/components/FloatingLabelInput.vue'
 import { getAuth, signInWithEmailAndPassword, signOut } from '@firebase/auth'
+import UsernameDisplay from '@/components/UsernameDisplay.vue'
 
 const router = useRouter()
 

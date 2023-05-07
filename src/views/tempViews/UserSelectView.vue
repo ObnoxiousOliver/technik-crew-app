@@ -19,7 +19,7 @@
         @click="selectedUsers[user.username] = !selectedUsers[user.username] ?? true"
       >
         <input type="checkbox" v-model="selectedUsers[user.username]">
-        <Username :user="user" />
+        <UsernameDisplay :user="user" />
       </SettingsListLink>
     </SettingsList>
 
@@ -30,6 +30,7 @@
 <script lang="ts" setup>
 import SettingsList from '@/components/SettingsList.vue'
 import SettingsListLink from '@/components/SettingsListLink.vue'
+import UsernameDisplay from '@/components/UsernameDisplay.vue'
 import { useTemp } from '@/stores/temp'
 import { useUsers } from '@/stores/users'
 import { ref } from 'vue'

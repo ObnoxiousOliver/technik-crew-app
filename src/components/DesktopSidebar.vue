@@ -6,7 +6,7 @@
     }"
   >
     <h2>
-      <Username :user="userStore.user" full />
+      <UsernameDisplay :user="userStore.user" full />
     </h2>
 
     <div class="home-sidebar__list-container">
@@ -56,6 +56,7 @@ import DesktopSidebarBtn from '@/components/DesktopSidebarBtn.vue'
 import { useUser } from '@/stores/user'
 import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import UsernameDisplay from './UsernameDisplay.vue'
 
 const userStore = useUser()
 

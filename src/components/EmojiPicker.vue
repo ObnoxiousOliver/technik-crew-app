@@ -26,6 +26,8 @@
 import { ref } from 'vue'
 import EmojiPicker from 'vue3-emoji-picker'
 import 'vue3-emoji-picker/css'
+import ActionSheetButton from './ActionSheetButton.vue'
+import ActionSheet from './ActionSheet.vue'
 
 const show = ref(false)
 </script>

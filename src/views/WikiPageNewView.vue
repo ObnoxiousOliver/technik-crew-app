@@ -28,6 +28,8 @@
 
 <script lang="ts" setup>
 import FloatingLabelInput from '@/components/FloatingLabelInput.vue'
+import FormContainer from '@/components/FormContainer.vue'
+import FormGroup from '@/components/FormGroup.vue'
 import { WikiPage } from '@/model/wiki'
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'

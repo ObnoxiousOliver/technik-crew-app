@@ -96,6 +96,9 @@ import { EquipmentTypeInfo } from '@/model/equipment'
 import { useLocations } from '@/stores/locations'
 import { Location } from '@/model/location'
 import NotFoundView from '@/views/NotFoundView.vue'
+import FormContainer from '@/components/FormContainer.vue'
+import FormInfo from '@/components/FormInfo.vue'
+import FormGroup from '@/components/FormGroup.vue'
 
 const locStore = useLocations()
 

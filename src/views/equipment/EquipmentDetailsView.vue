@@ -225,6 +225,9 @@ import { useFileDialog, watchOnce } from '@vueuse/core'
 import { compress } from '@/utilities/compress'
 import { createId } from '@/utilities/id'
 import { useToast } from '@/utilities/toast'
+import ActionSheet from '@/components/ActionSheet.vue'
+import ActionSheetButton from '@/components/ActionSheetButton.vue'
+import LocationDisplay from '@/components/LocationDisplay.vue'
 // import QrCreator from 'qr-creator'
 
 const typeInfo = EquipmentTypeInfo

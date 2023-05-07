@@ -3,7 +3,7 @@
     <li class="history-list__item" v-for="entry in history" :key="entry.date">
       <div class="history-list__meta">
         <span class="history-list__author">
-          <Username :user="users.getUserByUsername(entry.author)" />
+          <UsernameDisplay :user="users.getUserByUsername(entry.author)" />
         </span>
         <span class="history-list__date">
           {{ toDateString(new Date(entry.date)) }}
@@ -20,6 +20,7 @@
 import { HistoryState } from '@/model/history'
 import { useUsers } from '@/stores/users'
 import { toDateString } from '@/utilities/date'
+import UsernameDisplay from './UsernameDisplay.vue'
 
 const users = useUsers()
 

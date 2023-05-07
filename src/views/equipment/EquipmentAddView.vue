@@ -16,7 +16,7 @@
         {{ nameErr }}
       </FormInfo>
 
-      <Textbox
+      <TextBox
         label="Beschreibung"
         v-model="description"
       />
@@ -24,7 +24,7 @@
       <FormGroup inline>
         <i :class="categories[type]?.icon ?? categories.other.icon"></i>
 
-        <Dropdown class="fill-width" v-model="type">
+        <DropdownSelection class="fill-width" v-model="type">
           <option value="">
             Kategorie wählen
           </option>
@@ -35,7 +35,7 @@
           >
             {{ item.name }}
           </option>
-        </Dropdown>
+        </DropdownSelection>
       </FormGroup>
 
       <FormInfo :show="typeErr">
@@ -86,6 +86,11 @@ import FloatingLabelInput from '../../components/FloatingLabelInput.vue'
 import { SelectLocationPreset } from '../tempViews/presets'
 import { Location } from '@/model/location'
 import { useLocations } from '@/stores/locations'
+import DropdownSelection from '@/components/DropdownSelection.vue'
+import FormContainer from '@/components/FormContainer.vue'
+import FormInfo from '@/components/FormInfo.vue'
+import FormGroup from '@/components/FormGroup.vue'
+import TextBox from '@/components/TextBox.vue'
 
 const temp = useTemp()
 const locationData = temp.tempRoute(SelectLocationPreset('equipment-add-select-location'))()
