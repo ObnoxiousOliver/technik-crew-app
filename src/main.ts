@@ -26,7 +26,6 @@ import { enableMultiTabIndexedDbPersistence, getFirestore } from 'firebase/fires
 import { getStorage } from 'firebase/storage'
 import { createPinia } from 'pinia'
 import 'bootstrap-icons/font/bootstrap-icons.scss'
-import './registerServiceWorker'
 import './main'
 
 // #region Initialize Firebase

@@ -1,16 +1,16 @@
+require('@rushstack/eslint-patch/modern-module-resolution')
+
 module.exports = {
   root: true,
-  env: {
-    node: true
-  },
   extends: [
     'plugin:vue/vue3-essential',
     '@vue/standard',
+    '@vue/eslint-config-typescript',
     '@vue/typescript/recommended'
   ],
   plugins: ['unused-imports'],
   parserOptions: {
-    ecmaVersion: 2020
+    ecmaVersion: 'latest'
   },
   rules: {
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',

@@ -80,8 +80,8 @@ import { computed } from 'vue'
 import { Permission } from '@/model/permissions'
 import { useDev } from '@/stores/developer'
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const { version } = require('../../../package.json')
+declare const APP_VERSION: string
+const version = APP_VERSION
 
 const router = useRouter()
 const user = useUser()

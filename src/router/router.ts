@@ -97,7 +97,7 @@ export function compileRoutes (routes: AbstractRoute[]): RouteRecordRaw[] | null
 export function createRouter (routes: AbstractRoute[], options: Partial<RouterOptions> = {}) {
   const compiledRoutes = compileRoutes(routes)
   const router = _createRouter({
-    history: options.history ?? createWebHistory(process.env.BASE_URL),
+    history: options.history ?? createWebHistory(),
     routes: compiledRoutes ?? []
   })
 
