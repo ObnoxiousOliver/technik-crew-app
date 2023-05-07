@@ -2,21 +2,21 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import RouterPage from './layout/RouterPage.vue'
 import AppButton from './components/AppButton.vue'
-import InputField from './components/InputField.vue'
-import UsernameDisplay from './components/UsernameDisplay.vue'
-import Dropdown from './components/DropdownSelection.vue'
-import ToggleSwitch from './components/ToggleSwitch.vue'
-import ActionSheet from './components/ActionSheet.vue'
-import ActionSheetButton from './components/ActionSheetButton.vue'
-import ActionSheetDivider from './components/ActionSheetDivider.vue'
 import Spinner from './components/LoadingSpinner.vue'
-import FormContainer from './components/FormContainer.vue'
-import FormInfo from './components/FormInfo.vue'
-import FormGroup from './components/FormGroup.vue'
-import TextBox from './components/TextBox.vue'
-import Slider from './components/InputSlider.vue'
-import LocationDisplay from './components/LocationDisplay.vue'
-import InfoCard from './components/InfoCard.vue'
+// import InputField from './components/InputField.vue'
+// import UsernameDisplay from './components/UsernameDisplay.vue'
+// import Dropdown from './components/DropdownSelection.vue'
+// import ToggleSwitch from './components/ToggleSwitch.vue'
+// import ActionSheet from './components/ActionSheet.vue'
+// import ActionSheetButton from './components/ActionSheetButton.vue'
+// import ActionSheetDivider from './components/ActionSheetDivider.vue'
+// import FormContainer from './components/FormContainer.vue'
+// import FormInfo from './components/FormInfo.vue'
+// import FormGroup from './components/FormGroup.vue'
+// import TextBox from './components/TextBox.vue'
+// import Slider from './components/InputSlider.vue'
+// import LocationDisplay from './components/LocationDisplay.vue'
+// import InfoCard from './components/InfoCard.vue'
 import router from './router'
 import VWave from 'v-wave'
 import { FocusTrap } from 'focus-trap-vue'
@@ -53,21 +53,21 @@ createApp(App)
   .component('FocusTrap', FocusTrap)
   .component('Page', RouterPage)
   .component('Btn', AppButton)
-  .component('InputField', InputField)
-  .component('Dropdown', Dropdown)
-  .component('Toggle', ToggleSwitch)
-  .component('Username', UsernameDisplay)
-  .component('ActionSheet', ActionSheet)
-  .component('ActionSheetButton', ActionSheetButton)
-  .component('ActionSheetDivider', ActionSheetDivider)
   .component('Spinner', Spinner)
-  .component('FormContainer', FormContainer)
-  .component('FormInfo', FormInfo)
-  .component('FormGroup', FormGroup)
-  .component('Textbox', TextBox)
-  .component('Slider', Slider)
-  .component('LocationDisplay', LocationDisplay)
-  .component('InfoCard', InfoCard)
+  // .component('InputField', InputField)
+  // .component('Username', UsernameDisplay)
+  // .component('Dropdown', Dropdown)
+  // .component('Toggle', ToggleSwitch)
+  // .component('ActionSheet', ActionSheet)
+  // .component('ActionSheetButton', ActionSheetButton)
+  // .component('ActionSheetDivider', ActionSheetDivider)
+  // .component('FormContainer', FormContainer)
+  // .component('FormInfo', FormInfo)
+  // .component('FormGroup', FormGroup)
+  // .component('Textbox', TextBox)
+  // .component('Slider', Slider)
+  // .component('LocationDisplay', LocationDisplay)
+  // .component('InfoCard', InfoCard)
   // .use(vfmPlugin())
   .use(VWave, {
     duration: 0.5

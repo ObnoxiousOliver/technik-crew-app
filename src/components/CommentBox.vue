@@ -6,7 +6,7 @@
       'comment-box--has-attachments': shownAttachments?.length ?? 0 > 0,
     }]"
   >
-    <Textbox
+    <TextBox
       class="comment-box__textbox"
       placeholder="Anmerkung hinzufügen"
       v-model="value"
@@ -139,6 +139,7 @@ import reduce from 'image-blob-reduce'
 import GlowDiv from './GlowDiv.vue'
 import { compressableFileTypes } from '@/utilities/compress'
 import FileTypeIcon from './FileTypeIcon.vue'
+import TextBox from './TextBox.vue'
 
 const breakpoint = useBreakpoint()
 

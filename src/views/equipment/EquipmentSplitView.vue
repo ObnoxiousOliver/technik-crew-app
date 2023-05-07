@@ -5,7 +5,7 @@
     </template>
 
     <FormContainer @submit.prevent="submit" :disabled="submitting">
-      <Slider
+      <InputSlider
         type="range"
         v-model="amount"
         :min="0"
@@ -48,6 +48,10 @@
 </template>
 
 <script lang="ts" setup>
+import FormContainer from '@/components/FormContainer.vue'
+import FormGroup from '@/components/FormGroup.vue'
+import InputField from '@/components/InputField.vue'
+import InputSlider from '@/components/InputSlider.vue'
 import { back } from '@/router'
 import { useEquipment } from '@/stores/equipment'
 import { computed, ref, VueElement } from 'vue'

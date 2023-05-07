@@ -39,7 +39,7 @@
       </FormGroup>
       <FormInfo :show="nameError">{{ nameError }}</FormInfo>
 
-      <Dropdown
+      <DropdownSelection
         id="gender"
         v-model="gender"
       >
@@ -47,21 +47,21 @@
         <option value="non-binary">divers</option>
         <option value="male">männlich</option>
         <option value="female">weiblich</option>
-      </Dropdown>
+      </DropdownSelection>
       <FormInfo :show="genderError">{{ genderError }}</FormInfo>
 
       <FormGroup inline>
         <label for="preferLastname">
           Nur Nachname anzeigen:
         </label>
-        <Toggle id="preferLastname" v-model="preferLastname" />
+        <ToggleSwitch id="preferLastname" v-model="preferLastname" />
       </FormGroup>
 
       <FormGroup inline>
         <label>
           Anzeigename:
         </label>
-        <Username
+        <UsernameDisplayVue
           :firstname="firstname"
           :lastname="lastname"
           :gender="gender"
@@ -83,6 +83,11 @@ import { createTicket } from '@/utilities/admin'
 import { doc, getDoc, getFirestore } from '@firebase/firestore'
 import { ref } from 'vue'
 import { back } from '@/router'
+import DropdownSelection from '@/components/DropdownSelection.vue'
+import ToggleSwitch from '@/components/ToggleSwitch.vue'
+import FormContainer from '@/components/FormContainer.vue'
+import FormInfo from '@/components/FormInfo.vue'
+import FormGroup from '@/components/FormGroup.vue'
 
 const db = getFirestore()
 

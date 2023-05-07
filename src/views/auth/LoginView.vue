@@ -56,6 +56,9 @@ import LoginButton from '../../components/LoginButton.vue'
 import { FirebaseError } from 'firebase/app'
 import { useOffline } from '@/utilities/offline'
 import OfflineMessage from '@/components/OfflineMessage.vue'
+import FormContainer from '@/components/FormContainer.vue'
+import FormGroup from '@/components/FormGroup.vue'
+import FormInfo from '@/components/FormInfo.vue'
 
 const router = useRouter()
 

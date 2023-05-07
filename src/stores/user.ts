@@ -6,11 +6,11 @@ import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
 
 export const useUser = defineStore('user', () => {
-  const user = ref(null as null | User)
+  const user = ref<User | null>(null)
   const username = computed(() => user.value?.username)
   const permissions = ref(getDefaultPermissions())
-  const email = ref(null as null | string)
-  const uid = ref(null as null | string)
+  const email = ref<string | null>(null)
+  const uid = ref<string | null>(null)
 
   watch([user, uid], async () => {
     if (user.value) {

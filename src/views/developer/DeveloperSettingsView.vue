@@ -24,7 +24,7 @@
           <code>STRG</code>+<code>SHIFT</code>+<code>D</code>
         </span>
         <template #input>
-          <Toggle id="toggleDevMode" v-model="devModeEnabled" />
+          <ToggleSwitch id="toggleDevMode" v-model="devModeEnabled" />
         </template>
       </SettingsListOption>
 
@@ -40,7 +40,7 @@
           aber du kannst weiterhin geladenen Inhalt aus dem Cache sehen.
         </template>
         <template #input>
-          <Toggle id="forceOfflineMode" v-model="offlineMode" />
+          <ToggleSwitch id="forceOfflineMode" v-model="offlineMode" />
         </template>
       </SettingsListOption>
     </SettingsList>
@@ -76,6 +76,11 @@ import { computed, ref, toRef, watch } from 'vue'
 import SettingsList from '@/components/SettingsList.vue'
 import SettingsListOption from '@/components/SettingsListOption.vue'
 import SettingsListDivider from '@/components/SettingsListDivider.vue'
+import ToggleSwitch from '@/components/ToggleSwitch.vue'
+import ActionSheet from '@/components/ActionSheet.vue'
+import ActionSheetButton from '@/components/ActionSheetButton.vue'
+import ActionSheetDivider from '@/components/ActionSheetDivider.vue'
+import InfoCard from '@/components/InfoCard.vue'
 
 const devMode = useDev()
 watch(toRef(devMode, 'enabled'), (enabled) => {

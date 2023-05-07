@@ -10,7 +10,7 @@
   >
     <div class="equipment-note__head">
       <span class="equipment-note__author">
-        <Username v-if="author" :user="author" />
+        <UsernameDisplay v-if="author" :user="author" />
         <span v-else>
           {{ note?.author }}
         </span>
@@ -44,6 +44,7 @@ import { User } from '@/model/user'
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { toDateString } from '@/utilities/date'
 import NoteAttachment from './NoteAttachment.vue'
+import UsernameDisplay from './UsernameDisplay.vue'
 
 const props = defineProps<{
   note: NoteDB

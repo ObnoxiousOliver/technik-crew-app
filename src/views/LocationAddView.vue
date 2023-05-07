@@ -26,6 +26,8 @@
 
 <script lang="ts" setup>
 import FloatingLabelInput from '@/components/FloatingLabelInput.vue'
+import FormContainer from '@/components/FormContainer.vue'
+import FormInfo from '@/components/FormInfo.vue'
 import TextBox from '@/components/TextBox.vue'
 import { back } from '@/router'
 import { useLocations } from '@/stores/locations'

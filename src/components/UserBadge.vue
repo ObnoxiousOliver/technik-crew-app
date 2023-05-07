@@ -2,7 +2,7 @@
   <div class="user-badge">
     <i class="user-badge__icon bi-person" />
     <div class="user-badge__name">
-      <Username :user="user" :full="true" />
+      <UsernameDisplay :user="user" :full="true" />
     </div>
     <div class="user-badge__info">
       {{ user?.username }} -
@@ -34,6 +34,7 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import UsernameDisplay from './UsernameDisplay.vue'
 
 const router = useRouter()
 

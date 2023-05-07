@@ -2,7 +2,7 @@
   <Btn class="user-badge-btn">
     <div class="user-badge-btn__content">
       <div class="user-badge-btn__name">
-        <Username :user="props.user" full />
+        <UsernameDisplay :user="props.user" full />
       </div>
       <div class="user-badge-btn__username">
         {{ props.user.username }}
@@ -17,6 +17,7 @@
 
 <script lang="ts" setup>
 import { User } from '@/model/user'
+import UsernameDisplay from './UsernameDisplay.vue'
 
 const props = defineProps<{
   user: User

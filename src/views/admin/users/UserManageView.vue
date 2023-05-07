@@ -1,7 +1,7 @@
 <template>
   <Page>
     <template #title>
-      <Username v-if="user" :user="user" :full="true" />
+      <UsernameDisplay v-if="user" :user="user" :full="true" />
       <span v-else>{{ route.params.username.replace('.', ' ') }}</span>
     </template>
 
@@ -92,7 +92,7 @@
               <span v-if="permissions[id] || permissions[Permission.IsAdmin]">Ja</span>
               <span v-else>Nein</span>
             </span>
-            <Toggle
+            <ToggleSwitch
               :id="id"
               v-else
               :modelValue="permissions[id] || permissions[Permission.IsAdmin]"
@@ -211,6 +211,10 @@ import { getAuth, sendPasswordResetEmail } from '@firebase/auth'
 import { doc, getDoc, getFirestore } from '@firebase/firestore'
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
+import UsernameDisplay from '@/components/UsernameDisplay.vue'
+import ToggleSwitch from '@/components/ToggleSwitch.vue'
+import ActionSheet from '@/components/ActionSheet.vue'
+import ActionSheetButton from '@/components/ActionSheetButton.vue'
 
 const db = getFirestore()
 const route = useRoute()

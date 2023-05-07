@@ -10,10 +10,10 @@
       <SettingsListOption for="preferLastname">
         Nur Nachname anzeigen
         <template #desc>
-          Dein Anzeigename: <Username :user="userStore.user" />
+          Dein Anzeigename: <UsernameDisplay :user="userStore.user" />
         </template>
         <template #input>
-          <Toggle id="preferLastname" v-model="preferLastname" />
+          <ToggleSwitch id="preferLastname" v-model="preferLastname" />
         </template>
       </SettingsListOption>
       <SettingsListDivider />
@@ -39,6 +39,8 @@ import UserBadge from '@/components/UserBadge.vue'
 import { useUser } from '@/stores/user'
 import { ref, watch } from 'vue'
 import { getAuth } from '@firebase/auth'
+import UsernameDisplay from '@/components/UsernameDisplay.vue'
+import ToggleSwitch from '@/components/ToggleSwitch.vue'
 
 const userStore = useUser()
 const email = ref(getAuth().currentUser?.email)

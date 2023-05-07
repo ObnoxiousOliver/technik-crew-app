@@ -69,6 +69,9 @@ import { useLocations } from '@/stores/locations'
 import { storeToRefs } from 'pinia'
 import { ref } from 'vue'
 import { useToast } from '@/utilities/toast'
+import ActionSheet from '@/components/ActionSheet.vue'
+import ActionSheetButton from '@/components/ActionSheetButton.vue'
+import ActionSheetDivider from '@/components/ActionSheetDivider.vue'
 
 const locationStore = useLocations()
 

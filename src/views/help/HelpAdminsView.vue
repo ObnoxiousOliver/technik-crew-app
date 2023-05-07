@@ -24,7 +24,7 @@
     <ul v-if="users.admins.length" class="admin-list">
       <li class="admin-list__item" v-for="admin in users.admins" :key="admin.username">
         <i class="bi-person" />
-        <Username :user="admin" :full="true" />
+        <UsernameDisplay :user="admin" :full="true" />
       </li>
     </ul>
     <Spinner v-else />
@@ -32,6 +32,7 @@
 </template>
 
 <script lang="ts" setup>
+import UsernameDisplay from '@/components/UsernameDisplay.vue'
 import { useUsers } from '@/stores/users'
 
 const users = useUsers()

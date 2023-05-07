@@ -53,6 +53,7 @@
 import { Location } from '@/model/location'
 import { search } from '@/utilities/search'
 import { computed, ref } from 'vue'
+import InputField from './InputField.vue'
 
 const emit = defineEmits(['click'])
 

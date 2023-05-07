@@ -137,6 +137,10 @@ import { Equipment, EquipmentTypeInfo } from '@/model/equipment'
 import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import SettingsListLink from './SettingsListLink.vue'
+import ActionSheet from './ActionSheet.vue'
+import ActionSheetButton from './ActionSheetButton.vue'
+import ActionSheetDivider from './ActionSheetDivider.vue'
+import LocationDisplay from './LocationDisplay.vue'
 
 const route = useRoute()
 const emit = defineEmits(['click'])
