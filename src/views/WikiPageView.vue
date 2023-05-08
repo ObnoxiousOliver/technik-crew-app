@@ -25,16 +25,19 @@
 
     <template v-else>
 
-      <Btn
-        v-for="(tab, i) in page.content"
-        :key="tab.title"
-        :class="{
-          'btn--active': pageIndex === i
-        }"
-        @click="pageIndex = i"
+      <DropdownSelection
+        v-if="page.content && (page.content.some(x => x.title) || page.content.length > 1)"
+        v-model="pageIndex"
+        class="tabs"
       >
-        {{ tab.title ?? 'Tab ' + (i + 1) }}
-      </Btn>
+        <option
+          v-for="(tab, index) in page.content"
+          :key="index"
+          :value="index"
+        >
+          {{ tab.title ?? `Seite ${index + 1}` }}
+        </option>
+      </DropdownSelection>
 
       <div v-if="content" class="content" v-html="content" />
       <div v-else class="content--placeholder">
@@ -47,6 +50,7 @@
 </template>
 
 <script lang="ts" setup>
+import DropdownSelection from '@/components/DropdownSelection.vue'
 import { schema } from '@/model/tiptap'
 import { useWiki } from '@/stores/wiki'
 import { generateHTML } from '@tiptap/vue-3'
@@ -74,6 +78,10 @@ const content = computed(() => {
 
 <style lang="scss" scoped>
 @use '../scss' as r;
+
+.tabs {
+  margin: 1rem 0;
+}
 
 .content {
   word-break: break-word;

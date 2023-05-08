@@ -18,18 +18,8 @@
     <Spinner v-if="loading" />
 
     <template v-else>
-      <Btn
-        v-for="(tab, i) in tabs"
-        :key="i"
-        @click="pageIndex = i"
-      >
-        {{ tab.title ?? 'Tab ' + (i + 1) }}
-      </Btn>
-      <Btn
-        @click="addTab"
-      >
-        <i class="bi-plus-lg" />
-      </Btn>
+
+      <TabEdit v-if="tabs" v-model="tabs" v-model:index="pageIndex" />
 
       <KeepAlive
         v-for="(tab, i) in tabs"
@@ -39,9 +29,9 @@
           v-if="pageIndex === i"
           :json="tab.content"
           @update:json="val => {
-            c.log(val)
             tabs![i].content = val
           }"
+          class="wiki-page-edit__editor"
         />
       </KeepAlive>
     </template>
@@ -69,14 +59,14 @@
 </template>
 
 <script lang="ts" setup>
+import TabEdit from '@/components/TabEdit.vue'
 import TiptapEditor from '@/components/TiptapEditor.vue'
 import { WikiPageTabDB } from '@/model/wiki'
+import { back } from '@/router'
 import { useWiki } from '@/stores/wiki'
 import { storeToRefs } from 'pinia'
 import { computed, ref, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
-
-const c = window.console
 
 const route = useRoute()
 
@@ -94,24 +84,17 @@ watchEffect(() => {
   tabs.value = clone(page.value?.content ?? []) as WikiPageTabDB[]
 })
 
-function addTab () {
-  tabs.value?.push({
-    title: null,
-    content: {}
-  })
-  pageIndex.value = (tabs.value?.length ?? 1) - 1
-}
-
 function save () {
   if (!tabs.value) return
   page.value?.setContent(tabs.value)
+
+  back()
 }
 </script>
 
 <style lang="scss" scoped>
 .wiki-page-edit {
   &__editor {
-
   }
 }
 </style>
