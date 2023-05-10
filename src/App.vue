@@ -102,10 +102,11 @@ code {
 
 .bullet-list {
   padding-inline-start: 1rem;
-  margin: 1rem 0;
+  // margin: 1rem 0;
+  line-height: 1.5;
 
   li {
-    margin: 1rem 0;
+    // margin: .5rem 0;
   }
 }
 
