@@ -1,7 +1,7 @@
 <template>
   <div
     :class="['page', {
-      'page--heading-hidden': navigation && !headingVisible,
+      'page--heading-hidden': (navigation && !headingVisible) || props.smallTitle,
       'page--no-navigation': !navigation,
       'page--has-btns': $slots.btns,
       'page--opaque-titlebar': props.opaqueTitlebar,
@@ -25,7 +25,7 @@
     </nav>
     <main ref="scroller" class="page__scroller scroller-padding">
       <h2
-        v-if="$slots.title"
+        v-if="$slots.title && !props.smallTitle"
         class="page__title"
         ref="heading"
       >
@@ -74,7 +74,11 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
-  drop: Function
+  drop: Function,
+  smallTitle: {
+    type: Boolean,
+    default: false
+  }
 })
 
 const { isOverDropZone } = props.drop

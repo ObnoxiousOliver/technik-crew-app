@@ -5,7 +5,9 @@
         {{ page?.icon }}
       </span>
       <i v-else class="bi-file-earmark-text" />
-      {{ page?.title }}
+      <span class="text-transform-normal">
+        {{ page?.title }}
+      </span>
     </template>
 
     <template #btns>
@@ -21,47 +23,92 @@
 
     <Spinner v-if="!page" />
 
-    <div v-else>
+    <template v-else>
+
+      <DropdownSelection
+        v-if="page.content && (page.content.some(x => x.title) || page.content.length > 1)"
+        v-model="pageIndex"
+        class="tabs"
+      >
+        <option
+          v-for="(tab, index) in page.content"
+          :key="index"
+          :value="index"
+        >
+          {{ tab.title ?? `Seite ${index + 1}` }}
+        </option>
+      </DropdownSelection>
+
       <div v-if="content" class="content" v-html="content" />
       <div v-else class="content--placeholder">
         <p>
           Kein Inhalt
         </p>
       </div>
-    </div>
+    </template>
   </Page>
 </template>
 
 <script lang="ts" setup>
+import DropdownSelection from '@/components/DropdownSelection.vue'
 import { schema } from '@/model/tiptap'
-import { WikiPage } from '@/model/wiki'
+import { useWiki } from '@/stores/wiki'
 import { generateHTML } from '@tiptap/vue-3'
 import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
 const router = useRouter()
-const page = ref<WikiPage>()
+const wiki = useWiki()
+
+const page = computed(() => wiki.getPageFromId(route.params.id as string))
+const pageIndex = ref(0)
 
 const content = computed(() => {
-  if (!page.value?.content) return null
-  return generateHTML(page.value?.content, schema)
+  console.log(page.value?.content?.[pageIndex.value])
+  if (!page.value?.content?.[pageIndex.value]) return null
+  try {
+    return generateHTML(page.value.content[pageIndex.value].content, schema)
+  } catch (err) {
+    console.error(err)
+    return null
+  }
 })
-
-WikiPage.get(route.params.id)
-  .then(p => {
-    page.value = p
-  })
 </script>
 
 <style lang="scss" scoped>
 @use '../scss' as r;
 
+.tabs {
+  margin: 1rem 0;
+}
+
 .content {
+  white-space: pre-wrap;
   word-break: break-word;
+  user-select: text;
 
   &--placeholder {
     color: r.$text-secondary;
+  }
+
+  :deep() {
+    ul, ol {
+      padding-left: 1.5rem;
+    }
+
+    // pre {
+    //     code {
+    //       display: block;
+    //       padding: .5rem;
+    //       margin: .5rem 0;
+    //     }
+    //   }
+
+    p {
+      margin: .5rem 0;
+      min-height: 1.5rem;
+    }
   }
 }
 </style>
