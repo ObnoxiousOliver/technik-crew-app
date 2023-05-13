@@ -172,13 +172,14 @@ function removeTab (id: string) {
   &__container {
     position: relative;
     margin-bottom: 1rem;
+    max-height: calc(100vh - 15rem);
+    overflow-y: auto;
   }
 
   &__list {
     display: flex;
     flex-flow: column nowrap;
     gap: 0.5rem;
-    touch-action: none;
     overflow: hidden;
 
     &.tab-edit-enter-active {

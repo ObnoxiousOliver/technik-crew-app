@@ -1,7 +1,8 @@
 <template>
-  <Page>
+  <Page smallTitle>
     <template #title>
       <!-- <i class="bi-pencil-square" /> -->
+      Bearbeite:
       <span v-if="page?.icon">
         {{ page?.icon }}
       </span>
@@ -19,7 +20,12 @@
 
     <template v-else>
 
-      <TabEdit v-if="tabs" v-model="tabs" v-model:index="pageIndex" />
+      <TabEdit
+        class="wiki-page-edit__tabs"
+        v-if="tabs"
+        v-model="tabs"
+        v-model:index="pageIndex"
+      />
 
       <KeepAlive
         v-for="(tab, i) in tabs"
@@ -81,7 +87,7 @@ const tabs = ref<WikiPageTabDB[]>()
 // Update tabs when page changes
 watchEffect(() => {
   const clone = (value: object) => JSON.parse(JSON.stringify(value))
-  tabs.value = clone(page.value?.content ?? []) as WikiPageTabDB[]
+  tabs.value = clone(page.value?.content ?? [{}]) as WikiPageTabDB[]
 })
 
 function save () {
@@ -94,7 +100,9 @@ function save () {
 
 <style lang="scss" scoped>
 .wiki-page-edit {
-  &__editor {
+  &__tabs {
+    position: relative;
+    z-index: 2;
   }
 }
 </style>

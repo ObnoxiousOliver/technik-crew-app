@@ -1,14 +1,21 @@
 <template>
   <Component
     :is="to ? 'router-link' : 'button'"
-    v-wave
+    v-wave="!disabled"
+
+    :tabindex="disabled ? -1 : undefined"
+    :aria-label="props['aria-label']"
+    :disabled="disabled"
+    :aria-disabled="disabled"
+
     :class="['btn', {
       'btn--is-link': !!to,
       'btn--danger': danger,
       'btn--square': square,
       'btn--transparent': transparent,
       'btn--small': small,
-      'btn--chip': chip
+      'btn--chip': chip,
+      'btn--disabled': disabled,
     }]"
     :to="to"
     :type="to ? undefined : (type ?? 'button')"
@@ -33,7 +40,8 @@ const props = defineProps<{
   square?: boolean,
   transparent?: boolean,
   small?: boolean,
-  chip?: boolean
+  chip?: boolean,
+  disabled?: boolean
 }>()
 
 // Check for accessibility
@@ -81,7 +89,8 @@ onMounted(() => {
     box-shadow: r.$focus;
   }
 
-  &:disabled {
+  &.btn--disabled {
+    pointer-events: none;
     cursor: default;
     opacity: 0.5;
   }

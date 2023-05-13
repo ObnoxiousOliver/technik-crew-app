@@ -84,6 +84,7 @@ const content = computed(() => {
 }
 
 .content {
+  white-space: pre-wrap;
   word-break: break-word;
   user-select: text;
 
@@ -92,12 +93,21 @@ const content = computed(() => {
   }
 
   :deep() {
-    ul {
+    ul, ol {
       padding-left: 1.5rem;
     }
 
+    // pre {
+    //     code {
+    //       display: block;
+    //       padding: .5rem;
+    //       margin: .5rem 0;
+    //     }
+    //   }
+
     p {
-      padding-bottom: 1px;
+      margin: .5rem 0;
+      min-height: 1.5rem;
     }
   }
 }
