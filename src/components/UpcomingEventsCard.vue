@@ -44,7 +44,7 @@ import Event from '@/model/event'
 import { toDateString } from '@/utilities/date'
 
 defineProps<{
-  events: Event
+  events: Event[]
 }>()
 
 function getDate (date: number) {

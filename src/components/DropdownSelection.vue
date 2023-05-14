@@ -10,9 +10,9 @@
 <script lang="ts" setup>
 import { ref, watch } from 'vue'
 
-const props = defineProps({
-  modelValue: String
-})
+const props = defineProps<{
+  modelValue: string | number
+}>()
 const emit = defineEmits(['update:modelValue'])
 
 const value = ref(props.modelValue)

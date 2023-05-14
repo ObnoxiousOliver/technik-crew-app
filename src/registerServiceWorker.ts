@@ -18,12 +18,15 @@ if (process.env.NODE_ENV === 'production') {
     },
     updatefound () {
       console.log('New content is downloading.')
+      window.dispatchEvent(new Event('swUpdateFound'))
     },
     updated () {
       console.log('New content is available; please refresh.')
+      window.dispatchEvent(new Event('swUpdated'))
     },
     offline () {
       console.log('No internet connection found. App is running in offline mode.')
+      window.dispatchEvent(new Event('swOffline'))
     },
     error (error) {
       console.error('Error during service worker registration:', error)

@@ -1,6 +1,7 @@
 import { useToast } from '@/utilities/toast'
+import { disableNetwork, enableNetwork, getFirestore } from 'firebase/firestore'
 import { defineStore } from 'pinia'
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, watchEffect } from 'vue'
 
 export const useDev = defineStore('developer', () => {
   const flags = ref<{
@@ -40,7 +41,7 @@ export const useDev = defineStore('developer', () => {
   }
 
   if (ls.flags) {
-    Object.keys(flags.value).forEach((key: string) => {
+    Object.keys(ls.flags).forEach((key: string) => {
       (flags.value as Record<string, boolean>)[key] = !!ls.flags[key]
     })
   }
@@ -50,6 +51,16 @@ export const useDev = defineStore('developer', () => {
     if (e.ctrlKey && e.altKey && e.key === 'D') {
       e.preventDefault()
       enabled.value = !enabled.value
+    }
+  })
+
+  watchEffect(() => {
+    if (enabled.value) {
+      flags.value.forceOfflineMode
+        ? disableNetwork(getFirestore())
+        : enableNetwork(getFirestore())
+    } else {
+      enableNetwork(getFirestore())
     }
   })
 

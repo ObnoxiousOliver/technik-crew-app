@@ -30,7 +30,7 @@ const html = ref('')
 function update () {
   if (!root.value) return
   const clone = root.value.cloneNode(true) as HTMLElement
-  clone.querySelectorAll('& > .glow__glow').forEach((el) => {
+  clone.querySelectorAll('.glow__glow').forEach((el) => {
     el.remove()
   })
   html.value = clone.innerHTML

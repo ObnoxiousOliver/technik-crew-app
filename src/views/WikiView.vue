@@ -73,22 +73,17 @@
 
 <script lang="ts" setup>
 import UserPage from '@/layout/UserPage.vue'
-import { onMounted, ref } from 'vue'
-import { WikiPage } from '../model/wiki'
 import { useRouter } from 'vue-router'
+import { useWiki } from '@/stores/wiki'
+import { storeToRefs } from 'pinia'
 
 const router = useRouter()
-const pages = ref<WikiPage[]>([])
+const wiki = useWiki()
+const { pages, loading } = storeToRefs(wiki)
 
 function isEmoji (s: string) {
   return /\p{Extended_Pictographic}/ug.test(s)
 }
-
-const loading = ref(true)
-onMounted(async () => {
-  pages.value = await WikiPage.get() as WikiPage[]
-  loading.value = false
-})
 </script>
 
 <style lang="scss" scoped>

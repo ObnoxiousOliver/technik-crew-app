@@ -1,15 +1,8 @@
 <template>
-  <Page
-    opaqueTitlebar
-    :beforeBack="beforeBack"
-    :buttons="[
-      {
-        icon: 'bi-check-lg',
-        onClick: () => save()
-      }
-    ]"
-  >
+  <Page smallTitle>
     <template #title>
+      <!-- <i class="bi-pencil-square" /> -->
+      Bearbeite:
       <span v-if="page?.icon">
         {{ page?.icon }}
       </span>
@@ -17,13 +10,39 @@
       {{ page?.title }}
     </template>
 
+    <template #btns>
+      <Btn @click="save">
+        <i class="bi-check2" />
+      </Btn>
+    </template>
+
     <Spinner v-if="loading" />
 
-    <div class="wiki-page-edit__editor" v-else>
-      <TiptapEditor v-model="content" />
-    </div>
+    <template v-else>
 
-    <ActionSheet v-model:show="showConfirmBackSheet">
+      <TabEdit
+        class="wiki-page-edit__tabs"
+        v-if="tabs"
+        v-model="tabs"
+        v-model:index="pageIndex"
+      />
+
+      <KeepAlive
+        v-for="(tab, i) in tabs"
+        :key="i"
+      >
+        <TiptapEditor
+          v-if="pageIndex === i"
+          :json="tab.content"
+          @update:json="val => {
+            tabs![i].content = val
+          }"
+          class="wiki-page-edit__editor"
+        />
+      </KeepAlive>
+    </template>
+
+    <!-- <ActionSheet v-model:show="showConfirmBackSheet">
       <template #title>
         Ungespeicherte Änderungen
       </template>
@@ -41,57 +60,49 @@
           <i class="bi-x-lg" />Abbrechen
         </ActionSheetButton>
       </template>
-    </ActionSheet>
+    </ActionSheet> -->
   </Page>
 </template>
 
 <script lang="ts" setup>
+import TabEdit from '@/components/TabEdit.vue'
 import TiptapEditor from '@/components/TiptapEditor.vue'
-import { WikiPage } from '@/model/wiki'
-import { JSONContent } from '@tiptap/core'
-import { ref, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { back } from '../router'
+import { WikiPageTabDB } from '@/model/wiki'
+import { back } from '@/router'
+import { useWiki } from '@/stores/wiki'
+import { storeToRefs } from 'pinia'
+import { computed, ref, watchEffect } from 'vue'
+import { useRoute } from 'vue-router'
 
 const route = useRoute()
-const router = useRouter()
-const page = ref<WikiPage>()
 
-const content = ref<JSONContent>(null)
+const wiki = useWiki()
 
-const loading = ref(true)
-onMounted(async () => {
-  page.value = await WikiPage.get(route.params.id)
-  content.value = page.value.content
-  loading.value = false
+const { loading } = storeToRefs(wiki)
+
+const page = computed(() => wiki.getPageFromId(route.params.id as string))
+const pageIndex = ref(0)
+const tabs = ref<WikiPageTabDB[]>()
+
+// Update tabs when page changes
+watchEffect(() => {
+  const clone = (value: object) => JSON.parse(JSON.stringify(value))
+  tabs.value = clone(page.value?.content ?? [{}]) as WikiPageTabDB[]
 })
 
-async function save () {
-  await page.value.setContent(content.value)
-  await router.push({ name: 'wiki-page', params: { id: page.value.id } })
-}
+function save () {
+  if (!tabs.value) return
+  page.value?.setContent(tabs.value)
 
-// TODO: Add beforeBack on navigation event
-const showConfirmBackSheet = ref(false)
-function beforeBack () {
-  showConfirmBackSheet.value = true
+  back()
 }
 </script>
 
 <style lang="scss" scoped>
 .wiki-page-edit {
-  &__editor {
-    :deep(.editor-panel) {
-      position: sticky;
-      top: 0;
-    }
-
-    :deep(.editor) {
-      .ProseMirror {
-        min-height: calc(100vh - 20rem);
-        padding-bottom: 10rem;
-      }
-    }
+  &__tabs {
+    position: relative;
+    z-index: 2;
   }
 }
 </style>
