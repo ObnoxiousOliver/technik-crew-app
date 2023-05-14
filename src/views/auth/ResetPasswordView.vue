@@ -44,6 +44,8 @@ import { ref } from 'vue'
 import FloatingLabelInput from '../../components/FloatingLabelInput.vue'
 import { useRoute } from 'vue-router'
 import { FirebaseError } from 'firebase/app'
+import FormContainer from '@/components/FormContainer.vue'
+import FormInfo from '@/components/FormInfo.vue'
 
 const route = useRoute()
 

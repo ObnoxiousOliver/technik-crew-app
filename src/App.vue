@@ -80,6 +80,10 @@ code {
   }
 }
 
+.text-transform-normal {
+  text-transform: none;
+}
+
 .text-secondary {
   color: r.$text-secondary;
 }

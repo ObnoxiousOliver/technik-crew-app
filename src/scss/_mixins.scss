@@ -2,7 +2,7 @@
 
 @mixin btnTransparent ($hover: true) {
   background-color: transparent;
-  color: v.$text-primary;
+  color: inherit;
 
   @if ($hover) {
     &:hover:not(:disabled) {

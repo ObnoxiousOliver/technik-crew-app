@@ -71,7 +71,7 @@ onMounted(() => {
   display: flex;
   overflow: hidden;
   height: 3rem;
-  border-radius: r.$radius;
+  border-radius: 1.5rem;
   background: rgba(r.$bg-secondary, 0.8);
   backdrop-filter: blur(1rem);
   max-width: 20rem;
@@ -118,7 +118,7 @@ onMounted(() => {
         height: 2.2rem;
         transform: translate(-50%, -50%);
         background: r.$text-primary;
-        border-radius: r.$radius;
+        border-radius: 1.1rem;
         box-shadow: white 0 0 5rem;
       }
     }

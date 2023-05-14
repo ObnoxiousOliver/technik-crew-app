@@ -12,7 +12,7 @@
       <FormInfo :show="nameError">
         {{ nameError }}
       </FormInfo>
-      <Dropdown v-model="gender">
+      <DropdownSelection v-model="gender">
         <option :value="Gender.Male">
           männlich
         </option>
@@ -22,12 +22,12 @@
         <option :value="Gender.NonBinary">
           divers
         </option>
-      </Dropdown>
+      </DropdownSelection>
       <FormGroup inline>
         <label for="preferLastname">
           Nur Nachname anzeigen
         </label>
-        <Toggle id="preferLastname" v-model="preferLastname" />
+        <ToggleSwitch id="preferLastname" v-model="preferLastname" />
       </FormGroup>
       <Btn type="submit">
         Speichern
@@ -42,6 +42,11 @@ import { Gender } from '@/model/user'
 import { useUser } from '@/stores/user'
 import { ref } from 'vue'
 import { back } from '@/router'
+import DropdownSelection from '@/components/DropdownSelection.vue'
+import ToggleSwitch from '@/components/ToggleSwitch.vue'
+import FormContainer from '@/components/FormContainer.vue'
+import FormGroup from '@/components/FormGroup.vue'
+import FormInfo from '@/components/FormInfo.vue'
 
 const userStore = useUser()
 

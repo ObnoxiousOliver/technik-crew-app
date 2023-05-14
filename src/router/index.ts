@@ -7,7 +7,7 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
   {
     title: 'Anmelden',
     name: 'login',
-    component: () => import('../views/auth/LoginView.vue'),
+    component: () => import('../views/auth/LoginView.vue' /* webpackChunkName: "login" */),
     requiresAuth: false,
     depth: -1,
     offlineVisible: true,
@@ -18,7 +18,7 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
         title: 'Passwort zurücksetzen',
         name: 'reset-password',
         path: '/reset-password',
-        component: () => import('../views/auth/ResetPasswordView.vue'),
+        component: () => import('../views/auth/ResetPasswordView.vue' /* webpackChunkName: "reset-password" */),
         requiresAuth: null,
         depth: 9999,
         meta: {
@@ -32,19 +32,19 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
         name: 'sign-up-code',
         alias: '/sign-up',
         path: '/sign-up/code/:code?',
-        component: () => import('../views/auth/signUp/EnterCodeView.vue'),
+        component: () => import('../views/auth/signUp/EnterCodeView.vue' /* webpackChunkName: "sign-up-code" */),
 
         children: [
           {
             name: 'sign-up-email',
             path: '/sign-up/email',
-            component: () => import('../views/auth/signUp/EnterEmailView.vue'),
+            component: () => import('../views/auth/signUp/EnterEmailView.vue' /* webpackChunkName: "sign-up-email" */),
 
             children: [
               {
                 name: 'sign-up-password',
                 path: '/sign-up/password',
-                component: () => import('../views/auth/signUp/EnterPasswordView.vue')
+                component: () => import('../views/auth/signUp/EnterPasswordView.vue' /* webpackChunkName: "sign-up-password" */)
               }
             ]
           }
@@ -57,7 +57,7 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
   {
     title: 'Wiki',
     name: 'wiki',
-    component: () => import('../views/WikiView.vue'),
+    component: () => import('../views/WikiView.vue' /* webpackChunkName: "wiki" */),
     requiresAuth: true,
     offlineVisible: true,
 
@@ -65,13 +65,13 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
       {
         name: 'wiki-page',
         pathName: '/:id',
-        component: () => import('../views/WikiPageView.vue'),
+        component: () => import('../views/WikiPageView.vue' /* webpackChunkName: "wiki-page" */),
 
         children: [
           {
             name: 'wiki-page-edit',
             pathName: '/edit',
-            component: () => import('../views/WikiPageEditView.vue')
+            component: () => import('../views/WikiPageEditView.vue' /* webpackChunkName: "wiki-page-edit" */)
           }
         ]
       },
@@ -88,7 +88,7 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
   {
     title: 'Termine',
     name: 'events',
-    component: () => import('../views/EventsView.vue'),
+    component: () => import('../views/EventsView.vue' /* webpackChunkName: "events" */),
     requiresAuth: true,
     offlineVisible: true,
 
@@ -97,13 +97,13 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
         title: 'Neuer Termin',
         name: 'events-add',
         pathName: 'add',
-        component: () => import('../views/EventsAddView.vue')
+        component: () => import('../views/EventsAddView.vue' /* webpackChunkName: "events-add" */)
       },
       {
         title: 'Termin',
         name: 'events-detail',
         pathName: '/:id',
-        component: () => import('../views/EventsView.vue')
+        component: () => import('../views/EventsView.vue' /* webpackChunkName: "events-detail" */)
       }
     ]
   },
@@ -113,7 +113,7 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
     title: 'Dashboard',
     name: 'dashboard',
     alias: '/',
-    component: () => import('../views/DashboardView.vue'),
+    component: () => import('../views/DashboardView.vue' /* webpackChunkName: "dashboard" */),
     requiresAuth: true,
     offlineVisible: true
   },
@@ -123,7 +123,7 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
     title: 'Equipment',
     name: 'equipment',
     path: '/equipment',
-    component: () => import('../views/equipment/EquipmentView.vue'),
+    component: () => import('../views/equipment/EquipmentView.vue' /* webpackChunkName: "equipment" */),
     requiresAuth: true,
     offlineVisible: true,
 
@@ -132,34 +132,34 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
         title: 'Neues Equipment',
         name: 'equipment-add',
         pathName: 'add',
-        component: () => import('../views/equipment/EquipmentAddView.vue')
+        component: () => import('../views/equipment/EquipmentAddView.vue' /* webpackChunkName: "equipment-add" */)
       },
       {
         title: 'Equipment Details',
         name: 'equipment-details',
         path: '/equipment/:id',
-        component: () => import('../views/equipment/EquipmentDetailsView.vue'),
+        component: () => import('../views/equipment/EquipmentDetailsView.vue' /* webpackChunkName: "equipment-details" */),
         offlineVisible: true,
         children: [
           {
             title: 'Equipment Verlauf',
             name: 'equipment-history',
             path: '/equipment/:id/history',
-            component: () => import('../views/equipment/EquipmentHistoryView.vue'),
+            component: () => import('../views/equipment/EquipmentHistoryView.vue' /* webpackChunkName: "equipment-history" */),
             offlineVisible: true
           },
           {
             title: 'Equipment bearbeiten',
             name: 'equipment-edit',
             path: '/equipment/:id/edit/:field?',
-            component: () => import('../views/equipment/EquipmentEditView.vue'),
+            component: () => import('../views/equipment/EquipmentEditView.vue' /* webpackChunkName: "equipment-edit" */),
 
             children: [
               {
                 title: 'Standort ändern',
                 name: 'equipment-edit-location',
                 path: '/equipment/:id/edit/location',
-                component: () => import('../views/equipment/EquipmentEditLocationView.vue')
+                component: () => import('../views/equipment/EquipmentEditLocationView.vue' /* webpackChunkName: "equipment-edit-location" */)
               }
             ]
           },
@@ -167,7 +167,7 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
             title: 'Equipment Anzahl Teilen',
             name: 'equipment-split',
             path: '/equipment/:id/split',
-            component: () => import('../views/equipment/EquipmentSplitView.vue')
+            component: () => import('../views/equipment/EquipmentSplitView.vue' /* webpackChunkName: "equipment-split" */)
           }
         ]
       },
@@ -175,7 +175,7 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
         title: 'Equipment Code Scannen',
         name: 'equipment-scan',
         pathName: '/scan',
-        component: () => import('../views/equipment/EquipmentScanView.vue')
+        component: () => import('../views/equipment/EquipmentScanView.vue' /* webpackChunkName: "equipment-scan" */)
       },
 
       // Locations
@@ -183,25 +183,25 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
         title: 'Standorte',
         name: 'locations',
         path: '/locations',
-        component: () => import('../views/LocationsView.vue'),
+        component: () => import('../views/LocationsView.vue' /* webpackChunkName: "locations" */),
         children: [
           {
             title: 'Neuer Standort',
             name: 'location-add',
             path: '/locations/add',
-            component: () => import('../views/LocationAddView.vue')
+            component: () => import('../views/LocationAddView.vue' /* webpackChunkName: "location-add" */)
           },
           {
             title: 'Standort bearbeiten',
             name: 'location-edit',
             path: '/locations/:id',
-            component: () => import('../views/LocationEditView.vue')
+            component: () => import('../views/LocationEditView.vue' /* webpackChunkName: "location-edit" */)
           },
           {
             title: 'Standortverlauf',
             name: 'location-history',
             path: '/locations/:id/history',
-            component: () => import('../views/LocationHistoryView.vue')
+            component: () => import('../views/LocationHistoryView.vue' /* webpackChunkName: "location-history" */)
           }
         ]
       }
@@ -214,7 +214,7 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
     title: 'Einstellungen',
     name: 'settings',
     path: '/settings',
-    component: () => import('../views/settings/SettingsView.vue'),
+    component: () => import('../views/settings/SettingsView.vue' /* webpackChunkName: "settings" */),
     requiresAuth: true,
     backPath: '/dashboard',
     offlineVisible: true,
@@ -228,20 +228,20 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
         title: 'Profil',
         name: 'profile',
         path: '/settings/profile',
-        component: () => import('../views/settings/profile/ProfileView.vue'),
+        component: () => import('../views/settings/profile/ProfileView.vue' /* webpackChunkName: "profile" */),
 
         children: [
           {
             title: 'Profil bearbeiten',
             name: 'profile-edit',
             path: '/settings/profile/edit',
-            component: () => import('../views/settings/profile/ProfileEditView.vue')
+            component: () => import('../views/settings/profile/ProfileEditView.vue' /* webpackChunkName: "profile-edit" */)
           },
           {
             title: 'E-Mail Adresse ändern',
             name: 'profile-email',
             path: '/settings/profile/email',
-            component: () => import('../views/settings/profile/ProfileEmailView.vue')
+            component: () => import('../views/settings/profile/ProfileEmailView.vue' /* webpackChunkName: "profile-email" */)
           }
         ]
       },
@@ -252,7 +252,7 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
         name: 'dev-settings',
         pathName: '/dev',
         validate: () => useDev().enabled,
-        component: () => import('../views/developer/DeveloperSettingsView.vue'),
+        component: () => import('../views/developer/DeveloperSettingsView.vue' /* webpackChunkName: "dev-settings" */),
         offlineVisible: true
       },
 
@@ -262,7 +262,7 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
         title: 'Tickets',
         name: 'tickets',
         path: '/admin/tickets',
-        component: () => import('../views/admin/tickets/TicketsView.vue'),
+        component: () => import('../views/admin/tickets/TicketsView.vue' /* webpackChunkName: "tickets" */),
         requiresPermission: Permission.ManageTickets,
 
         children: [
@@ -270,7 +270,7 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
             title: 'Ticket erstellen',
             name: 'ticket-create',
             path: '/admin/tickets/create',
-            component: () => import('../views/admin/tickets/TicketCreateView.vue')
+            component: () => import('../views/admin/tickets/TicketCreateView.vue' /* webpackChunkName: "ticket-create" */)
           }
         ]
       },
@@ -280,7 +280,7 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
         title: 'Benutzer verwalten',
         name: 'users',
         path: '/admin/users',
-        component: () => import('../views/admin/users/UsersView.vue'),
+        component: () => import('../views/admin/users/UsersView.vue' /* webpackChunkName: "users" */),
         requiresAuth: true,
         requiresPermission: Permission.ManageUsers,
 
@@ -289,7 +289,7 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
             title: 'Benutzer verwalten',
             name: 'user-manage',
             path: '/admin/users/:username',
-            component: () => import('../views/admin/users/UserManageView.vue'),
+            component: () => import('../views/admin/users/UserManageView.vue' /* webpackChunkName: "user-manage" */),
             requiresAuth: true
           }
         ]
@@ -301,7 +301,7 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
   {
     title: 'Hilfe',
     name: 'help',
-    component: () => import('../views/help/HelpView.vue'),
+    component: () => import('../views/help/HelpView.vue' /* webpackChunkName: "help" */),
     offlineVisible: true,
     depth: 99999,
 
@@ -311,7 +311,7 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
         title: 'Offline Modus',
         name: 'help-offline',
         pathName: '/offline',
-        component: () => import('../views/help/HelpOfflineView.vue')
+        component: () => import('../views/help/HelpOfflineView.vue' /* webpackChunkName: "help-offline" */)
       },
 
       // Who are the admins
@@ -319,7 +319,7 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
         title: 'Wer sind die Admins?',
         name: 'help-admins',
         pathName: '/admins',
-        component: () => import('../views/help/HelpAdminsView.vue')
+        component: () => import('../views/help/HelpAdminsView.vue' /* webpackChunkName: "help-admins" */)
       }
     ]
   },
@@ -328,7 +328,7 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
   {
     name: '404',
     path: '/:pathMatch(.*)*',
-    component: () => import('../views/NotFoundView.vue'),
+    component: () => import('../views/NotFoundView.vue' /* webpackChunkName: "not-found" */),
     depth: Infinity,
     backPath: null,
     offlineVisible: true,

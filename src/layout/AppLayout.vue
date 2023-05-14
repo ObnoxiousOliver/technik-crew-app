@@ -40,7 +40,7 @@
       v-slot="{ Component }"
     >
       <template v-if="Component">
-        <Transition :name="route.meta.transitionName">
+        <Transition :name="route.meta.transitionName as (string | undefined)">
           <Component :is="Component" />
         </Transition>
       </template>
