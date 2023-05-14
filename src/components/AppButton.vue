@@ -16,6 +16,7 @@
       'btn--small': small,
       'btn--chip': chip,
       'btn--disabled': disabled,
+      'btn--accent': accent
     }]"
     :to="to"
     :type="to ? undefined : (type ?? 'button')"
@@ -41,7 +42,8 @@ const props = defineProps<{
   transparent?: boolean,
   small?: boolean,
   chip?: boolean,
-  disabled?: boolean
+  disabled?: boolean,
+  accent?: boolean,
 }>()
 
 // Check for accessibility
@@ -132,6 +134,13 @@ onMounted(() => {
 
     &:focus-visible {
       box-shadow: r.$focus-danger;
+    }
+  }
+  &.btn--accent {
+    background: rgba(r.$accent, .05);
+    color: r.$accent;
+    &:hover:not(:disabled) {
+      background: rgba(r.$accent, .1);
     }
   }
 }
