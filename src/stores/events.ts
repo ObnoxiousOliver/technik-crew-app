@@ -12,6 +12,17 @@ export const useEvents = defineStore('events', () => {
     events.value.push(await Event.create(options))
   }
 
+  async function getById (id: string) {
+    let e: Event = events.value.find(x => x.id === id) as Event
+    if (e) return e
+
+    e = await Event.get(id)
+    if (e) {
+      events.value.push(e)
+      return e
+    }
+  }
+
   // Load and save events to local storage
   watch([events, upcoming], () => {
     // Clear duplicates
@@ -143,6 +154,7 @@ export const useEvents = defineStore('events', () => {
     upcoming,
     create,
     setSubscribingMonth,
-    fetchUpcoming
+    fetchUpcoming,
+    getById
   }
 })

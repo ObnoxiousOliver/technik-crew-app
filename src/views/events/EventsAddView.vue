@@ -365,7 +365,7 @@ function reset () {
 </script>
 
 <style lang="scss" scoped>
-@use '../scss' as r;
+@use '../../scss' as r;
 
 .events-add {
   &__name {

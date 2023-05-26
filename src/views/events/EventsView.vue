@@ -48,9 +48,9 @@
 </template>
 
 <script lang="ts" setup>
-import DateSelect from '../components/DateSelect.vue'
-import UserPage from '../layout/UserPage.vue'
-import EventCalendar from '../components/EventCalendar.vue'
+import DateSelect from '@/components/DateSelect.vue'
+import UserPage from '@/layout/UserPage.vue'
+import EventCalendar from '@/components/EventCalendar.vue'
 import { useEvents } from '@/stores/events'
 import { computed, ref, watch } from 'vue'
 
@@ -85,7 +85,7 @@ function prev () {
 </script>
 
 <style lang="scss" scoped>
-@use '../scss' as r;
+@use '../../scss' as r;
 
 .events-view {
   &__btns {

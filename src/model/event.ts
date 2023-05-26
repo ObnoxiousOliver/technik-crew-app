@@ -234,7 +234,9 @@ export default class Event {
     return events
   }
 
-  static async get (id?: string) {
+  static async get (id: undefined): Promise<Event[]>
+  static async get (id: string): Promise<Event>
+  static async get (id: string | undefined) {
     const db = getFirestore()
     if (id) {
       const event = await getDoc(doc(db, 'events', id))

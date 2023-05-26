@@ -8,7 +8,7 @@
     :time-format-options="{ hour: 'numeric', minute: '2-digit' }"
     :items="items"
     class="calendar theme-default"
-    @itemClick="itemClick"
+    @click-item="itemClick"
   >
     <template #header>
     </template>
@@ -21,11 +21,13 @@ import 'vue-simple-calendar/dist/style.css'
 import { ICalendarItem as CalendarItem } from 'vue-simple-calendar/dist/src/ICalendarItem'
 import { EventDB } from '../model/event'
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 
 const props = defineProps({
   events: Array,
   date: Date
 })
+const router = useRouter()
 
 const items = computed((): CalendarItem[] => props.events
   ?.map((e: EventDB): CalendarItem => ({
@@ -50,7 +52,7 @@ function getDate (dateNumber: number, wholeDay: boolean): string {
 }
 
 function itemClick (item: CalendarItem) {
-  console.log(item)
+  router.push({ name: 'events-details', params: { id: item.id } })
 }
 </script>
 

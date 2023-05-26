@@ -88,7 +88,7 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
   {
     title: 'Termine',
     name: 'events',
-    component: () => import('../views/EventsView.vue' /* webpackChunkName: "events" */),
+    component: () => import('../views/events/EventsView.vue' /* webpackChunkName: "events" */),
     requiresAuth: true,
     offlineVisible: true,
 
@@ -97,13 +97,13 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
         title: 'Neuer Termin',
         name: 'events-add',
         pathName: 'add',
-        component: () => import('../views/EventsAddView.vue' /* webpackChunkName: "events-add" */)
+        component: () => import('../views/events/EventsAddView.vue' /* webpackChunkName: "events-add" */)
       },
       {
         title: 'Termin',
-        name: 'events-detail',
+        name: 'events-details',
         pathName: '/:id',
-        component: () => import('../views/EventsView.vue' /* webpackChunkName: "events-detail" */)
+        component: () => import('../views/events/EventDetailView.vue' /* webpackChunkName: "events-detail" */)
       }
     ]
   },

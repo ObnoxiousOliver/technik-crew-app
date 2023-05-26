@@ -1,7 +1,7 @@
 export interface DateStringOptions {
   daysAgoThreshold?: boolean | number
   weekday?: 'long' | 'short' | 'narrow'
-  year?: 'numeric' | '2-digit'
+  year?: 'numeric' | '2-digit' | 'auto'
   month?: 'numeric' | '2-digit' | 'long' | 'short' | 'narrow'
   day?: 'numeric' | '2-digit'
   hour?: 'numeric' | '2-digit'
@@ -75,7 +75,11 @@ export function toDateString (date: Date, options: DateStringOptions = {}) {
       str += date.toLocaleDateString('de-DE', {
         day: opt.day,
         month: opt.month,
-        year: opt.year
+        year: opt.year === 'auto'
+          ? date.getFullYear() !== now.getFullYear()
+            ? 'numeric'
+            : undefined
+          : opt.year
       })
     }
   }
