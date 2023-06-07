@@ -100,10 +100,30 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
         component: () => import('../views/events/EventsAddView.vue' /* webpackChunkName: "events-add" */)
       },
       {
+        title: 'Terminarchiv',
+        name: 'events-archive',
+        pathName: 'archive',
+        component: () => import('../views/events/EventsArchiveView.vue' /* webpackChunkName: "events-archive" */)
+      },
+      {
         title: 'Termin',
         name: 'events-details',
         pathName: '/:id',
-        component: () => import('../views/events/EventDetailView.vue' /* webpackChunkName: "events-detail" */)
+        component: () => import('../views/events/EventsDetailView.vue' /* webpackChunkName: "events-detail" */),
+        children: [
+          {
+            title: 'Termin bearbeiten',
+            name: 'events-edit',
+            pathName: '/edit/:field?',
+            component: () => import('../views/events/EventsEditView.vue' /* webpackChunkName: "events-edit" */)
+          },
+          {
+            title: 'Termin Teilnehmer',
+            name: 'events-history',
+            pathName: '/history',
+            component: () => import('../views/events/EventsHistoryView.vue' /* webpackChunkName: "events-history" */)
+          }
+        ]
       }
     ]
   },

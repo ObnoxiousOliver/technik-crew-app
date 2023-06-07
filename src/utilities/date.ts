@@ -51,11 +51,11 @@ export function toDateString (date: Date, options: DateStringOptions = {}) {
   }
   let str = ''
 
-  if (diffDays === 0) {
+  if (diffDays === 0 && opt.daysAgoThreshold !== false) {
     str += 'heute'
-  } else if (diffDays === 1) {
+  } else if (diffDays === 1 && opt.daysAgoThreshold !== false) {
     str += 'gestern'
-  } else if (diffDays === 2) {
+  } else if (diffDays === 2 && opt.daysAgoThreshold !== false) {
     str += 'vorgestern'
   } else {
     if (opt.weekday) {

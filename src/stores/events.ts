@@ -3,13 +3,26 @@ import { useOffline } from '@/utilities/offline'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { defineStore } from 'pinia'
 import { ref, watch } from 'vue'
+import { search as s } from '@/utilities/search'
 
 export const useEvents = defineStore('events', () => {
   const events = ref([] as Event[])
   const upcoming = ref([] as Event[])
 
   async function create (options: Partial<EventDB>) {
-    events.value.push(await Event.create(options))
+    await Event.create(options)
+  }
+
+  async function deleteEvent (id: string) {
+    const event = events.value.find(x => x.id === id)
+
+    if (event) {
+      await Event.delete(id)
+    }
+  }
+
+  function search (query: string) {
+    return s(query, events.value.filter(x => !x.hidden), (x) => `${x.name} ${x.description} ${x.id}`)
   }
 
   async function getById (id: string) {
@@ -46,7 +59,7 @@ export const useEvents = defineStore('events', () => {
     now.setHours(0, 0, 0, 0)
 
     // Get events that are already in the list
-    const ue = events.value.filter(x => x.startDate >= now.getTime())
+    const ue = events.value.filter(x => x.startDate >= now.getTime() && !x.hidden)
 
     if (ue.length >= 5 || useOffline().value) {
       ue.sort((a, b) => a.startDate - b.startDate)
@@ -87,9 +100,7 @@ export const useEvents = defineStore('events', () => {
     if (useOffline().value) return
 
     console.log('Updating month subscription', `(${date.getMonth() + 1}/${date.getFullYear()})`)
-    if (unsubscribe) {
-      unsubscribe()
-    }
+    unsubscribe?.()
 
     await fetchMonth(date)
     unsubscribe = Event.subscribeMonth(date, (change) => {
@@ -123,7 +134,7 @@ export const useEvents = defineStore('events', () => {
     if (useOffline().value) return
 
     const monthEvents = await Event.getMonth(date)
-    events.value = events.value.filter(x => !x.months.includes(`${date.getFullYear()}-${date.getMonth() + 1}`))
+    events.value = events.value.filter(x => !x.months.includes(Event.dateToMonthString(date)))
     monthEvents.forEach(x => {
       if (!events.value.find(y => y.id === x.id)) {
         events.value.push(x)
@@ -155,6 +166,8 @@ export const useEvents = defineStore('events', () => {
     create,
     setSubscribingMonth,
     fetchUpcoming,
-    getById
+    getById,
+    search,
+    delete: deleteEvent
   }
 })

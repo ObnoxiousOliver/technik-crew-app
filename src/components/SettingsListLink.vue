@@ -60,7 +60,11 @@ const props = defineProps({
 
   &__content {
     height: 100%;
+    width: 0;
     flex: 1 1 auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 
     :deep(i) {
       margin-right: 1rem;

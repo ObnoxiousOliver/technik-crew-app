@@ -19,18 +19,18 @@
 import { CalendarView } from 'vue-simple-calendar'
 import 'vue-simple-calendar/dist/style.css'
 import { ICalendarItem as CalendarItem } from 'vue-simple-calendar/dist/src/ICalendarItem'
-import { EventDB } from '../model/event'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
+import Event from '@/model/event'
 
-const props = defineProps({
-  events: Array,
+const props = defineProps<{
+  events: Event[],
   date: Date
-})
+}>()
 const router = useRouter()
 
-const items = computed((): CalendarItem[] => props.events
-  ?.map((e: EventDB): CalendarItem => ({
+const items = computed(() => props.events
+  ?.filter(e => e.hidden !== true && e.id).map((e) => ({
     id: e.id,
     title: e.name || 'Unbenannter Termin',
     startDate: getDate(e.startDate, e.wholeDay),

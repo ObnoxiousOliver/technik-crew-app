@@ -16,6 +16,8 @@
       ref="input"
       :disabled="disabled"
       @change="onChange"
+      @keydown="onChange"
+      @keydown.enter="enter"
       @focus="focused = true"
       @blur="focused = false"
       :type="type === 'number' ? 'text' : type"
@@ -34,7 +36,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 const focused = ref(false)
 const input = ref(null as HTMLInputElement | null)
 
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue', 'submit'])
 
 const props = defineProps<{
   disabled?: boolean
@@ -82,6 +84,12 @@ watch(() => props.modelValue, (val) => {
 function onChange (e: InputEvent) {
   value.value = (e.target as HTMLInputElement).value
   input.value.value = value.value
+}
+
+async function enter () {
+  setTimeout(() => {
+    emit('submit', input.value.value)
+  })
 }
 
 onMounted(() => {
