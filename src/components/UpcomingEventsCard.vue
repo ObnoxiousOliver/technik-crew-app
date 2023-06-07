@@ -13,7 +13,7 @@
         <RouterLink
           class="upcoming-events__event-link"
           v-wave
-          :to="{ name: 'events-detail', params: { id: event.id } }"
+          :to="{ name: 'events-details', params: { id: event.id } }"
         >
           <div :class="['upcoming-events__event-link__color', 'upcoming-events__event-link__color--' + event.color ?? 'gray']"></div>
           <div class="upcoming-events__event-link__name">

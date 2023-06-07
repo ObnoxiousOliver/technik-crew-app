@@ -102,6 +102,11 @@ code {
 
 .prewrap {
   white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.nowrap {
+  white-space: nowrap;
 }
 
 .bullet-list {

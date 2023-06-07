@@ -6,15 +6,15 @@
     </template>
 
     <HistoryList v-if="history" :history="history" />
-
-    <OfflineMessage v-else not-loaded />
+    <OfflineMessage v-else-if="offline" not-loaded />
+    <Spinner v-else-if="loading" />
   </Page>
 </template>
 
 <script lang="ts" setup>
 import { useEquipment } from '@/stores/equipment'
 import { logOnServer } from '@/utilities/log'
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import HistoryList from '../../components/HistoryList.vue'
 import NotFoundView from '../NotFoundView.vue'
@@ -33,6 +33,7 @@ const history = computed({
   set: (value) => value && equipment.value?.id && useHistory().set('equipment', equipment.value.id, value)
 })
 
+const loading = ref(true)
 onMounted(async () => {
   if (offline.value) return
 
@@ -41,5 +42,6 @@ onMounted(async () => {
       logOnServer('Error in equipment history:', err)
       return []
     }) ?? null
+  loading.value = false
 })
 </script>

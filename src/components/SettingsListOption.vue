@@ -48,6 +48,7 @@ const props = defineProps({
 
   &__label {
     flex: 1 1 auto;
+    width: 0;
     line-height: 1.25;
   }
 

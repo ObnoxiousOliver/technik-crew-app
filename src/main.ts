@@ -22,12 +22,12 @@ import VWave from 'v-wave'
 import { FocusTrap } from 'focus-trap-vue'
 import { initializeApp } from 'firebase/app'
 import { getAuth } from 'firebase/auth'
-import { enableMultiTabIndexedDbPersistence, getFirestore } from 'firebase/firestore'
 import { getStorage } from 'firebase/storage'
 import { createPinia } from 'pinia'
 import 'bootstrap-icons/font/bootstrap-icons.scss'
 import './registerServiceWorker'
 import './main'
+import { enableMultiTabIndexedDbPersistence, getFirestore } from 'firebase/firestore'
 
 // #region Initialize Firebase
 const firebaseConfig = {
