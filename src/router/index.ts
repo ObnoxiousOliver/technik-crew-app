@@ -220,6 +220,12 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
         name: 'inventory-create',
         pathName: 'create',
         component: () => import('../views/inventory/InventoryCreateView.vue' /* webpackChunkName: "inventory-create" */)
+      },
+      {
+        title: 'Kollektion',
+        name: 'inventory-collection',
+        pathName: '/:id',
+        component: () => import('../views/inventory/InventoryCollectionView.vue' /* webpackChunkName: "inventory-collection" */)
       }
     ]
   },

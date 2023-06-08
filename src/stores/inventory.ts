@@ -11,6 +11,10 @@ export const useInventory = defineStore('inventory', () => {
     return Collection.create(name, description, fields)
   }
 
+  function getCollectionById (id: string) {
+    return collections.value.find(x => x.id === id)
+  }
+
   let unsubscribe: (() => void) | null
   function subscribe () {
     unsubscribe?.()
@@ -37,6 +41,7 @@ export const useInventory = defineStore('inventory', () => {
 
   return {
     collections,
-    create
+    create,
+    getCollectionById
   }
 })

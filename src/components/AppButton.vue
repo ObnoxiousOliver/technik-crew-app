@@ -55,6 +55,7 @@ onMounted(() => {
     // console.warn('AppButton: Button is not accessible. Make sure to set a label.', btnEl.value)
   }
 })
+defineExpose({ el: btnEl })
 </script>
 
 <style lang="scss" scoped>

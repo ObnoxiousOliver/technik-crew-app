@@ -1,21 +1,14 @@
 <template>
-  <li class="collection-btn">
+  <li
+    :class="['collection-btn', {
+      'collection-btn--selected': selected,
+      'collection-btn--selection-mode': selectionMode
+    }]"
+  >
     <Btn
       ref="btn"
-      :to="selectionMode ? undefined : {
-        name: 'inventory',
-        params: { id: collection.id }
-      }"
-      v-on-long-press.prevent="() => {
-        if (!selectionMode) {
-          selected = true
-        }
-      }"
-      @click="() => {
-        if (selectionMode) {
-          selected = !selected
-        }
-      }"
+      v-on-long-press.prevent="longPress"
+      @click="click"
       class="collection-btn__btn"
     >
       <div class="collection-btn__icon">
@@ -48,13 +41,6 @@
       <i class="bi-three-dots-vertical" />
     </Btn>
 
-    <InputCheckbox
-      v-else
-      class="collection-btn__checkbox"
-      type="checkbox"
-      v-model="selected"
-    />
-
     <ActionSheet v-model:show="showOptions">
       <template #title>
         <template v-if="collection.icon">
@@ -78,10 +64,13 @@ import { Collection } from '@/model/inventory/collection'
 import GlowDiv from './GlowDiv.vue'
 import { useVModel } from '@vueuse/core'
 import { vOnLongPress } from '@vueuse/components'
-import InputCheckbox from './InputCheckbox.vue'
 import { computed, ref } from 'vue'
 import ActionSheet from './ActionSheet.vue'
 import ActionSheetButton from './ActionSheetButton.vue'
+import AppButton from './AppButton.vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const props = defineProps<{
   collection: Collection
@@ -90,6 +79,8 @@ const props = defineProps<{
 }>()
 const emit = defineEmits(['update:selected'])
 
+const btn = ref<typeof AppButton | null>(null)
+
 const _selected = useVModel(props, 'selected', emit)
 const selected = computed({
   get: () => !!_selected.value,
@@ -97,6 +88,38 @@ const selected = computed({
 })
 
 const showOptions = ref(false)
+
+const ignoreClick = ref(false)
+function click () {
+  if (ignoreClick.value) {
+    ignoreClick.value = false
+    return
+  }
+
+  if (props.selectionMode) {
+    selected.value = !selected.value
+  } else {
+    router.push({
+      name: 'inventory-collection',
+      params: {
+        id: props.collection.id
+      }
+    })
+  }
+}
+
+function longPress () {
+  if (!props.selectionMode) {
+    selected.value = true
+    ignoreClick.value = true
+
+    btn.value?.el.addEventListener('pointerup', () => {
+      setTimeout(() => {
+        ignoreClick.value = false
+      })
+    }, { once: true })
+  }
+}
 </script>
 
 <style lang="scss" scoped>
@@ -105,6 +128,35 @@ const showOptions = ref(false)
 .collection-btn {
   position: relative;
   margin: 1rem 0;
+  border-radius: r.$radius;
+  transition: .5s cubic-bezier(0.19, 1, 0.22, 1);
+
+  &--selection-mode:not(&--selected) {
+    animation: .2s wiggle infinite;
+
+    @keyframes wiggle {
+      0%, 100% {
+        transform: rotate(0.5deg);
+      }
+      50% {
+        transform: rotate(-0.5deg);
+      }
+    }
+  }
+
+  &--selected {
+    padding: .4rem;
+
+    .collection-btn__btn {
+      padding: 1.1rem;
+      border-radius: r.$radius - .4rem;
+
+      :deep(.btn__content) {
+        transform: scale(.97);
+      }
+    }
+    box-shadow: r.$accent 0 0 0 0.1rem;
+  }
 
   &__btn {
     overflow: hidden;
@@ -112,7 +164,15 @@ const showOptions = ref(false)
     text-align: left;
     padding: 1.5rem;
 
+    transition:
+      border-radius .5s cubic-bezier(0.19, 1, 0.22, 1),
+      padding .5s cubic-bezier(0.19, 1, 0.22, 1),
+      background-color .2s,
+      box-shadow .2s,
+      opacity .2s;
+
     :deep(.btn__content) {
+      transition: transform .5s cubic-bezier(0.19, 1, 0.22, 1);
       display: grid;
       grid-template-columns: 2.5rem 1fr;
       gap: 1rem 0;
@@ -124,22 +184,17 @@ const showOptions = ref(false)
     inset: 1rem 1rem auto auto;
   }
 
-  &__checkbox {
-    position: absolute;
-    inset: 1rem 1rem auto auto;
-  }
-
   &__icon, &__name {
     grid-row: 1;
-    font-size: 1.5rem;
+    font-size: 1.5em;
   }
 
   &__desc {
     grid-column: 1 / -1;
     font-weight: normal;
     color: r.$text-secondary;
-    line-height: 1.2rem;
-    max-height: 1.2rem * 3;
+    line-height: 1.2em;
+    max-height: 1.2em * 3;
     text-overflow: ellipsis;
     overflow: hidden;
 

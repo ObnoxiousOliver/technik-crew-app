@@ -27,13 +27,18 @@
     </template>
 
     <SettingsList>
-      <SettingsListOption for="selectAll">
+      <SettingsListOption v-if="selectionMode" for="selectAll">
         <template #desc>
           {{ Object.values(selected).filter(x=>x).length }} ausgewählt
         </template>
 
         <template #input>
           <InputCheckbox id="selectAll" v-model="allSelected" />
+        </template>
+      </SettingsListOption>
+      <SettingsListOption v-else>
+        <template #desc>
+          {{ inventory.collections.length }} Sammlungen
         </template>
       </SettingsListOption>
     </SettingsList>
