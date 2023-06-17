@@ -88,7 +88,7 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
   {
     title: 'Termine',
     name: 'events',
-    component: () => import('../views/EventsView.vue' /* webpackChunkName: "events" */),
+    component: () => import('../views/events/EventsView.vue' /* webpackChunkName: "events" */),
     requiresAuth: true,
     offlineVisible: true,
 
@@ -97,13 +97,33 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
         title: 'Neuer Termin',
         name: 'events-add',
         pathName: 'add',
-        component: () => import('../views/EventsAddView.vue' /* webpackChunkName: "events-add" */)
+        component: () => import('../views/events/EventsAddView.vue' /* webpackChunkName: "events-add" */)
+      },
+      {
+        title: 'Terminarchiv',
+        name: 'events-archive',
+        pathName: 'archive',
+        component: () => import('../views/events/EventsArchiveView.vue' /* webpackChunkName: "events-archive" */)
       },
       {
         title: 'Termin',
-        name: 'events-detail',
+        name: 'events-details',
         pathName: '/:id',
-        component: () => import('../views/EventsView.vue' /* webpackChunkName: "events-detail" */)
+        component: () => import('../views/events/EventsDetailView.vue' /* webpackChunkName: "events-detail" */),
+        children: [
+          {
+            title: 'Termin bearbeiten',
+            name: 'events-edit',
+            pathName: '/edit/:field?',
+            component: () => import('../views/events/EventsEditView.vue' /* webpackChunkName: "events-edit" */)
+          },
+          {
+            title: 'Termin Teilnehmer',
+            name: 'events-history',
+            pathName: '/history',
+            component: () => import('../views/events/EventsHistoryView.vue' /* webpackChunkName: "events-history" */)
+          }
+        ]
       }
     ]
   },

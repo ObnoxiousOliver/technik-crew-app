@@ -197,7 +197,7 @@ function onPointerDown (e: PointerEvent) {
     font-size: 1.5rem;
     margin: 2rem 0 1.5rem;
 
-    :deep(i) {
+    & > :deep(i) {
       margin-right: 1rem;
     }
   }

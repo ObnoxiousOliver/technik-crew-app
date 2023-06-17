@@ -42,7 +42,7 @@
               class="user-page__search__input__field"
               placeholder="Suchen..."
               inputmode="search"
-              @keydown.enter="submit()"
+              @submit="submit()"
               @keydown.esc="expandSearch(false)"
               @focus="submitted = false"
               @blur="blur"
@@ -75,11 +75,11 @@
           ...(searchRecents?.map(x => ({
             name: x,
             type: 'recent'
-          })) ?? []),
+          })) ?? []).reverse(),
           ...(searchSuggestions?.map(x => ({
             name: x,
             type: 'suggestion'
-          })) ?? [])
+          })) ?? []).reverse()
         ]"
         @selectItem="submit"
         @applyItem="(q) => {
@@ -120,12 +120,12 @@ const router = useRouter()
 const route = useRoute()
 
 const searchBtnRef = ref(null)
-const searchInputRef = ref(null)
+const searchInputRef = ref<HTMLInputElement>()
 const page = ref(null as HTMLElement| null)
 const searchBtnLeft = ref(0)
 const searchExpanded = ref(false)
 
-const searchInput = ref()
+const searchInput = ref('')
 const submitted = ref(false)
 function submit (val?: string) {
   if (val) {

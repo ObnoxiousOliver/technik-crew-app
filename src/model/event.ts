@@ -1,4 +1,6 @@
-import { addDoc, collection, doc, DocumentChange, DocumentData, getDoc, getDocs, getFirestore, limit, onSnapshot, query, setDoc, where } from 'firebase/firestore'
+import { addDoc, collection, deleteDoc, doc, DocumentChange, DocumentData, getDoc, getDocs, getFirestore, limit, onSnapshot, query, setDoc, where } from 'firebase/firestore'
+import { HistoryState } from './history'
+import { useUser } from '@/stores/user'
 
 export type EventColors = 'gray' | 'red' | 'orange' | 'yellow' | 'green' | 'cyan' | 'blue' | 'purple' | 'pink'
 
@@ -11,7 +13,8 @@ export interface EventDB {
   color: EventColors,
   months: string[], // "YYYY-MM"
   neededUsers: string[],
-  neededEquipment: string[]
+  neededEquipment: string[],
+  hidden: boolean
 }
 
 export default class Event {
@@ -22,7 +25,7 @@ export default class Event {
     return this.event.name
   }
 
-  set name (name: string) {
+  private set name (name: string) {
     this.event.name = name
   }
 
@@ -30,7 +33,7 @@ export default class Event {
     return this.event.description
   }
 
-  set description (description: string) {
+  private set description (description: string) {
     this.event.description = description
   }
 
@@ -38,7 +41,7 @@ export default class Event {
     return this.event.wholeDay
   }
 
-  set wholeDay (wholeDay: boolean) {
+  private set wholeDay (wholeDay: boolean) {
     this.event.wholeDay = wholeDay
   }
 
@@ -46,7 +49,7 @@ export default class Event {
     return this.event.startDate
   }
 
-  set startDate (startDate: number) {
+  private set startDate (startDate: number) {
     this.event.startDate = startDate
   }
 
@@ -54,7 +57,7 @@ export default class Event {
     return this.event.endDate
   }
 
-  set endDate (endDate: number) {
+  private set endDate (endDate: number) {
     this.event.endDate = endDate
   }
 
@@ -62,7 +65,7 @@ export default class Event {
     return this.event.color
   }
 
-  set color (color: EventColors) {
+  private set color (color: EventColors) {
     this.event.color = color
   }
 
@@ -74,7 +77,7 @@ export default class Event {
     return this.event.neededUsers
   }
 
-  set neededUsers (neededUsers: string[]) {
+  private set neededUsers (neededUsers: string[]) {
     this.event.neededUsers = neededUsers
   }
 
@@ -82,8 +85,16 @@ export default class Event {
     return this.event.neededEquipment
   }
 
-  set neededEquipment (neededEquipment: string[]) {
+  private set neededEquipment (neededEquipment: string[]) {
     this.event.neededEquipment = neededEquipment
+  }
+
+  get hidden (): boolean {
+    return this.event.hidden
+  }
+
+  private set hidden (hidden: boolean) {
+    this.event.hidden = hidden
   }
 
   constructor (id: string | null, options: Partial<EventDB> = {}) {
@@ -123,7 +134,8 @@ export default class Event {
           startDate.getTime(),
           endDate?.getTime() ?? startDate.getTime()),
       neededUsers: options.neededUsers ?? [],
-      neededEquipment: options.neededEquipment ?? []
+      neededEquipment: options.neededEquipment ?? [],
+      hidden: options.hidden || false
     }
   }
 
@@ -141,6 +153,101 @@ export default class Event {
 
   toDB (): EventDB {
     return this.event
+  }
+
+  set (options: Partial<{
+    name: string,
+    description: string,
+    wholeDay: boolean,
+    startDate: number,
+    endDate: number,
+    color: string,
+    neededUsers: string[],
+    neededEquipment: string[]
+  }>) {
+    const changes: string[] = []
+
+    if (options.name !== undefined) {
+      this.name = options.name
+      changes.push(`Name geändert -> ${options.name}`)
+    }
+    if (options.description !== undefined) {
+      this.description = options.description
+      changes.push(`Beschreibung geändert -> ${options.description}`)
+    }
+    if (options.wholeDay !== undefined) {
+      this.wholeDay = options.wholeDay
+      changes.push('Ganztägig geändert -> ' + (options.wholeDay ? 'Ja' : 'Nein'))
+    }
+    if (options.startDate !== undefined) {
+      this.startDate = options.startDate
+      changes.push(`Startdatum geändert -> ${new Date(options.startDate).toLocaleString()}`)
+    }
+    if (options.endDate !== undefined) {
+      this.endDate = options.endDate
+      changes.push(`Enddatum geändert -> ${new Date(options.endDate).toLocaleString()}`)
+    }
+    if (options.color !== undefined) {
+      this.color = options.color as EventColors
+      changes.push(`Farbe geändert -> ${options.color}`)
+    }
+    if (options.neededUsers !== undefined) {
+      this.neededUsers = options.neededUsers
+      changes.push(`Benötigte Helfer geändert -> ${options.neededUsers.join(', ')}`)
+    }
+    if (options.neededEquipment !== undefined) {
+      this.neededEquipment = options.neededEquipment
+      changes.push(`Benötigte Ausrüstung geändert -> ${options.neededEquipment.join(', ')}`)
+    }
+
+    this.event.months = Event.getOverlappingMonths(this.event.startDate, this.event.endDate
+      ? this.event.endDate
+      : this.event.startDate)
+
+    this.save()
+    this.recordHistory({
+      description: changes.join('\n')
+    })
+  }
+
+  async recordHistory <T> (options: Partial<{
+    author: string
+    description: string
+    date: number
+    type: string
+    content: T
+  }>) {
+    if (!this.id) {
+      throw new Error('Cannot record history on an event without an id')
+    }
+
+    const db = getFirestore()
+
+    addDoc(
+      collection(db, 'events', this.id, 'history'),
+      new HistoryState({
+        author: options.author ?? useUser().username,
+        description: options.description,
+        date: options.date,
+        type: options.type ?? 'event',
+        content: options.content ?? this.toDB()
+      }).toDB())
+  }
+
+  async getHistory () {
+    if (!this.id) {
+      throw new Error('Cannot get history on an equipment without an id')
+    }
+
+    return HistoryState.get('events', this.id)
+  }
+
+  async setHidden (hidden: boolean) {
+    this.hidden = hidden
+    this.save()
+    this.recordHistory({
+      description: hidden ? 'Versteckt' : 'Sichtbar'
+    })
   }
 
   static getOverlappingMonths (startDate: number, endDate: number): string[] {
@@ -176,12 +283,17 @@ export default class Event {
     return months
   }
 
+  static dateToMonthString (date: Date) {
+    return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`
+  }
+
   static async getMonth (date: Date) {
     const db = getFirestore()
 
     const querySnapshot = await getDocs(query(
       collection(db, 'events'),
-      where('months', 'array-contains', `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`)
+      where('months', 'array-contains', Event.dateToMonthString(date)),
+      where('hidden', '==', false)
     ))
 
     const events: Event[] = []
@@ -199,7 +311,42 @@ export default class Event {
 
     const q = query(
       collection(db, 'events'),
-      where('months', 'array-contains', dateString)
+      where('months', 'array-contains', dateString),
+      where('hidden', '==', false)
+    )
+
+    const unsubscribe = onSnapshot(q, {
+    }, (querySnapshot) => {
+      querySnapshot.docChanges().forEach((change) => {
+        onChange(change)
+      })
+    })
+
+    return unsubscribe
+  }
+
+  static async getArchived () {
+    const db = getFirestore()
+
+    const querySnapshot = await getDocs(query(
+      collection(db, 'events'),
+      where('hidden', '==', true)
+    ))
+
+    const events: Event[] = []
+    querySnapshot.forEach((doc) => {
+      events.push(new Event(doc.id, doc.data() as EventDB))
+    })
+
+    return events
+  }
+
+  static subscribeArchived (onChange: (change: DocumentChange<DocumentData>) => void) {
+    const db = getFirestore()
+
+    const q = query(
+      collection(db, 'events'),
+      where('hidden', '==', true)
     )
 
     const unsubscribe = onSnapshot(q, {
@@ -221,6 +368,7 @@ export default class Event {
     const querySnapshot = await getDocs(query(
       collection(db, 'events'),
       where('startDate', '>=', now.getTime()),
+      where('hidden', '==', false),
       limit(n)
     ))
 
@@ -234,7 +382,9 @@ export default class Event {
     return events
   }
 
-  static async get (id?: string) {
+  static async get (id: undefined): Promise<Event[]>
+  static async get (id: string): Promise<Event>
+  static async get (id: string | undefined) {
     const db = getFirestore()
     if (id) {
       const event = await getDoc(doc(db, 'events', id))
@@ -255,8 +405,43 @@ export default class Event {
 
   static async create (options: Partial<EventDB> = {}) {
     const db = getFirestore()
-    const event = new Event(null, options)
+    let event = new Event(null, options)
     const doc = await addDoc(collection(db, 'events'), event.toDB())
-    return new Event(doc.id, event.toDB())
+    event = new Event(doc.id, event.toDB())
+
+    await event.recordHistory({
+      description: 'Termin erstellt'
+    })
+
+    return event
+  }
+
+  static async delete (id: string) {
+    const db = getFirestore()
+    await deleteDoc(doc(db, 'events', id))
+  }
+
+  static isSameDay (event: Event) {
+    const s = new Date(event.startDate)
+    const e = new Date(event.endDate)
+
+    return s.getFullYear() === e.getFullYear() &&
+      s.getMonth() === e.getMonth() &&
+      s.getDate() === e.getDate()
+  }
+
+  static isSameMonth (event: Event) {
+    const s = new Date(event.startDate)
+    const e = new Date(event.endDate)
+
+    return s.getFullYear() === e.getFullYear() &&
+      s.getMonth() === e.getMonth()
+  }
+
+  static isSameYear (event: Event) {
+    const s = new Date(event.startDate)
+    const e = new Date(event.endDate)
+
+    return s.getFullYear() === e.getFullYear()
   }
 }
