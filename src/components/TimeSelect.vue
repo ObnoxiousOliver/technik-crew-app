@@ -89,11 +89,14 @@ const timeString = computed(() => {
   position: relative;
   padding-left: 1rem;
   padding-right: 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   font-weight: normal;
   white-space: nowrap;
+
+  & > :deep(.btn__content) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
 
   &__display {
     user-select: text;

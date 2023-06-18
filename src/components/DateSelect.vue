@@ -106,10 +106,13 @@ const dateString = computed(() => {
   white-space: nowrap;
 
   &:not(&--no-text) {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
     padding-left: 1rem;
+
+    & > :deep(.btn__content) {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
     padding-right: 1rem;
   }
 

@@ -7,7 +7,7 @@
       </Btn>
     </template>
     <template #btns>
-      <DateSelect month noText v-model="date" />
+      <!-- <DateSelect month noText v-model="date" /> -->
       <Btn @click="previousMonth" aria-label="Ein Monat zurück">
         <i class="bi-chevron-left"></i>
       </Btn>
@@ -22,19 +22,19 @@
 </template>
 
 <script lang="ts" setup>
-import DateSelect from './DateSelect.vue'
 import Card from './DashboardCard.vue'
 import EventCalendar from './EventCalendar.vue'
 import 'vue-simple-calendar/dist/style.css'
 import { ref, watch } from 'vue'
+import Event from '@/model/event'
 
 const emit = defineEmits([
   'update:date'
 ])
-const props = defineProps({
-  events: Array,
+const props = defineProps<{
+  events: Event[],
   date: Date
-})
+}>()
 const date = ref(props.date ?? new Date())
 watch(date, (val) => {
   emit('update:date', val)
