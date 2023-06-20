@@ -92,7 +92,10 @@ watchEffect(() => {
 
 function save () {
   if (!tabs.value) return
-  page.value?.setContent(tabs.value)
+  page.value?.setContent(tabs.value.map(tab => ({
+    title: tab.title ?? null,
+    content: tab.content
+  })))
 
   back()
 }
