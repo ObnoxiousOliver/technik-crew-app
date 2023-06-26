@@ -43,7 +43,16 @@ async function submit (changes: Partial<EventDB>) {
 
   submitting.value = true
 
-  console.log(notSame('description') as number)
+  console.log({
+    name: notSame('name') as string,
+    description: notSame('description') as string,
+    color: notSame('color') as string,
+    startDate: notSame('startDate') as number,
+    endDate: notSame('endDate') as number,
+    wholeDay: notSame('wholeDay') as boolean,
+    neededUsers: notSame('neededUsers') as string[],
+    neededEquipment: notSame('neededEquipment') as string[]
+  })
 
   await event.value.set({
     name: notSame('name') as string,

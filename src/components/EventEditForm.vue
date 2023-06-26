@@ -203,6 +203,14 @@ function update () {
 onMounted(update)
 defineExpose({ updateForm: update })
 
+function isSameDay () {
+  const s = new Date(start.value)
+  const e = new Date(end.value)
+  return s.getDate() === e.getDate() &&
+    s.getMonth() === e.getMonth() &&
+    s.getFullYear() === e.getFullYear()
+}
+
 // const nameErr = ref('')
 function submit () {
   // if (name.value.trim() === '') {
@@ -211,13 +219,19 @@ function submit () {
   //   nameErr.value = ''
   // }
 
+  // console.log(isSameDay()
+  //   ? start.value.getTime()
+  //   : end.value.getTime())
+
   emit('submit', {
     color: color.value,
     name: name.value,
     description: description.value,
     wholeDay: wholeday.value,
     startDate: start.value.getTime(),
-    endDate: ((oneday.value && wholeday.value) || wholeday.value) ? start.value.getTime() : end.value.getTime(),
+    endDate: isSameDay()
+      ? start.value.getTime()
+      : end.value.getTime(),
     neededEquipment: props.event.neededEquipment,
     neededUsers: props.event.neededUsers
   } as Partial<EventDB>)
