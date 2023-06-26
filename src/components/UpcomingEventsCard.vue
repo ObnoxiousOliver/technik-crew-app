@@ -29,9 +29,9 @@
             </span>
             <br>
           </div>
-          <div v-if="event.description" class="upcoming-events__event-link__description">
+          <!-- <div v-if="event.description" class="upcoming-events__event-link__description">
             {{ event.description }}
-          </div>
+          </div> -->
         </RouterLink>
       </li>
     </ul>
@@ -87,18 +87,29 @@ function getDate (date: number) {
     text-decoration: none;
 
     &__name {
-      flex: 1 1 auto;
+      flex: 1 0 auto;
     }
 
     &__date {
       color: r.$text-secondary;
+      white-space: nowrap;
     }
 
     &__description {
+      display: -webkit-box;
+      line-clamp: 2;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+
       color: r.$text-secondary;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-height: 1.25 * 2em;
+      line-height: 1.25;
     }
 
     &__color {
+      flex: 0 0 auto;
       width: 1.2rem;
       height: 1.2rem;
       border-radius: 50%;
