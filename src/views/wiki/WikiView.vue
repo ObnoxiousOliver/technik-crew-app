@@ -10,6 +10,15 @@
     <template #title>
       <i class="bi-compass" />Wiki
     </template>
+    <template #btns>
+      <Btn
+        :to="{
+          name: 'wiki-archive'
+        }"
+      >
+        <i class="bi-archive" />
+      </Btn>
+    </template>
 
     <!-- <SettingsList>
       <SettinsListLink
@@ -87,7 +96,7 @@ function isEmoji (s: string) {
 </script>
 
 <style lang="scss" scoped>
-@use '../scss' as r;
+@use '../../scss' as r;
 
 .page-grid {
   display: grid;

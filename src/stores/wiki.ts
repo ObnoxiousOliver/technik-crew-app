@@ -2,9 +2,9 @@ import { WikiPage } from '@/model/wiki'
 import { dev, logWiki } from '@/utilities/developer'
 import { logOnServer } from '@/utilities/log'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
-import { collection, getFirestore, onSnapshot } from 'firebase/firestore'
+import { collection, deleteDoc, doc, getFirestore, onSnapshot } from 'firebase/firestore'
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
 export const useWiki = defineStore('wiki', () => {
   const pages = ref<WikiPage[]>([])
@@ -81,9 +81,19 @@ export const useWiki = defineStore('wiki', () => {
     return pages.value.find((page) => page.id === id) ?? null
   }
 
+  function deletePage (pageId: string) {
+    if (!pageId) {
+      throw new Error('Cannot delete a wiki page without an id')
+    }
+
+    const db = getFirestore()
+    deleteDoc(doc(db, 'wiki', pageId))
+  }
+
   return {
-    pages,
+    pages: computed(() => pages.value.filter((page) => !page.hidden)),
     loading,
-    getPageFromId
+    getPageFromId,
+    deletePage
   }
 })
