@@ -11,14 +11,12 @@
         '--progress': progress,
       }"
     >
-      Gib einen Titel ein und schreibe ein Emoji an erster Stelle.
+      Gib einen Titel ein und schreibe ein oder mehrere Emoji an den Anfang.
       Das Emoji wird als Icon für die Seite verwendet{{ icon ? ': ' + icon : '.' }}
     </p>
 
     <FormContainer @submit.prevent="submit" :disabled="submitting">
-      <FormGroup inline>
-        <FloatingLabelInput label="Titel" v-model="title" />
-      </FormGroup>
+      <FloatingLabelInput label="Titel" v-model="title" />
       <Btn type="submit">
         Seite erstellen
       </Btn>
@@ -29,8 +27,8 @@
 <script lang="ts" setup>
 import FloatingLabelInput from '@/components/FloatingLabelInput.vue'
 import FormContainer from '@/components/FormContainer.vue'
-import FormGroup from '@/components/FormGroup.vue'
 import { WikiPage } from '@/model/wiki'
+import { splitFirstEmojiFromString } from '@/utilities/getFirstEmojiOfString'
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -41,6 +39,8 @@ const progress = ref(0)
 const time = ref(0)
 onMounted(() => {
   const interval = setInterval(() => {
+    if (!p.value) return
+
     // Give every letter in p a rainbow color
     const letters = p.value?.innerText.split('') ?? []
     // generate a rainbow of colors
@@ -51,7 +51,7 @@ onMounted(() => {
     }).join('')
     const colors = Array.from({ length: letters.length }, (_, i) => {
       const hue = i / letters.length * 360 * 2.5 + time.value / 20
-      return (a) => `hsl(${hue}, 100%, ${50 + 50 * (1 - a)}%)`
+      return (a: number) => `hsl(${hue}, 100%, ${50 + 50 * (1 - a)}%)`
     })
     p.value?.querySelectorAll('span').forEach((span, i) => {
       span.style.color = colors[i](progress.value)
@@ -66,23 +66,16 @@ onMounted(() => {
 })
 
 const title = ref('')
-const icon = computed(() => {
-  const match = title.value.match(/\p{Emoji_Presentation}/gu)
-  console.log(match)
-
-  if (match && title.value.trim().indexOf(match[0]) === 0) {
-    return match[0]
-  }
-  return null
-})
+const icon = computed(() => splitFirstEmojiFromString(title.value)?.[0] ?? '')
 
 const submitting = ref(false)
 async function submit () {
   submitting.value = true
 
+  const emojiTitle = splitFirstEmojiFromString(title.value)
   const page = await WikiPage.create({
-    title: title.value.replace(icon.value, '').trim(),
-    icon: icon.value
+    title: emojiTitle?.[1] ?? title.value,
+    icon: emojiTitle?.[0] ?? null
   })
 
   router.push({
