@@ -74,7 +74,7 @@ async function submit () {
 
   const emojiTitle = splitFirstEmojiFromString(title.value)
   const page = await WikiPage.create({
-    title: emojiTitle?.[1] ?? title.value,
+    title: emojiTitle?.[1].trim() ?? title.value.trim(),
     icon: emojiTitle?.[0] ?? null
   })
 

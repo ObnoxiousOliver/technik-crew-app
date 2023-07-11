@@ -1,17 +1,18 @@
 <!-- eslint-disable vue/no-mutating-props -->
 <template>
-  <div class="input__label" v-if="label">
-    {{ label }}
-  </div>
   <div
     v-bind="$attrs"
     :class="['input', {
       'input--disabled': disabled,
       'input--has-before': !!$slots.before,
       'input--has-after': !!$slots.after,
-      'input--focused': focused
+      'input--focused': focused,
+      'input--label': label
     }]"
   >
+    <div class="input__label" v-if="label">
+      {{ label }}
+    </div>
     <div v-if="$slots.before" class="input__before">
       <slot name="before" />
     </div>
@@ -131,10 +132,13 @@ defineExpose({
   transition: box-shadow .2s, opacity .2s;
 
   &__label {
-    margin-bottom: -.5rem;
+    position: absolute;
+    top: .4rem;
+    left: .75rem;
     font-weight: 600;
     font-size: .8rem;
     padding: 0 .3rem;
+    color: r.$text-secondary;
   }
 
   &--focused {
@@ -185,6 +189,10 @@ defineExpose({
     border: none;
     font: inherit;
     color: inherit;
+
+    .input--label & {
+      padding-top: .75rem;
+    }
 
     &:focus-visible {
       outline: none;

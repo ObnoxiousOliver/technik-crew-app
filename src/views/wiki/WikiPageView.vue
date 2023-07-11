@@ -12,12 +12,20 @@
 
     <template #btns>
       <Btn
-        @click="router.push({
+        :to="{
           name: 'wiki-page-edit',
           params: { id: page?.id }
-        })"
+        }"
       >
         <i class="bi-pencil-square" />
+      </Btn>
+      <Btn
+        :to="{
+          name: 'wiki-page-details',
+          params: { id: page?.id }
+        }"
+      >
+        <i class="bi-three-dots-vertical" />
       </Btn>
     </template>
 
@@ -77,7 +85,7 @@ const content = computed(() => {
 </script>
 
 <style lang="scss" scoped>
-@use '../scss' as r;
+@use '../../scss' as r;
 
 .tabs {
   margin: 1rem 0;
