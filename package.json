@@ -37,7 +37,6 @@
     "vue": "^3.2.13",
     "vue-router": "^4.0.3",
     "vue-simple-calendar": "^6.2.1",
-    "vue3-emoji-picker": "^1.1.7",
     "vuedraggable": "^4.1.0"
   },
   "devDependencies": {
