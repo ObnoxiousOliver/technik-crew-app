@@ -84,7 +84,7 @@ const pageIndex = ref(0)
 const tabs = ref<WikiPageTabDB[]>()
 const pageTitle = ref('')
 watchEffect(() => {
-  pageTitle.value = (page.value?.icon ?? '') + (page.value?.title ?? '')
+  pageTitle.value = (page.value?.icon ? page.value?.icon + ' ' : '') + (page.value?.title ?? '')
 })
 
 // Update tabs when page changes
@@ -98,7 +98,7 @@ function save () {
   page.value?.setTitle(pageTitle.value)
   page.value?.setContent(tabs.value.map(tab => ({
     title: tab.title ?? null,
-    content: tab.content
+    content: tab.content ?? null
   })))
 
   back()
