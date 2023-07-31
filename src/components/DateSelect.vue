@@ -1,14 +1,11 @@
 <template>
-  <Btn
+  <!-- <Btn
     :class="['date-select', {
       'date-select--disabled': disabled,
       'date-select--no-text': noText
     }]"
-    @click="() => {
-      input.showPicker()
-    }"
     :square="noText"
-  >
+    >
     <template v-if="noText">
       <i class="bi-calendar2-week" />
     </template>
@@ -19,16 +16,18 @@
       <div class="date-select__icon">
         <i class="bi-calendar2-week" />
       </div>
-    </template>
+    </template> -->
 
-    <input
-      tabindex="-1"
-      v-model="dateInput"
-      ref="input"
-      :type="month ? 'month' : 'date'"
-      class="date-select__input"
-    >
-  </Btn>
+  <input
+    @click="() => {
+      input?.showPicker()
+    }"
+    v-model="dateInput"
+    ref="input"
+    :type="month ? 'month' : 'date'"
+    class="date-select__input"
+  >
+  <!-- </Btn> -->
 
 </template>
 
@@ -121,12 +120,19 @@ const dateString = computed(() => {
   }
 
   &__input {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    opacity: 0;
+    @include r.box;
+    padding: 0 1rem;
+    height: 3rem;
+    border: none;
+    font: inherit;
+    color: inherit;
+
+    transition: .2s;
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: r.$focus;
+    }
   }
 
   &--disabled {
