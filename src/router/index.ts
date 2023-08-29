@@ -57,7 +57,7 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
   {
     title: 'Wiki',
     name: 'wiki',
-    component: () => import('../views/WikiView.vue' /* webpackChunkName: "wiki" */),
+    component: () => import('../views/wiki/WikiView.vue' /* webpackChunkName: "wiki" */),
     requiresAuth: true,
     offlineVisible: true,
 
@@ -65,21 +65,40 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
       {
         name: 'wiki-page',
         pathName: '/:id',
-        component: () => import('../views/WikiPageView.vue' /* webpackChunkName: "wiki-page" */),
+        component: () => import('../views/wiki/WikiPageView.vue' /* webpackChunkName: "wiki-page" */),
 
         children: [
           {
             name: 'wiki-page-edit',
             pathName: '/edit',
-            component: () => import('../views/WikiPageEditView.vue' /* webpackChunkName: "wiki-page-edit" */)
+            depth: 10,
+            component: () => import('../views/wiki/WikiPageEditView.vue' /* webpackChunkName: "wiki-page-edit" */)
+          },
+          {
+            name: 'wiki-page-details',
+            pathName: '/details',
+            component: () => import('../views/wiki/WikiPageDetailsView.vue' /* webpackChunkName: "wiki-page-details" */),
+
+            children: [
+              {
+                name: 'wiki-page-history',
+                pathName: '/history',
+                component: () => import('../views/wiki/WikiPageHistoryView.vue' /* webpackChunkName: "wiki-page-history" */)
+              }
+            ]
           }
         ]
+      },
+      {
+        name: 'wiki-archive',
+        pathName: '/archive',
+        component: () => import('../views/wiki/WikiArchiveView.vue' /* webpackChunkName: "wiki-archive" */)
       },
       {
         title: 'Neue Seite',
         name: 'wiki-page-new',
         pathName: '/new',
-        component: () => import('../views/WikiPageNewView.vue')
+        component: () => import('../views/wiki/WikiPageNewView.vue')
       }
     ]
   },
