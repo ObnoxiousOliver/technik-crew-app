@@ -38,6 +38,8 @@
     <Spinner v-if="loading" />
 
     <div v-else class="page-grid">
+      {{ collections }}
+
       <RouterLink
         v-wave
         class="page-grid__item"
@@ -88,7 +90,7 @@ import { storeToRefs } from 'pinia'
 
 const router = useRouter()
 const wiki = useWiki()
-const { pages, loading } = storeToRefs(wiki)
+const { pages, loading, collections } = storeToRefs(wiki)
 
 function isEmoji (s: string) {
   return /\p{Extended_Pictographic}/ug.test(s)

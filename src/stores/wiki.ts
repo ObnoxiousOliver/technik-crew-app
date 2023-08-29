@@ -1,4 +1,4 @@
-import { WikiPage } from '@/model/wiki'
+import { WikiCollectionDB, WikiPage } from '@/model/wiki'
 import { dev, logWiki } from '@/utilities/developer'
 import { logOnServer } from '@/utilities/log'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
@@ -8,6 +8,7 @@ import { computed, ref } from 'vue'
 
 export const useWiki = defineStore('wiki', () => {
   const pages = ref<WikiPage[]>([])
+  const collections = ref<WikiCollectionDB[]>([])
 
   const loading = ref(true)
 
@@ -20,16 +21,24 @@ export const useWiki = defineStore('wiki', () => {
     const db = getFirestore()
     const wikiCollection = collection(db, 'wiki')
 
-    unsubscribe = onSnapshot(wikiCollection, (snapshot) => {
+    const unsubscribe1 = onSnapshot(wikiCollection, (snapshot) => {
       loading.value = false
 
       // Remove pages that are not in the snapshot
       pages.value = pages.value.filter((page) => {
+        if (page.id === '!collections') {
+          return false
+        }
+
         return snapshot.docs.findIndex((doc) => doc.id === page.id) !== -1
       })
 
       // Add or update pages
       snapshot.docChanges().forEach((change) => {
+        if (change.doc.id === '!collections') {
+          return
+        }
+
         const index = pages.value.findIndex((page) => page.id === change.doc.id)
 
         // Add new pages
@@ -67,6 +76,23 @@ export const useWiki = defineStore('wiki', () => {
       console.error(...dev(logWiki), 'Error while subscribing to wiki pages:', error)
       logOnServer('Error:', 'Error while subscribing to wiki pages:', error.toString())
     })
+
+    const unsubscribe2 = WikiPage.subscribeCollections((collectionsDoc) => {
+      collectionsDoc.data()?.collections?.forEach((collection: WikiCollectionDB) => {
+        const index = collections.value.findIndex((c) => c.id === collection.id)
+
+        if (index === -1) {
+          collections.value.push(collection)
+        } else {
+          collections.value[index] = collection
+        }
+      })
+    })
+
+    unsubscribe = () => {
+      unsubscribe1()
+      unsubscribe2()
+    }
   }
   // Subscribe if user is logged in
   onAuthStateChanged(getAuth(), (user) => {
@@ -92,6 +118,7 @@ export const useWiki = defineStore('wiki', () => {
 
   return {
     pages: computed(() => pages.value.filter((page) => !page.hidden)),
+    collections,
     loading,
     getPageFromId,
     deletePage

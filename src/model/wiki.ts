@@ -1,7 +1,8 @@
 import { JSONContent } from '@tiptap/vue-3'
-import { DocumentChange, DocumentData, addDoc, collection, doc, getDoc, getDocs, getFirestore, onSnapshot, query, setDoc, where } from 'firebase/firestore'
+import { DocumentChange, DocumentData, DocumentSnapshot, addDoc, collection, doc, getDoc, getDocs, getFirestore, onSnapshot, query, setDoc, where } from 'firebase/firestore'
 import { HistoryState } from './history'
 import { splitFirstEmojiFromString } from '@/utilities/getFirstEmojiOfString'
+import { createId } from '@/utilities/id'
 
 export interface WikiPageTabDB {
   title: string | null
@@ -13,6 +14,13 @@ export interface WikiPageDB {
   title: string
   content: WikiPageTabDB[] | JSONContent | null
   hidden: boolean
+  path: string[]
+}
+
+export interface WikiCollectionDB {
+  id: string
+  name: string
+  path: string[]
 }
 
 export class WikiPage {
@@ -57,13 +65,22 @@ export class WikiPage {
     this.page.hidden = value
   }
 
+  public get path (): string[] {
+    return this.page.path
+  }
+
+  private set path (value: string[]) {
+    this.page.path = value
+  }
+
   constructor (id: string | null, options: Partial<WikiPageDB>) {
     this.id = id
     this.page = {
       icon: options.icon ?? null,
       title: options.title ?? 'Neue Seite',
       content: options.content ?? null,
-      hidden: options.hidden ?? false
+      hidden: options.hidden ?? false,
+      path: options.path ?? []
     }
   }
 
@@ -72,7 +89,8 @@ export class WikiPage {
       icon: this.icon,
       title: this.title,
       content: this.content,
-      hidden: this.hidden
+      hidden: this.hidden,
+      path: this.path
     }
   }
 
@@ -110,6 +128,11 @@ export class WikiPage {
 
   async setContent (content: WikiPageTabDB[]) {
     this.page.content = content
+
+    await this.recordHistory({
+      description: 'Seiteninhalt geändert'
+    })
+
     await this.save()
   }
 
@@ -117,12 +140,26 @@ export class WikiPage {
     const emojiTitle = splitFirstEmojiFromString(title)
     this.title = emojiTitle?.[1].trim() ?? title.trim()
     this.icon = emojiTitle?.[0] ?? null
+
+    await this.recordHistory({
+      description: 'Seitentitel geändert -> ' + this.title
+    })
+
     await this.save()
   }
 
   async setHidden (hidden: boolean) {
     this.hidden = hidden
+
+    await this.recordHistory({
+      description: hidden ? 'Seite archiviert' : 'Seite wiederhergestellt'
+    })
+
     await this.save()
+  }
+
+  setPath (path: string[]) {
+    this.path = path
   }
 
   async save () {
@@ -132,10 +169,6 @@ export class WikiPage {
 
     const db = getFirestore()
     await setDoc(doc(db, 'wiki', this.id), this.toDB())
-
-    await this.recordHistory({
-      description: 'Seite gespeichert'
-    })
   }
 
   static async create (options: Partial<WikiPageDB>): Promise<WikiPage> {
@@ -235,5 +268,33 @@ export class WikiPage {
     })
 
     return unsubscribe
+  }
+
+  static async getCollections () {
+    const db = getFirestore()
+
+    const collections = (await getDoc(doc(db, 'wiki', '!collections'))).data()?.collections as WikiCollectionDB[] ?? []
+    return collections
+  }
+
+  static subscribeCollections (onChange: (change: DocumentSnapshot<DocumentData>) => void) {
+    const db = getFirestore()
+
+    return onSnapshot(doc(db, 'wiki', '!collections'), onChange)
+  }
+
+  static async createCollection (name: string, path: string[] = []) {
+    const db = getFirestore()
+
+    const collections = (await getDoc(doc(db, 'wiki', '!collections'))).data()?.collections as WikiCollectionDB[] ?? []
+    collections.push({
+      id: createId(),
+      name,
+      path
+    })
+
+    await setDoc(doc(db, 'wiki', '!collections'), {
+      collections
+    })
   }
 }
