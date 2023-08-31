@@ -1,5 +1,7 @@
 import { DocumentChange, addDoc, collection, doc, getFirestore, onSnapshot, setDoc } from 'firebase/firestore'
 import { FieldTemplate, FieldTemplateDB, FieldTypes } from './collectionField'
+import { HistoryState } from '../history'
+import { useUser } from '@/stores/user'
 
 export const collectionId = 'inventory-collections'
 export const itemsId = 'inventory-items'
@@ -9,6 +11,7 @@ export interface CollectionDB {
   icon: string | null
   description: string | null
   fields: FieldTemplateDB<FieldTypes>[]
+  is_hidden?: boolean
 }
 
 export class Collection {
@@ -31,13 +34,17 @@ export class Collection {
     this.collection.fields = value.map(field => field.toDB())
   }
 
+  get isHidden () { return this.collection.is_hidden }
+  private set isHidden (value) { this.collection.is_hidden = value }
+
   constructor (id: string | null, options: Partial<CollectionDB>) {
     this.id = id
     this.collection = {
       name: options.name ?? '',
       icon: options.icon ?? null,
       description: options.description ?? null,
-      fields: options.fields ?? []
+      fields: options.fields ?? [],
+      is_hidden: options.is_hidden ?? false
     }
 
     this._fields = this.collection.fields.map(x => FieldTemplate.fromDB(x))
@@ -50,6 +57,45 @@ export class Collection {
       description: this.description,
       fields: this._fields.map(field => field.toDB())
     }
+  }
+
+  async setHidden (hidden: boolean) {
+    if (!this.id) {
+      throw new Error('Cannot get history on an equipment without an id')
+    }
+    if (this.isHidden === hidden) return
+
+    this.isHidden = hidden
+    await this.save()
+    await this.recordHistory({
+      description: hidden
+        ? 'Ausgeblendet'
+        : 'Wieder sichtbar'
+    })
+  }
+
+  async recordHistory <T> (options: Partial<{
+    author: string
+    description: string
+    date: number
+    type: string
+    content: T
+  }>) {
+    if (!this.id) {
+      throw new Error('Cannot record history on a collection without an id')
+    }
+
+    const db = getFirestore()
+
+    addDoc(
+      collection(db, collectionId, this.id, 'history'),
+      new HistoryState({
+        author: options.author ?? useUser().username,
+        description: options.description,
+        date: options.date,
+        type: options.type ?? 'collection',
+        content: options.content ?? this.toDB()
+      }).toDB())
   }
 
   async save () {

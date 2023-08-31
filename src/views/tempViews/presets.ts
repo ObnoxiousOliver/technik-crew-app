@@ -10,7 +10,7 @@ export function SelectUsersPreset (name: string, pathName = 'select-users', meta
   }
 }
 
-export function SelectLocationPreset (name: string, pathName = 'select-location', meta: Record<string, unknown>) {
+export function SelectLocationPreset (name: string, pathName = 'select-location', meta?: Record<string, unknown>) {
   return {
     name,
     pathName,

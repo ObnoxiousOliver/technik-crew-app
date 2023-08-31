@@ -264,7 +264,21 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
         title: 'Kollektion',
         name: 'inventory-collection',
         pathName: '/:id',
-        component: () => import('../views/inventory/InventoryCollectionView.vue' /* webpackChunkName: "inventory-collection" */)
+        component: () => import('../views/inventory/InventoryCollectionView.vue' /* webpackChunkName: "inventory-collection" */),
+
+        children: [{
+          title: 'Gegenstand',
+          name: 'inventory-item-details',
+          pathName: 'item/:itemId',
+          component: () => import('../views/inventory/InventoryItemDetailsView.vue' /* webpackChunkName: "inventory-item-details" */)
+        }]
+      },
+      {
+        title: 'Gegenstand erstellen',
+        name: 'inventory-item-create',
+        pathName: 'create-item',
+        depth: 2.1,
+        component: () => import('../views/inventory/InventoryItemCreateView.vue' /* webpackChunkName: "inventory-item-create" */)
       }
     ]
   },

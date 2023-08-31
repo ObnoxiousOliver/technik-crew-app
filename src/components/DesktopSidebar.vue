@@ -19,9 +19,9 @@
         </li>
 
         <li>
-          <DesktopSidebarBtn :to="{ name: 'equipment' }">
-            <i class="bi bi-speaker" />
-            Equipment
+          <DesktopSidebarBtn :to="{ name: 'inventory' }">
+            <i class="bi bi-box-seam" />
+            Inventar
           </DesktopSidebarBtn>
         </li>
 
@@ -69,7 +69,7 @@ setActiveButton()
 
 function setActiveButton () {
   const prev = active.value
-  active.value = ['dashboard', 'equipment', 'events', 'wiki', 'settings'].indexOf(route.meta.root ?? 'dashboard')
+  active.value = ['dashboard', 'inventory', 'events', 'wiki', 'settings'].indexOf(route.meta.root as string ?? 'dashboard')
   if (prev < active.value) {
     upDown.value = 'down'
   } else if (prev > active.value) {

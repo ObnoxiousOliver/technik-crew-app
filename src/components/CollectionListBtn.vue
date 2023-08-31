@@ -1,15 +1,20 @@
 <template>
-  <li
-    :class="['collection-btn', {
+  <li class="collection-btn">
+    <!-- :class="['collection-btn', {
       'collection-btn--selected': selected,
       'collection-btn--selection-mode': selectionMode
-    }]"
-  >
+    }]" -->
+    <!-- v-on-long-press.prevent="longPress"
+    @click="click" -->
     <Btn
       ref="btn"
-      v-on-long-press.prevent="longPress"
-      @click="click"
       class="collection-btn__btn"
+      :to="{
+        name: 'inventory-collection',
+        params: {
+          id: collection.id
+        }
+      }"
     >
       <div class="collection-btn__icon">
         <GlowDiv>
@@ -29,7 +34,7 @@
       </div>
     </Btn>
 
-    <Btn
+    <!-- <Btn
       square
       transparent
       small
@@ -39,7 +44,7 @@
       v-if="!selectionMode"
     >
       <i class="bi-three-dots-vertical" />
-    </Btn>
+    </Btn> -->
 
     <ActionSheet v-model:show="showOptions">
       <template #title>
@@ -62,9 +67,7 @@
 <script setup lang="ts">
 import { Collection } from '@/model/inventory/collection'
 import GlowDiv from './GlowDiv.vue'
-import { useVModel } from '@vueuse/core'
-import { vOnLongPress } from '@vueuse/components'
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import ActionSheet from './ActionSheet.vue'
 import ActionSheetButton from './ActionSheetButton.vue'
 import AppButton from './AppButton.vue'
@@ -74,52 +77,52 @@ const router = useRouter()
 
 const props = defineProps<{
   collection: Collection
-  selected?: boolean
-  selectionMode?: boolean
+  // selected?: boolean
+  // selectionMode?: boolean
 }>()
-const emit = defineEmits(['update:selected'])
+// const emit = defineEmits(['update:selected'])
 
 const btn = ref<typeof AppButton | null>(null)
 
-const _selected = useVModel(props, 'selected', emit)
-const selected = computed({
-  get: () => !!_selected.value,
-  set: (v) => (_selected.value = v)
-})
+// const _selected = useVModel(props, 'selected', emit)
+// const selected = computed({
+//   get: () => !!_selected.value,
+//   set: (v) => (_selected.value = v)
+// })
 
 const showOptions = ref(false)
 
-const ignoreClick = ref(false)
-function click () {
-  if (ignoreClick.value) {
-    ignoreClick.value = false
-    return
-  }
+// const ignoreClick = ref(false)
+// function click () {
+//   if (ignoreClick.value) {
+//     ignoreClick.value = false
+//     return
+//   }
 
-  if (props.selectionMode) {
-    selected.value = !selected.value
-  } else {
-    router.push({
-      name: 'inventory-collection',
-      params: {
-        id: props.collection.id
-      }
-    })
-  }
-}
+//   if (props.selectionMode) {
+//     selected.value = !selected.value
+//   } else {
+//     router.push({
+//       name: 'inventory-collection',
+//       params: {
+//         id: props.collection.id
+//       }
+//     })
+//   }
+// }
 
-function longPress () {
-  if (!props.selectionMode) {
-    selected.value = true
-    ignoreClick.value = true
+// function longPress () {
+//   if (!props.selectionMode) {
+//     selected.value = true
+//     ignoreClick.value = true
 
-    btn.value?.el.addEventListener('pointerup', () => {
-      setTimeout(() => {
-        ignoreClick.value = false
-      })
-    }, { once: true })
-  }
-}
+//     btn.value?.el.addEventListener('pointerup', () => {
+//       setTimeout(() => {
+//         ignoreClick.value = false
+//       })
+//     }, { once: true })
+//   }
+// }
 </script>
 
 <style lang="scss" scoped>

@@ -289,9 +289,11 @@ export function createRouter (routes: AbstractRoute[], options: Partial<RouterOp
   function temporaryRoute (name: string, pathName: string, component: Component, meta: RouteMeta = {}) {
     const currentRoute = router.currentRoute.value
 
+    const currentPath = currentRoute.path.split('?')[0]
+
     router.addRoute({
       name,
-      path: `${currentRoute.path}/${pathName}`,
+      path: `${currentPath}/${pathName}`,
       component,
       meta: {
         root: currentRoute.meta.root,
@@ -306,7 +308,7 @@ export function createRouter (routes: AbstractRoute[], options: Partial<RouterOp
     })
 
     localStorage.setItem('temporary_route', JSON.stringify({
-      path: `${currentRoute.path}/${pathName}`,
+      path: `${currentPath}/${pathName}`,
       backPath: currentRoute.path
     }))
 

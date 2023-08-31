@@ -1,14 +1,17 @@
 <template>
   <UserPage
-    :add-btn="!selectionMode"
-    :search="!selectionMode"
+    add-btn
+    search
+    :add-btn-to="{
+      name: 'inventory-create'
+    }"
   >
     <template #title>
       <i class="bi-box-seam" /> Inventar
     </template>
 
     <template #btns>
-      <template v-if="selectionMode">
+      <!-- <template v-if="selectionMode">
         <Btn @click="showArchiveSheet = true" aria-label="Archivieren">
           <i class="bi-archive" />
         </Btn>
@@ -23,10 +26,10 @@
         <Btn aria-label="Filter">
           <i class="bi-funnel" />
         </Btn>
-      </template>
+      </template> -->
     </template>
 
-    <SettingsList>
+    <!-- <SettingsList>
       <SettingsListOption v-if="selectionMode" for="selectAll">
         <template #desc>
           {{ Object.values(selected).filter(x=>x).length }} ausgewählt
@@ -41,15 +44,15 @@
           {{ inventory.collections.length }} Sammlungen
         </template>
       </SettingsListOption>
-    </SettingsList>
+    </SettingsList> -->
 
     <CollectionList
       :collections="(inventory.collections as Collection[])"
-      v-model:selectionMode="selectionMode"
-      v-model:selected="selected"
     />
+    <!-- v-model:selectionMode="selectionMode"
+      v-model:selected="selected" -->
 
-    <ActionSheet v-model:show="showArchiveSheet">
+    <!-- <ActionSheet v-model:show="showArchiveSheet">
       <template #title>
         <i class="bi-archive" /> Archivieren
       </template>
@@ -80,35 +83,23 @@
           <i class="bi-x-lg" /> Abbrechen
         </ActionSheetButton>
       </template>
-    </ActionSheet>
+    </ActionSheet> -->
   </UserPage>
 </template>
 
 <script setup lang="ts">
-import ActionSheet from '@/components/ActionSheet.vue'
-import ActionSheetButton from '@/components/ActionSheetButton.vue'
-import ActionSheetDivider from '@/components/ActionSheetDivider.vue'
 import CollectionList from '@/components/CollectionList.vue'
-import InputCheckbox from '@/components/InputCheckbox.vue'
-import SettingsList from '@/components/SettingsList.vue'
-import SettingsListOption from '@/components/SettingsListOption.vue'
 import UserPage from '@/layout/UserPage.vue'
 import { Collection } from '@/model/inventory/collection'
 import { useInventory } from '@/stores/inventory'
-import { computed, ref } from 'vue'
 
 const inventory = useInventory()
 
-const selectionMode = ref(false)
-const selected = ref<Record<string, boolean>>({})
+// const selectionMode = ref(false)
+// const selected = ref<Record<string, boolean>>({})
 
-const allSelected = computed({
-  get: () => inventory.collections.every(x => x.id && (selected.value[x.id] ?? false)),
-  set: (v) => inventory.collections.forEach(x => x.id && (selected.value[x.id] = v))
-})
-
-const showArchiveSheet = ref(false)
-function archive () {
-  console.log('archive')
-}
+// const allSelected = computed({
+//   get: () => inventory.collections.every(x => x.id && (selected.value[x.id] ?? false)),
+//   set: (v) => inventory.collections.forEach(x => x.id && (selected.value[x.id] = v))
+// })
 </script>
