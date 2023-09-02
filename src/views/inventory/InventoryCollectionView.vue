@@ -1,7 +1,15 @@
 <template>
   <Page>
     <template #btns>
-      <Btn aria-label="Bearbeiten">
+      <Btn
+        :to="{
+          name: 'inventory-edit',
+          params: {
+            id: collection?.id
+          }
+        }"
+        aria-label="Bearbeiten"
+      >
         <i class="bi-pencil-square" />
       </Btn>
       <Btn

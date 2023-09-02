@@ -37,6 +37,10 @@
         </RouterLink>
       </tbody>
     </table>
+
+    <div v-if="!items.length" class="collection-item-list__no-items text-secondary">
+      <i>Keine Gegenstände vorhanden</i>
+    </div>
   </div>
 </template>
 
@@ -98,6 +102,10 @@ const items = computed(() => {
 
   &__spacer {
     height: .5rem;
+  }
+
+  &__no-items {
+    padding: 1rem;
   }
 
   td, th {

@@ -1,7 +1,7 @@
 <template>
   <Page>
     <template #title>
-      <i class="bi-collection" /> Kollektion erstellen
+      <i class="bi-pencil-square" /> Kollektion bearbeiten
     </template>
 
     <FormContainer @submit.prevent="submit">
@@ -27,9 +27,7 @@
 
       <FormDivider />
 
-      <Btn type="submit">
-        <i class="bi-plus-lg btn__icon" />Kollektion erstellen
-      </Btn>
+      <Btn type="submit">Bestätigen</Btn>
     </FormContainer>
   </Page>
 </template>
@@ -42,21 +40,25 @@ import FormDivider from '@/components/FormDivider.vue'
 import FormInfo from '@/components/FormInfo.vue'
 import TextBox from '@/components/TextBox.vue'
 import { FieldTemplate, FieldTypes } from '@/model/inventory/collectionField'
-import router from '@/router'
+import { back } from '@/router'
 import { useInventory } from '@/stores/inventory'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { useRoute } from 'vue-router'
 
 const inventory = useInventory()
+const route = useRoute()
 
-const name = ref('')
-const description = ref('')
-const fields = ref<FieldTemplate<FieldTypes>[]>([])
+const collection = computed(() => inventory.getCollectionById(route.params.id as string))
+const name = ref((collection.value?.icon ?? '') + (collection.value?.name ?? ''))
+const description = ref(collection.value?.description ?? '')
+const fields = ref<FieldTemplate<FieldTypes>[]>(collection.value?.fields.map(f => new FieldTemplate(f.toDB())) ?? [])
 
 const nameErr = ref<string | null>(null)
 
 const submitting = ref(false)
 async function submit () {
   if (submitting.value) return
+  if (!collection.value) return
 
   if (!name.value) {
     nameErr.value = 'Bitte gib einen Namen ein'
@@ -64,18 +66,13 @@ async function submit () {
   }
 
   submitting.value = true
-  const collection = await inventory.createCollection({
+  await collection.value.set({
     name: name.value,
     description: description.value,
     fields: fields.value
   })
   submitting.value = false
 
-  router.replace({
-    name: 'inventory-collection',
-    params: {
-      id: collection.id
-    }
-  })
+  back()
 }
 </script>

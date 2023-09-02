@@ -36,60 +36,17 @@
       </Btn>
     </div>
 
-    <div v-if="field.type === 'number'" class="collection-fields-list-item__options collection-fields-list-item__options--number">
-      <DropdownSelection v-model="unit">
-        <option
-          v-for="(unit, i) in fieldTypeNumberUnits"
-          :key="i"
-          :value="i"
-        >
-          {{ unit.name }}
-        </option>
-      </DropdownSelection>
-      <DropdownSelection
-        v-if="unit !== 'none'"
-        v-model="unitSymbol"
-      >
-        <option
-          v-for="(symbol, i) in Object.keys(fieldTypeNumberUnits[unit]?.units)"
-          :key="symbol"
-          :value="i"
-        >
-          {{ symbol }} ({{ fieldTypeNumberUnits[unit]?.units[symbol] }})
-        </option>
-      </DropdownSelection>
-    </div>
+    <CollectionFieldsListItemOptions v-model:field="field" />
 
-    <div v-if="field.type === 'enum'" class="collection-fields-list-item__options collection-fields-list-item__options--enum">
-      <ul v-if="enumOptions.length > 0">
-        <li v-for="(option, i) in enumOptions" :key="i">
-          <InputField
-            class="collection-fields-list-item__options--enum__input"
-            v-model="enumOptions[i]"
-            :label="`${i + 1}. Option`"
-          />
-
-          <Btn
-            square
-            @click="enumOptions.splice(i, 1)"
-          >
-            <i class="bi-trash" />
-          </Btn>
-        </li>
-      </ul>
-      <Btn @click="enumOptions.push('')">
-        <i class="bi-plus-lg btn__icon" />Option hinzufügen
-      </Btn>
-    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { fieldTypeNumberUnits, FieldTypeNumberUnits, FieldTypes, Option } from '@/model/inventory/collectionField'
+import { fieldTypes, FieldTypes, Option } from '@/model/inventory/collectionField'
 import DropdownSelection from './DropdownSelection.vue'
 import InputField from './FloatingLabelInput.vue'
-import { ref, watch, watchEffect } from 'vue'
 import { useVModel } from '@vueuse/core'
+import CollectionFieldsListItemOptions from './CollectionFieldsListItemOptions.vue'
 
 const props = defineProps<{
   field: {
@@ -101,43 +58,9 @@ const props = defineProps<{
   canMoveUp: boolean
   canMoveDown: boolean
 }>()
-const emit = defineEmits(['update:modelValue', 'remove', 'moveUp', 'moveDown'])
+const emit = defineEmits(['update:field', 'remove', 'moveUp', 'moveDown'])
 
 const field = useVModel(props, 'field', emit)
-
-const fieldTypes: {
-  [key in FieldTypes]: string
-} = {
-  string: 'Text',
-  number: 'Zahl',
-  boolean: 'Ja/Nein',
-  date: 'Datum',
-  time: 'Uhrzeit',
-  datetime: 'Datum und Uhrzeit',
-  enum: 'Eigene Auswahl',
-  list: 'Liste'
-}
-
-watchEffect(() => {
-  if (field.value.type === 'number') {
-    field.value.options = {
-      number: {
-        unit: unit.value,
-        symbol: Object.keys(fieldTypeNumberUnits[unit.value]?.units)[unitSymbol.value]
-      }
-    } as Option<'number'>
-  }
-})
-
-// Number
-const unit = ref<FieldTypeNumberUnits>('none')
-const unitSymbol = ref<number>(0)
-watch(unit, () => {
-  unitSymbol.value = 0
-})
-
-// Enum
-const enumOptions = ref<string[]>([''])
 </script>
 
 <style scoped lang="scss">
@@ -151,7 +74,7 @@ const enumOptions = ref<string[]>([''])
 
   padding: .5rem;
   border-radius: r.$radius + .7rem;
-  border: .2rem dashed r.$bg-secondary;
+  border: .2rem dashed r.$bg-stroke;
   background: r.$bg-primary;
 
   &__controls {

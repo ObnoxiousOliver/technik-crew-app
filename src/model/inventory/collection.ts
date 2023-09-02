@@ -1,7 +1,8 @@
-import { DocumentChange, addDoc, collection, doc, getFirestore, onSnapshot, setDoc } from 'firebase/firestore'
+import { DocumentChange, addDoc, collection, doc, getDoc, getDocs, getFirestore, onSnapshot, setDoc } from 'firebase/firestore'
 import { FieldTemplate, FieldTemplateDB, FieldTypes } from './collectionField'
 import { HistoryState } from '../history'
 import { useUser } from '@/stores/user'
+import { splitFirstEmojiFromString } from '@/utilities/getFirstEmojiOfString'
 
 export const collectionId = 'inventory-collections'
 export const itemsId = 'inventory-items'
@@ -42,7 +43,7 @@ export class Collection {
     this.collection = {
       name: options.name ?? '',
       icon: options.icon ?? null,
-      description: options.description ?? null,
+      description: options.description?.length ? options.description : null,
       fields: options.fields ?? [],
       is_hidden: options.is_hidden ?? false
     }
@@ -71,6 +72,41 @@ export class Collection {
       description: hidden
         ? 'Ausgeblendet'
         : 'Wieder sichtbar'
+    })
+  }
+
+  async set (options: Partial<CollectionDB>) {
+    if (!this.id) {
+      throw new Error('Cannot get history on an equipment without an id')
+    }
+
+    const changes = []
+
+    if (options.name && options.name !== this.name) {
+      const icon = splitFirstEmojiFromString(options.name)
+
+      this.name = icon ? icon[1] : options.name
+      this.icon = icon ? icon[0] : null
+      changes.push(`Name geändert -> ${options.name}`)
+    }
+    if (options.description && options.description !== this.description) {
+      this.description = options.description
+      changes.push(`Beschreibung geändert ->\n${options.description}`)
+    }
+    if (options.is_hidden && options.is_hidden !== this.isHidden) {
+      this.isHidden = options.is_hidden
+      changes.push(options.is_hidden ? 'Ausgeblendet' : 'Wieder sichtbar')
+    }
+    if (options.fields && JSON.stringify(options.fields) !== JSON.stringify(this.fields)) {
+      this.fields = options.fields.map(x => FieldTemplate.fromDB(x))
+      changes.push('Felder geändert')
+    }
+
+    if (changes.length === 0) return
+
+    await this.save()
+    await this.recordHistory({
+      description: changes.join('\n')
     })
   }
 
@@ -111,8 +147,11 @@ export class Collection {
   static async create (name: string, description?: string | null, fields?: FieldTemplate<FieldTypes>[]) {
     const db = getFirestore()
 
+    const icon = splitFirstEmojiFromString(name)
+
     const c = new Collection(null, {
-      name,
+      name: icon ? icon[1] : name,
+      icon: icon ? icon[0] : null,
       description,
       fields
     })
@@ -129,5 +168,21 @@ export class Collection {
         onChange(x as DocumentChange<CollectionDB>)
       })
     })
+  }
+
+  static async get (id?: string) {
+    const db = getFirestore()
+
+    if (!id) {
+      const snapshot = await getDocs(collection(db, collectionId))
+      return snapshot.docs.map(x => new Collection(x.id, x.data()))
+    }
+
+    const col = await getDoc(doc(db, collectionId, id))
+    if (col.exists()) {
+      return new Collection(col.id, col.data())
+    } else {
+      return null
+    }
   }
 }

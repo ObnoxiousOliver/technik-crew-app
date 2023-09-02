@@ -30,7 +30,12 @@
         {{ collection.name }}
       </div>
       <div class="collection-btn__desc">
-        {{ collection.description ?? 'Keine Beschreibung' }}
+        <template v-if="collection.description">
+          {{ collection.description }}
+        </template>
+        <template v-else>
+          <i>Keine Beschreibung</i>
+        </template>
       </div>
     </Btn>
 

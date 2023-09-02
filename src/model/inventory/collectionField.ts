@@ -339,18 +339,28 @@ export const fieldTypeNumberUnits: {
   }
 }
 
+export const fieldTypes: {
+  [key in FieldTypes]: string
+} = {
+  string: 'Text',
+  number: 'Zahl',
+  boolean: 'Ja/Nein',
+  date: 'Datum',
+  time: 'Uhrzeit',
+  datetime: 'Datum und Uhrzeit',
+  enum: 'Eigene Auswahl',
+  list: 'Liste'
+}
+
 export interface FieldTemplateBase<T extends FieldTypes> {
   type: T
   // eslint-disable-next-line no-use-before-define
-  options?: Option<T>
+  options: Option<T>
 }
 
 export interface Option<T extends FieldTypes> {
   // Number
   number?: T extends 'number' ? {
-    min?: number
-    max?: number
-    step?: number
     unit?: FieldTypeNumberUnits
     symbol?: string
   } : never

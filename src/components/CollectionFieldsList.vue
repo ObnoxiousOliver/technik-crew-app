@@ -19,19 +19,44 @@
         :canMoveDown="i < fields.length - 1"
       />
     </TransitionGroup>
-    <Btn
-      class="collection-fields-list__add-field"
-      @click="addField"
-    >
-      <i class="bi-plus-lg btn__icon" />Feld hinzufügen
-    </Btn>
+    <div class="collection-fields-list__buttons">
+      <Btn @click="addField()">
+        <i class="bi-plus-lg btn__icon" />Feld hinzufügen
+      </Btn>
+      <Btn square @click="showPresetSheet = true">
+        <i class="bi-grid" />
+      </Btn>
+    </div>
   </div>
+
+  <ActionSheet v-model:show="showPresetSheet">
+    <template #title>
+      <i class="bi-grid" />Vorlagen
+    </template>
+
+    <CollectionFieldPresetList
+      @select="(preset) => {
+        addField(preset)
+        showPresetSheet = false
+      }"
+    />
+
+    <template #buttons>
+      <ActionSheetButton @click="showPresetSheet = false">
+        <i class="bi-x" />Abbrechen
+      </ActionSheetButton>
+    </template>
+  </ActionSheet>
 </template>
 
 <script setup lang="ts">
 import { FieldTemplate, FieldTypes } from '@/model/inventory/collectionField'
 import CollectionFieldsListItem from './CollectionFieldsListItem.vue'
 import { useVModel } from '@vueuse/core'
+import ActionSheet from './ActionSheet.vue'
+import { ref } from 'vue'
+import ActionSheetButton from './ActionSheetButton.vue'
+import CollectionFieldPresetList from './CollectionFieldPresetList.vue'
 
 const props = defineProps<{
   modelValue: FieldTemplate<FieldTypes>[]
@@ -40,8 +65,18 @@ const emit = defineEmits(['update:modelValue'])
 
 const fields = useVModel(props, 'modelValue', emit)
 
-function addField () {
-  fields.value.push(new FieldTemplate<FieldTypes>())
+const showPresetSheet = ref(false)
+
+function addField (preset?: FieldTemplate<FieldTypes>) {
+  if (preset) {
+    fields.value.push(new FieldTemplate<FieldTypes>({
+      name: preset.name,
+      type: preset.type,
+      options: preset.options
+    }))
+  } else {
+    fields.value.push(new FieldTemplate<FieldTypes>())
+  }
 }
 </script>
 
@@ -57,7 +92,7 @@ function addField () {
 
     padding: .5rem;
     border-radius: r.$radius + .7rem;
-    border: .2rem dashed r.$bg-secondary;
+    border: .2rem dashed r.$bg-stroke;
     background: r.$bg-primary;
     margin-bottom: .5rem;
 
@@ -81,9 +116,15 @@ function addField () {
     }
   }
 
-  &__add-field {
-    width: stretch;
-    margin-top: .5rem;
+  &__buttons {
+    display: flex;
+    flex-flow: row wrap;
+    gap: 0.5rem;
+    justify-content: stretch;
+
+    :not(:last-child) {
+      flex: 1 1 auto;
+    }
   }
 }
 </style>

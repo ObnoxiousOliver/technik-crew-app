@@ -7,10 +7,7 @@
     <FormContainer @submit.prevent="submit" :disabled="submitting">
       <FormGroup>
         <p>Gegenstand wird erstellt in</p>
-        <DropdownSelection v-model="computedCollectionId">
-          <option value="none">
-            Keine Sammlung ausgewählt
-          </option>
+        <DropdownSelection v-model="collectionId">
           <option
             v-for="(collection, i) in inventory.collections"
             :key="collection.id ?? i"
@@ -63,7 +60,7 @@ import SettingsListLink from '@/components/SettingsListLink.vue'
 import TextBox from '@/components/TextBox.vue'
 import { useInventory } from '@/stores/inventory'
 import { useTemp } from '@/stores/temp'
-import { computed, ref, watchEffect } from 'vue'
+import { ref, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 import { SelectLocationPreset } from '../tempViews/presets'
 import { Location } from '@/model/location'
@@ -84,13 +81,7 @@ const state = temp.getData('inventory-item-create') as {
   locationId: string | null
 } | null
 
-const collectionId = ref(state?.collectionId ?? route.query.collection as string | null ?? null)
-const computedCollectionId = computed({
-  get: () => collectionId.value ?? 'none',
-  set: (v) => {
-    collectionId.value = v === 'none' ? null : v
-  }
-})
+const collectionId = ref<string>(route.query.collection as string ?? inventory.collections?.[0]?.id ?? '')
 
 const name = ref(state?.name ?? '')
 const description = ref(state?.description ?? '')
@@ -130,10 +121,11 @@ async function submit () {
   })
 
   temp.deleteData('inventory-item-create')
+
   router.replace({
     name: 'inventory-item-details',
     params: {
-      id: collectionId.value,
+      id: item.collectionId,
       itemId: item.id
     }
   })
