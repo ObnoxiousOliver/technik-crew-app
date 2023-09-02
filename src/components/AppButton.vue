@@ -4,7 +4,7 @@
     v-wave="!disabled"
 
     :tabindex="disabled ? -1 : undefined"
-    :aria-label="props['aria-label']"
+    :aria-label="props.ariaLabel"
     :disabled="disabled"
     :aria-disabled="disabled"
 
@@ -30,13 +30,13 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import { RouteLocationRaw } from 'vue-router'
 
 const props = defineProps<{
   to?: RouteLocationRaw,
   type?: string,
-  'aria-label'?: string,
+  ariaLabel?: string,
   danger?: boolean,
   square?: boolean,
   transparent?: boolean,
@@ -48,13 +48,13 @@ const props = defineProps<{
 
 // Check for accessibility
 const btnEl = ref<HTMLButtonElement | HTMLAnchorElement | null>(null)
-onMounted(() => {
-  if (!btnEl.value) return
+// onMounted(() => {
+//   if (!btnEl.value) return
 
-  if (!btnEl.value.textContent && !props['aria-label']) {
-    // console.warn('AppButton: Button is not accessible. Make sure to set a label.', btnEl.value)
-  }
-})
+//   if (!btnEl.value.textContent && !props['aria-label']) {
+//     // console.warn('AppButton: Button is not accessible. Make sure to set a label.', btnEl.value)
+//   }
+// })
 </script>
 
 <style lang="scss" scoped>
