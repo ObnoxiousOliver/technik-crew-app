@@ -4,7 +4,7 @@
 
 <script lang="ts" setup>
 import AppLayout from './layout/AppLayout.vue'
-import { deleteUser, getAuth, onAuthStateChanged } from '@firebase/auth'
+import { getAuth, onAuthStateChanged } from '@firebase/auth'
 import { doc, getDoc, getFirestore } from '@firebase/firestore'
 import { onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
