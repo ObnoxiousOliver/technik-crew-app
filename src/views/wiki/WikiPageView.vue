@@ -1,20 +1,18 @@
 <template>
   <Page>
     <template #title>
-      <span v-if="page?.icon">
-        {{ page?.icon }}
-      </span>
+      <span v-if="page?.icon">{{ page?.icon }}&nbsp;</span>
       <i v-else class="bi-file-earmark-text" />
       <span class="text-transform-normal">
         {{ page?.title }}
       </span>
     </template>
 
-    <template #btns>
+    <template v-if="page" #btns>
       <Btn
         :to="{
           name: 'wiki-page-edit',
-          params: { id: page?.id }
+          params: { id: page.id }
         }"
       >
         <i class="bi-pencil-square" />
@@ -22,7 +20,7 @@
       <Btn
         :to="{
           name: 'wiki-page-details',
-          params: { id: page?.id }
+          params: { id: page.id }
         }"
       >
         <i class="bi-three-dots-vertical" />
@@ -32,7 +30,6 @@
     <Spinner v-if="!page" />
 
     <template v-else>
-
       <DropdownSelection
         v-if="page.content && (page.content.some(x => x.title) || page.content.length > 1)"
         v-model="pageIndex"
@@ -61,12 +58,11 @@
 import DropdownSelection from '@/components/DropdownSelection.vue'
 import { schema } from '@/model/tiptap'
 import { useWiki } from '@/stores/wiki'
-import { generateHTML } from '@tiptap/vue-3'
+import { generateHTML, generateText } from '@tiptap/vue-3'
 import { computed, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 
 const route = useRoute()
-const router = useRouter()
 const wiki = useWiki()
 
 const page = computed(() => wiki.getPageFromId(route.params.id as string))
@@ -76,9 +72,11 @@ const content = computed(() => {
   console.log(page.value?.content?.[pageIndex.value])
   if (!page.value?.content?.[pageIndex.value]) return null
   try {
+    const text = generateText(page.value.content[pageIndex.value].content, schema)
+    if (!text) return null
     return generateHTML(page.value.content[pageIndex.value].content, schema)
   } catch (err) {
-    console.error(err)
+    console.warn(err)
     return null
   }
 })
