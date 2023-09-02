@@ -1,27 +1,26 @@
 <template>
-  <Btn
+  <!-- <Btn
     :class="['time-select', {
       'time-select--disabled': disabled
     }]"
-    @click="() => {
-      input.showPicker()
-    }"
-  >
-    <span class="time-select__display">
+    > -->
+  <!-- <span class="time-select__display">
       {{ timeString }}
     </span>
     <div class="time-select__icon">
       <i class="bi-clock" />
-    </div>
+    </div> -->
 
-    <input
-      tabindex="-1"
-      v-model="timeInput"
-      ref="input"
-      type="time"
-      class="time-select__input"
-    >
-  </Btn>
+  <input
+    v-model="timeInput"
+    ref="input"
+    type="time"
+    class="time-select__input"
+    @click="() => {
+      input?.showPicker()
+    }"
+  >
+  <!-- </Btn> -->
 </template>
 
 <script lang="ts" setup>
@@ -31,10 +30,7 @@ const props = defineProps<{
   modelValue: Date,
   disabled?: boolean
 }>()
-const emit = defineEmits<{
-  'update:modelValue': Date
-}>()
-
+const emit = defineEmits(['update:modelValue'])
 const input = ref<HTMLInputElement>()
 
 const t = props.modelValue ?? new Date()
@@ -56,7 +52,7 @@ watch(() => props.modelValue, (val) => {
 })
 
 const timeInput = computed({
-  get: () => time.value.toTimeString().split(' ')[0],
+  get: () => time.value.toTimeString().split(' ')[0].split(':').slice(0, 2).join(':'),
   set: (val) => {
     if (val === '') {
       time.value = new Date()
@@ -91,6 +87,7 @@ const timeString = computed(() => {
   padding-right: 1rem;
   font-weight: normal;
   white-space: nowrap;
+  cursor: pointer;
 
   & > :deep(.btn__content) {
     display: flex;
@@ -103,12 +100,19 @@ const timeString = computed(() => {
   }
 
   &__input {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    opacity: 0;
+    @include r.box;
+    padding: 0 1rem;
+    height: 3rem;
+    border: none;
+    font: inherit;
+    color: inherit;
+
+    transition: .2s;
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: r.$focus;
+    }
   }
 
   &--disabled {
