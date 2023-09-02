@@ -4,7 +4,7 @@
     v-wave="!disabled"
 
     :tabindex="disabled ? -1 : undefined"
-    :aria-label="props['aria-label']"
+    :aria-label="props.ariaLabel"
     :disabled="disabled"
     :aria-disabled="disabled"
 
@@ -36,7 +36,7 @@ import { RouteLocationRaw } from 'vue-router'
 const props = defineProps<{
   to?: RouteLocationRaw,
   type?: string,
-  'aria-label'?: string,
+  ariaLabel?: string,
   danger?: boolean,
   square?: boolean,
   transparent?: boolean,
