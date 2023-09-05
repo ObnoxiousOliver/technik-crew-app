@@ -72,6 +72,10 @@ const items = computed(() => {
 @use '../scss' as r;
 
 .collection-item-list {
+  overflow-x: auto;
+  margin: 0 -1.5rem;
+  padding: 0 1.5rem 1rem;
+
   table {
     width: stretch;
     border-collapse: collapse;

@@ -29,6 +29,8 @@
 
       <Btn type="submit">Bestätigen</Btn>
     </FormContainer>
+
+    <pre>{{ collection?.toDB() }}</pre>
   </Page>
 </template>
 
@@ -42,6 +44,7 @@ import TextBox from '@/components/TextBox.vue'
 import { FieldTemplate, FieldTypes } from '@/model/inventory/collectionField'
 import { back } from '@/router'
 import { useInventory } from '@/stores/inventory'
+import { splitFirstEmojiFromString } from '@/utilities/getFirstEmojiOfString'
 import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 
@@ -66,8 +69,11 @@ async function submit () {
   }
 
   submitting.value = true
+
+  const icon = splitFirstEmojiFromString(name.value)
   await collection.value.set({
-    name: name.value,
+    name: icon ? icon[1] : name.value,
+    icon: icon ? icon[0] : null,
     description: description.value,
     fields: fields.value
   })

@@ -352,6 +352,30 @@ export const fieldTypes: {
   list: 'Liste'
 }
 
+export function getOptionString (preset: FieldTemplate<FieldTypes>): string | undefined {
+  if (preset.type === 'number') {
+    const unit = preset.options.number?.unit ?? 'none'
+    const symbol = preset.options.number?.symbol
+
+    return `${fieldTypeNumberUnits[unit]?.name} ${symbol
+      ? ' - ' + fieldTypeNumberUnits[unit]?.units[symbol]
+      : ''
+    }${
+      symbol
+      ? ` (${symbol})`
+      : ''
+    }`
+  }
+  if (preset.type === 'enum') {
+    return preset.options.enum?.map((option: string) => `"${option}"`).join(', ')
+  }
+  if (preset.type === 'list') {
+    const type = fieldTypes[preset.options.list?.type as FieldTypes ?? 'string']
+    const options = getOptionString(preset.options.list as FieldTemplate<FieldTypes>)
+    return `Liste von ${type}${options ? ` (${options})` : ''}`
+  }
+}
+
 export interface FieldTemplateBase<T extends FieldTypes> {
   type: T
   // eslint-disable-next-line no-use-before-define
@@ -416,10 +440,16 @@ export class FieldTemplate<T extends FieldTypes> {
 
 export class FieldValue<T extends FieldTypes> {
   readonly id: string
-  readonly value: T
+  readonly template: FieldTemplateBase<T>
+  readonly value: any
 
-  constructor (id: string, value: T) {
-    this.id = id
-    this.value = value
+  constructor (opt: {
+    id: string
+    template: FieldTemplateBase<T>
+    value: any
+  }) {
+    this.id = opt.id
+    this.template = opt.template
+    this.value = opt.value
   }
 }

@@ -25,7 +25,10 @@
     v-model="dateInput"
     ref="input"
     :type="month ? 'month' : 'date'"
-    class="date-select__input"
+    :class="['date-select', {
+      'date-select--disabled': disabled
+    }]"
+    :disabled="disabled"
   >
   <!-- </Btn> -->
 
@@ -35,91 +38,97 @@
 import { computed, ref, watch } from 'vue'
 
 const props = defineProps<{
-  modelValue: Date,
+  modelValue: Date | null,
   disabled?: boolean,
-  month?: boolean,
-  noText?: boolean
+  month?: boolean
+  // noText?: boolean
 }>()
-const emit = defineEmits<{
-  'update:modelValue': Date
-}>()
+const emit = defineEmits(['update:modelValue'])
 
 const input = ref<HTMLInputElement>()
 
-const date = ref(props.modelValue || new Date())
+const date = ref<Date | null>(props.modelValue || new Date())
 watch(date, (val) => {
   emit('update:modelValue', val)
 })
 watch(() => props.modelValue, (val) => {
-  const opt = {
+  const opt: Intl.DateTimeFormatOptions = {
     year: 'numeric',
     month: '2-digit',
     day: props.month ? undefined : '2-digit'
   }
   if (val) {
-    if (val.toLocaleString('en-US', opt) !== date.value.toLocaleString('en-US', opt)) {
+    if (val.toLocaleString('en-US', opt) !== date.value?.toLocaleString('en-US', opt)) {
       date.value = val
+
+      if (input.value) {
+        input.value.value = dateInput.value
+      }
     }
   }
 })
 
 const dateInput = computed({
-  get: () => `${
-    date.value.getFullYear()
-  }-${
-    (date.value.getMonth() + 1).toString().padStart(2, '0')
-  }${
-    props.month
-      ? ''
-      : `-${date.value.getDate().toString().padStart(2, '0')}`
-  }`,
+  get: () => {
+    if (!date.value) return ''
+
+    return `${
+      date.value.getFullYear()
+    }-${
+      (date.value.getMonth() + 1).toString().padStart(2, '0')
+    }${
+      props.month
+        ? ''
+        : `-${date.value.getDate().toString().padStart(2, '0')}`
+    }`
+  },
   set: (val) => {
     if (val === '') {
-      date.value = new Date()
+      date.value = null
       return
     }
     date.value = new Date(val)
   }
 })
 
-const dateString = computed(() => {
-  return date.value.toLocaleDateString('de-DE', props.month
-    ? {
-        year: 'numeric',
-        month: 'long'
-      }
-    : {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
-      })
-})
+// const dateString = computed(() => {
+//   return date.value?.toLocaleDateString('de-DE', props.month
+//     ? {
+//         year: 'numeric',
+//         month: 'long'
+//       }
+//     : {
+//         year: 'numeric',
+//         month: 'short',
+//         day: 'numeric'
+//       }) ?? ''
+// })
 </script>
 
 <style lang="scss" scoped>
 @use '../scss' as r;
 
 .date-select {
-  position: relative;
-  font-weight: normal;
-  white-space: nowrap;
+  // position: relative;
+  // font-weight: normal;
+  // white-space: nowrap;
 
-  &:not(&--no-text) {
-    padding-left: 1rem;
+  // &:not(&--no-text) {
+  //   padding-left: 1rem;
 
-    & > :deep(.btn__content) {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    padding-right: 1rem;
-  }
+  //   & > :deep(.btn__content) {
+  //     display: flex;
+  //     align-items: center;
+  //     justify-content: space-between;
+  //   }
+  //   padding-right: 1rem;
+  // }
 
-  &__display {
-    user-select: text;
-  }
+  // &__display {
+  //   user-select: text;
+  // }
 
-  &__input {
+  // &__input {
     @include r.box;
     padding: 0 1rem;
     height: 3rem;
@@ -133,7 +142,7 @@ const dateString = computed(() => {
       outline: none;
       box-shadow: r.$focus;
     }
-  }
+  // }
 
   &--disabled {
     pointer-events: none;

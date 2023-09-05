@@ -107,7 +107,7 @@ watchEffect(() => {
     field.value.options = {
       number: {
         unit: unit.value,
-        symbol: Object.keys(fieldTypeNumberUnits[unit.value]?.units)[unitSymbol.value]
+        symbol: Object.keys(fieldTypeNumberUnits[unit.value]?.units)[unitSymbol.value] ?? ''
       }
     } as Option<'number'>
   }

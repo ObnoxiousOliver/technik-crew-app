@@ -25,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import { FieldTemplate, fieldTypes, FieldTypes, fieldTypeNumberUnits } from '@/model/inventory/collectionField'
+import { FieldTemplate, fieldTypes, FieldTypes, getOptionString } from '@/model/inventory/collectionField'
 import { useInventory } from '@/stores/inventory'
 import { computed } from 'vue'
 
@@ -51,26 +51,6 @@ function getTypeString (preset: FieldTemplate<FieldTypes>) {
   return fieldTypes[preset.type]
 }
 
-function getOptionString (preset: FieldTemplate<FieldTypes>) {
-  if (preset.type === 'number') {
-    const unit = preset.options.number?.unit ?? 'none'
-    const symbol = preset.options.number?.symbol
-
-    return `${fieldTypeNumberUnits[unit]?.name} ${symbol
-      ? ' - ' + fieldTypeNumberUnits[unit]?.units[symbol]
-      : ''
-    }${
-      symbol
-      ? ` (${symbol})`
-      : ''
-    }`
-  }
-  if (preset.type === 'enum') {
-    return preset.options.enum?.map((option: string) => `"${option}"`).join(', ')
-  }
-
-  return ''
-}
 </script>
 
 <style scoped lang="scss">

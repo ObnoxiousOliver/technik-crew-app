@@ -8,14 +8,14 @@
   >
     <QrCodeScanner
       ref="scanner"
-      :class="['equipment-scan__scanner', {
-        'equipment-scan__scanner--loading': scanner?.loading
+      :class="['scan-code__scanner', {
+        'scan-code__scanner--loading': scanner?.loading
       }]"
       @result="result"
     />
 
     <template v-if="err">
-      <div class="equipment-scan__error">
+      <div class="scan-code__error">
         <i class="bi-exclamation-triangle" />
 
         <template v-if="notSupported">
@@ -28,10 +28,10 @@
       </div>
     </template>
 
-    <Spinner v-else-if="scanner?.loading" class="equipment-scan__spinner" />
+    <Spinner v-else-if="scanner?.loading" class="scan-code__spinner" />
 
     <template v-else>
-      <div class="equipment-scan__frame">
+      <div class="scan-code__frame">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           :viewBox="[
@@ -51,10 +51,10 @@
         </svg>
 
       </div>
-      <div class="equipment-scan__overlay">
+      <div class="scan-code__overlay">
         QR-Code oder Barcode scannen
 
-        <div v-if="errMsg" class="equipment-scan__err">
+        <div v-if="errMsg" class="scan-code__err">
           {{ errMsg }}
         </div>
       </div>
@@ -64,19 +64,13 @@
 
 <script lang="ts" setup>
 import QrCodeScanner from '@/components/QrcodeScanner.vue'
-import { useEquipment } from '@/stores/equipment'
 import { Result } from '@zxing/library'
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
 
 const emit = defineEmits(['scan'])
-const props = defineProps<{
-  preventDefault?: boolean
+defineProps<{
   errMsg?: string
 }>()
-
-const equipment = useEquipment()
-const router = useRouter()
 
 const scanner = ref<{
   loading: boolean
@@ -94,14 +88,8 @@ const err = computed(() => notSupported.value || notALlowed.value)
 
 function result (result: Result) {
   if (!result) return
+
   emit('scan', result.getText())
-
-  if (props.preventDefault) return
-
-  const eq = equipment.findByCode(result.getText())
-  if (!eq) return
-
-  router.push({ name: 'equipment-details', params: { id: eq.id } })
 }
 
 onMounted(() => {
@@ -122,9 +110,9 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
-@use '../../scss' as r;
+@use '../scss' as r;
 
-.equipment-scan {
+.scan-code {
   &__scanner {
     z-index: -1;
     aspect-ratio: unset;
@@ -166,7 +154,7 @@ onMounted(() => {
       // margin: -1.8px;
     }
 
-    .equipment-scan--landscape & {
+    .scan-code--landscape & {
       inset: 50% 50% auto auto;
     }
   }
@@ -181,7 +169,7 @@ onMounted(() => {
     font-size: .8rem;
     text-align: center;
 
-    .equipment-scan--landscape & {
+    .scan-code--landscape & {
       inset: 50% 0 auto;
     }
   }

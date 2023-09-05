@@ -83,11 +83,12 @@ export class Collection {
     const changes = []
 
     if (options.name && options.name !== this.name) {
-      const icon = splitFirstEmojiFromString(options.name)
-
-      this.name = icon ? icon[1] : options.name
-      this.icon = icon ? icon[0] : null
+      this.name = options.name
       changes.push(`Name geändert -> ${options.name}`)
+    }
+    if (options.icon && options.icon !== this.icon) {
+      this.icon = options.icon
+      changes.push(`Icon geändert -> ${options.icon}`)
     }
     if (options.description && options.description !== this.description) {
       this.description = options.description

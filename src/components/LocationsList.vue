@@ -4,6 +4,7 @@
       v-model="searchInput"
       class="locations-list__search__input"
       placeholder="Suchen..."
+      after-padding
     >
       <template #before>
         <i class="bi-search" />

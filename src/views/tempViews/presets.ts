@@ -21,3 +21,15 @@ export function SelectLocationPreset (name: string, pathName = 'select-location'
     }
   }
 }
+
+export function ScanCodePreset (name: string, pathName = 'scan-code', meta?: Record<string, unknown>) {
+  return {
+    name,
+    pathName,
+    component: () => import('@/views/tempViews/ScanCodeView.vue'),
+    meta: {
+      title: 'Code scannen',
+      ...meta
+    }
+  }
+}

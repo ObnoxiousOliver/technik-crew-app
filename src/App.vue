@@ -109,6 +109,10 @@ code {
   white-space: nowrap;
 }
 
+.w-stretch {
+  width: stretch;
+}
+
 .bullet-list {
   padding-inline-start: 1rem;
   // margin: 1rem 0;
