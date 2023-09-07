@@ -61,6 +61,12 @@ watch(() => props.modelValue, (val) => {
 const timeInput = computed({
   get: () => time.value.toTimeString().split(' ')[0].split(':').slice(0, 2).join(':'),
   set: (val) => {
+    if (val === 'Invalid Date' || /^\d{2}:\d{2}$/.test(val) === false) {
+      if (input.value) {
+        input.value.value = timeInput.value
+      }
+      return
+    }
     if (val === '') {
       time.value = new Date()
       return

@@ -3,6 +3,7 @@ import { FieldTypes, FieldValue } from './collectionField'
 import { itemsId } from './collection'
 import { HistoryState } from '../history'
 import { useUser } from '@/stores/user'
+import { useLocations } from '@/stores/locations'
 
 export interface CollectionItemDB {
   collectionId: string | null
@@ -122,6 +123,24 @@ export class CollectionItem {
       }).toDB())
   }
 
+  async setCode (code: string | null) {
+    this.code = code
+    await this.save()
+
+    await this.recordHistory({
+      description: code ? 'Code geändert -> ' + code : 'Code entfernt'
+    })
+  }
+
+  async setLocation (locationId: string | null) {
+    this.locationId = locationId
+    await this.save()
+
+    await this.recordHistory({
+      description: locationId ? 'Standort geändert -> ' + useLocations().getLocationById(locationId)?.name ?? locationId : 'Standort entfernt'
+    })
+  }
+
   static subscribe (onChange: (change: DocumentChange<CollectionItemDB>) => void) {
     const db = getFirestore()
 
@@ -135,6 +154,7 @@ export class CollectionItem {
   static async create (options: Partial<CollectionItemDB>) {
     const db = getFirestore()
     let item = new CollectionItem(null, options)
+    console.log(item.toDB())
     const docRef = await addDoc(collection(db, itemsId), item.toDB())
     item = new CollectionItem(docRef.id, options)
     return item

@@ -1,5 +1,9 @@
 <template>
-  <div class="info-card">
+  <div
+    :class="['info-card', {
+      'info-card--danger': danger
+    }]"
+  >
     <div
       v-if="$slots.title || title || $slots.desc || desc"
       class="info-card__header"
@@ -25,6 +29,7 @@
 defineProps<{
   title?: string
   desc?: string
+  danger?: boolean
 }>()
 </script>
 
@@ -60,6 +65,10 @@ defineProps<{
 
   &__content {
     flex: 1 1 auto;
+  }
+
+  &--danger {
+    color: r.$danger;
   }
 }
 </style>

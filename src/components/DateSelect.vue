@@ -24,12 +24,13 @@
     }"
     v-model="dateInput"
     ref="input"
-    :type="month ? 'month' : 'date'"
     :class="['date-select', {
       'date-select--disabled': disabled
     }]"
+    type="date"
     :disabled="disabled"
   >
+  <!-- :type="month ? 'month' : 'date'" -->
   <!-- </Btn> -->
 
 </template>
@@ -40,7 +41,8 @@ import { computed, ref, watch } from 'vue'
 const props = defineProps<{
   modelValue: Date | null,
   disabled?: boolean,
-  month?: boolean
+  // month?: boolean,
+  noClear?: boolean
   // noText?: boolean
 }>()
 const emit = defineEmits(['update:modelValue'])
@@ -55,7 +57,7 @@ watch(() => props.modelValue, (val) => {
   const opt: Intl.DateTimeFormatOptions = {
     year: 'numeric',
     month: '2-digit',
-    day: props.month ? undefined : '2-digit'
+    day: /* props.month ? undefined :  */'2-digit'
   }
   if (val) {
     if (val.toLocaleString('en-US', opt) !== date.value?.toLocaleString('en-US', opt)) {
@@ -68,25 +70,29 @@ watch(() => props.modelValue, (val) => {
   }
 })
 
+function getDateAsString (date: Date) {
+  return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`
+}
+
 const dateInput = computed({
   get: () => {
-    if (!date.value) return ''
+    if (!date.value) return props.noClear ? getDateAsString(new Date()) : ''
 
-    return `${
-      date.value.getFullYear()
-    }-${
-      (date.value.getMonth() + 1).toString().padStart(2, '0')
-    }${
-      props.month
-        ? ''
-        : `-${date.value.getDate().toString().padStart(2, '0')}`
-    }`
+    return getDateAsString(date.value)
   },
   set: (val) => {
+    if (val === '' && props.noClear) {
+      if (input.value) {
+        input.value.value = getDateAsString(new Date())
+      }
+      return
+    }
+
     if (val === '') {
       date.value = null
       return
     }
+
     date.value = new Date(val)
   }
 })

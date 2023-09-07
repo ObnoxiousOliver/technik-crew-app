@@ -11,9 +11,18 @@
     </div>
 
     <ItemFieldsListItemInput
+      v-if="!readonly"
       v-model="fieldValue"
       :fieldTemplate="fieldTemplate"
     />
+
+    <div class="item-fields-list-item__display">
+      <ItemFieldsListItemDisplay
+        v-if="readonly"
+        :fieldValue="fieldValue"
+        :fieldTemplate="fieldTemplate"
+      />
+    </div>
 
   </li>
 </template>
@@ -23,10 +32,12 @@ import { FieldTemplate, FieldTypes, fieldTypes, FieldValue, getOptionString } fr
 import { useVModel } from '@vueuse/core'
 import { computed } from 'vue'
 import ItemFieldsListItemInput from './ItemFieldsListItemInput.vue'
+import ItemFieldsListItemDisplay from './ItemFieldsListItemDisplay.vue'
 
 const props = defineProps<{
   field: FieldValue<FieldTypes> | undefined
   fieldTemplate: FieldTemplate<FieldTypes>
+  readonly?: boolean
 }>()
 
 const emit = defineEmits(['update:field'])
@@ -36,10 +47,10 @@ const field = useVModel(props, 'field', emit)
 const fieldValue = computed({
   get: () => {
     if (props.fieldTemplate.type === 'string') {
-      return field.value?.value as string ?? ''
+      return field.value?.value as string | null ?? ''
     }
     if (props.fieldTemplate.type === 'number') {
-      return field.value?.value as number ?? ''
+      return field.value?.value as number | null ?? ''
     }
     if (props.fieldTemplate.type === 'boolean') {
       return field.value?.value as boolean | null ?? null
@@ -50,8 +61,11 @@ const fieldValue = computed({
     if (props.fieldTemplate.type === 'time') {
       return field.value?.value as Date | null ?? null
     }
+    if (props.fieldTemplate.type === 'datetime') {
+      return field.value?.value as Date | null ?? null
+    }
     if (props.fieldTemplate.type === 'enum') {
-      return field.value?.value as string ?? ''
+      return field.value?.value as string | null ?? ''
     }
     if (props.fieldTemplate.type === 'list') {
       return field.value?.value as (string | number | boolean)[] ?? []
@@ -70,7 +84,7 @@ const fieldValue = computed({
 
     field.value = {
       id: props.fieldTemplate.id,
-      template: props.fieldTemplate,
+      template: props.fieldTemplate.toDB(),
       value
     }
   }

@@ -440,12 +440,12 @@ export class FieldTemplate<T extends FieldTypes> {
 
 export class FieldValue<T extends FieldTypes> {
   readonly id: string
-  readonly template: FieldTemplateBase<T>
+  readonly template: FieldTemplateDB<T>
   readonly value: any
 
   constructor (opt: {
     id: string
-    template: FieldTemplateBase<T>
+    template: FieldTemplateDB<T>
     value: any
   }) {
     this.id = opt.id

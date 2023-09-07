@@ -30,7 +30,7 @@
       <Btn type="submit">Bestätigen</Btn>
     </FormContainer>
 
-    <pre>{{ collection?.toDB() }}</pre>
+    <!-- <pre>{{ collection?.toDB() }}</pre> -->
   </Page>
 </template>
 

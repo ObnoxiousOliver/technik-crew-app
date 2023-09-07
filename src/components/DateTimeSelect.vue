@@ -1,6 +1,11 @@
 <template>
   <div class="date-time-select">
-    <DateSelect :disabled="disabled || disabledDate" class="date-time-select__date" v-model="date" />
+    <DateSelect
+      :disabled="disabled || disabledDate"
+      class="date-time-select__date"
+      v-model="date"
+      :noClear="noClear"
+    />
     <TimeSelect :disabled="disabled || disabledTime" class="date-time-select__time" v-model="time" />
   </div>
 </template>
@@ -14,18 +19,17 @@ const props = defineProps<{
   modelValue: Date,
   disabled?: boolean,
   disabledDate?: boolean,
-  disabledTime?: boolean
+  disabledTime?: boolean,
+  noClear?: boolean
 }>()
-const emit = defineEmits<{
-  'update:modelValue': Date
-}>()
+const emit = defineEmits(['update:modelValue'])
 
 const value = ref(props.modelValue ?? new Date())
 watch(value, (val) => {
   emit('update:modelValue', val)
 })
 watch(() => props.modelValue, (val) => {
-  const opt = {
+  const opt: Intl.DateTimeFormatOptions = {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
@@ -43,6 +47,7 @@ const date = computed({
   get: () => value.value,
   set: (val) => {
     const t = new Date(value.value)
+
     t.setFullYear(
       val.getFullYear(),
       val.getMonth(),

@@ -35,30 +35,50 @@
   </template>
 
   <template v-if="fieldTemplate.type === 'date'">
-    <DateSelect
-      class="item-fields-list-item-input w-stretch"
-      v-model="fieldValueDate"
-    />
+    <div class="item-fields-list-item-input item-fields-list-item-input--date">
+      <InputCheckbox v-model="fieldValueNullDate" />
+      <DateSelect
+        :disabled="!fieldValueNullDate"
+        v-model="fieldValueDate"
+        noClear
+      />
+    </div>
   </template>
+
   <template v-if="fieldTemplate.type === 'time'">
-    <TimeSelect
-      class="item-fields-list-item-input w-stretch"
-      v-model="fieldValueTime"
-    />
+    <div class="item-fields-list-item-input item-fields-list-item-input--time">
+      <InputCheckbox v-model="fieldValueNullTime" />
+      <TimeSelect
+        v-if="fieldValueTime"
+        :disabled="!fieldValueNullTime"
+        v-model="fieldValueTime"
+      />
+    </div>
+  </template>
+
+  <template v-if="fieldTemplate.type === 'datetime'">
+    <div class="item-fields-list-item-input item-fields-list-item-input--datetime">
+      <InputCheckbox v-model="fieldValueNullDatetime" />
+      <DateTimeSelect
+        v-if="fieldValueDatetime"
+        :disabled="!fieldValueNullDatetime"
+        v-model="fieldValueDatetime"
+        noClear
+      />
+    </div>
   </template>
 
   <template v-if="fieldTemplate.type === 'enum'">
-    <DropdownSelection
-      class="item-fields-list-item-input w-stretch"
-      v-model="fieldValue"
-    >
-      <option value="">
-        Keine Auswahl
-      </option>
-      <option v-for="(option, i) in fieldTemplate.options.enum" :key="i">
-        {{ option }}
-      </option>
-    </DropdownSelection>
+    <div class="item-fields-list-item-input item-fields-list-item-input--enum">
+      <DropdownSelection v-model="fieldValue">
+        <option value="">
+          Keine Auswahl
+        </option>
+        <option v-for="(option, i) in fieldTemplate.options.enum" :key="i">
+          {{ option }}
+        </option>
+      </DropdownSelection>
+    </div>
   </template>
 
   <template v-if="fieldTemplate.type === 'list'">
@@ -90,6 +110,8 @@
       <i class="bi-plus-lg btn__icon" />Wert hinzufügen
     </Btn>
   </template>
+
+  <!-- {{ fieldValue }} -->
 </template>
 
 <script lang="ts" setup>
@@ -102,6 +124,7 @@ import DateSelect from './DateSelect.vue'
 import { computed, ref, watch } from 'vue'
 import InputCheckbox from './InputCheckbox.vue'
 import TimeSelect from './TimeSelect.vue'
+import DateTimeSelect from './DateTimeSelect.vue'
 
 const props = defineProps<{
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -121,7 +144,9 @@ watch(fieldValueBool, (val) => {
 })
 watch(fieldValue, (val) => {
   if (props.fieldTemplate.type !== 'boolean') return
-  fieldValueBool.value = val ?? fieldValueBool.value
+  if (val !== null) {
+    fieldValueBool.value = val
+  }
 })
 const fieldValueNullBool = computed<boolean>({
   get: () => {
@@ -137,45 +162,98 @@ const fieldValueNullBool = computed<boolean>({
 })
 
 // Date
-const fieldValueDate = computed({
+function getDateAsString (date: Date) {
+  return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`
+}
+
+const fieldValueDate = ref(new Date())
+watch(fieldValueDate, (val, old) => {
+  if (props.fieldTemplate.type !== 'date') return
+
+  if (val === null) {
+    fieldValueDate.value = old
+    return
+  }
+
+  fieldValue.value = fieldValueNullDate.value ? getDateAsString(val) : null
+})
+watch(fieldValue, (val) => {
+  if (props.fieldTemplate.type !== 'date') return
+  if (val) {
+    fieldValueDate.value = new Date(val)
+  }
+})
+const fieldValueNullDate = computed<boolean>({
   get: () => {
     if (props.fieldTemplate.type === 'date') {
-      return fieldValue.value ? new Date(fieldValue.value) : null
+      return fieldValue.value !== null
     }
-    return null
+    return false
   },
   set: (val) => {
     if (props.fieldTemplate.type !== 'date') return
-
-    if (!val) {
-      fieldValue.value = val
-      return
-    }
-
-    fieldValue.value = `${val.getFullYear()}-${(val.getMonth() + 1).toString().padStart(2, '0')}-${val.getDate().toString().padStart(2, '0')}`
+    fieldValue.value = val ? getDateAsString(fieldValueDate.value) : null
   }
 })
 
 // Time
-// const fieldValueTime = computed({
-//   get: () => {
-//     if (props.fieldTemplate.type === 'time') {
-//       console.log(fieldValue.value)
-//       return fieldValue.value ? new Date(fieldValue.value) : new Date()
-//     }
-//     return null
-//   },
-//   set: (val) => {
-//     if (props.fieldTemplate.type !== 'time') return
+function getTimeAsString (time: Date) {
+  return `${time.getHours().toString().padStart(2, '0')}:${time.getMinutes().toString().padStart(2, '0')}`
+}
 
-//     if (!val) {
-//       fieldValue.value = new Date()
-//       return
-//     }
+const fieldValueTime = ref(new Date())
+watch(fieldValueTime, (val) => {
+  if (props.fieldTemplate.type !== 'time') return
+  fieldValue.value = fieldValueNullTime.value ? getTimeAsString(val) : null
+})
+watch(fieldValue, (val) => {
+  if (props.fieldTemplate.type !== 'time') return
+  if (val) {
+    fieldValueTime.value = new Date('0 ' + val)
+  }
+})
+const fieldValueNullTime = computed<boolean>({
+  get: () => {
+    if (props.fieldTemplate.type === 'time') {
+      return fieldValue.value !== null
+    }
+    return false
+  },
+  set: (val) => {
+    if (props.fieldTemplate.type !== 'time') return
+    fieldValue.value = val ? getTimeAsString(fieldValueTime.value) : null
+  }
+})
 
-//     fieldValue.value = `${val?.getHours().toString().padStart(2, '0')}:${val?.getMinutes().toString().padStart(2, '0')}`
-//   }
-// })
+// Datetime
+function getDatetimeAsString (datetime: Date) {
+  return `${getDateAsString(datetime)} ${getTimeAsString(datetime)}`
+}
+
+const fieldValueDatetime = ref(new Date())
+watch(fieldValueDatetime, (val) => {
+  if (props.fieldTemplate.type !== 'datetime') return
+  fieldValue.value = fieldValueNullDatetime.value ? getDatetimeAsString(val) : null
+})
+watch(fieldValue, (val) => {
+  if (props.fieldTemplate.type !== 'datetime') return
+  if (val) {
+    fieldValueDatetime.value = new Date(val)
+  }
+})
+const fieldValueNullDatetime = computed<boolean>({
+  get: () => {
+    if (props.fieldTemplate.type === 'datetime') {
+      console.log(fieldValue.value)
+      return fieldValue.value !== null
+    }
+    return false
+  },
+  set: (val) => {
+    if (props.fieldTemplate.type !== 'datetime') return
+    fieldValue.value = val ? getDatetimeAsString(fieldValueDatetime.value) : null
+  }
+})
 
 // List
 function cleanList () {
@@ -221,6 +299,17 @@ function removeItem (i: number) {
     flex-flow: row nowrap;
     align-items: center;
     gap: .5rem;
+  }
+
+  &--time, &--date, &--datetime {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    gap: .5rem;
+
+    & > :nth-child(2) {
+      flex: 1 1 auto;
+    }
   }
 
   &--list {

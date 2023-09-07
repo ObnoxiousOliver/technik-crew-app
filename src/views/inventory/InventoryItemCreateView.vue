@@ -29,6 +29,7 @@
       <SettingsList>
         <SettingsListDivider />
         <SettingsListOption>
+          <i class="bi-geo-alt" />
           Standort
           <template #desc>
             <template v-if="location">{{ location.name }}</template>
@@ -48,7 +49,7 @@
           </template>
         </SettingsListOption>
         <SettingsListLink :to="selectLocation.route">
-          <i class="bi-geo-alt" />
+          <i :class="location ? 'bi-pencil-square' : 'bi-plus-lg'" />
           <template v-if="location">Standort ändern</template>
           <template v-else>Standort hinzufügen</template>
         </SettingsListLink>
@@ -56,10 +57,11 @@
         <SettingsListDivider />
 
         <SettingsListOption>
-          Code
+          <i class="bi-qr-code-scan" />
+          QR- oder Barcode
           <template #desc>
             <template v-if="code">{{ code }}</template>
-            <template v-else><i>Kein Code</i></template>
+            <template v-else><i>Kein QR- oder Barcode</i></template>
           </template>
           <template #input>
             <Btn
@@ -76,13 +78,10 @@
         </SettingsListOption>
 
         <SettingsListLink :to="scanCode.route">
-          <i class="bi-qr-code-scan" />
-          <template v-if="code">
-            Code andern
-          </template>
-          <template v-else>
-            Code scannen
-          </template>
+          <i class="bi-upc-scan" />
+          QR- oder Barcode
+          <template v-if="code">andern</template>
+          <template v-else>scannen</template>
         </SettingsListLink>
         <SettingsListLink @click="showCodeSheet = true" is-button>
           <i class="bi-pencil-square" />
@@ -95,8 +94,6 @@
 
         <SettingsListItem>
           <ItemFieldsList
-            class="item-fields-list--settings"
-
             v-if="collection?.fields"
             :fieldTemplate="collection?.fields"
             v-model:fields="fields"
@@ -175,7 +172,8 @@ const state = temp.getData('inventory-item-create') as {
   name: string
   description: string
   locationId: string | null,
-  code: string | null
+  code: string | null,
+  fields: FieldValue<FieldTypes>[]
 } | null
 
 const collectionId = ref<string>(route.query.collection as string ?? inventory.collections?.[0]?.id ?? '')
@@ -202,7 +200,7 @@ watch(showCodeSheet, () => {
   }
 })
 
-const fields = ref<FieldValue<FieldTypes>[]>([])
+const fields = ref<FieldValue<FieldTypes>[]>(state?.fields ?? [])
 
 watchEffect(() => {
   temp.setData('inventory-item-create', {
@@ -210,7 +208,8 @@ watchEffect(() => {
     name: name.value,
     description: description.value,
     locationId: location.value?.id,
-    code: code.value
+    code: code.value,
+    fields: fields.value
   })
 })
 
@@ -228,7 +227,9 @@ async function submit () {
     collectionId: collectionId.value,
     name: name.value,
     description: description.value,
-    locationId: location.value?.id
+    locationId: location.value?.id,
+    code: code.value,
+    fields: fields.value
   })
 
   temp.deleteData('inventory-item-create')

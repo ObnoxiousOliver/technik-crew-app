@@ -46,6 +46,17 @@
       </SettingsListOption>
     </SettingsList> -->
 
+    <InfoCard danger>
+      <template #title>
+        <i class="bi-exclamation-triangle" />
+        Experimentell
+      </template>
+
+      <template #desc>
+        Diese Seite ist noch nicht fertig und wird noch überarbeitet.
+      </template>
+    </InfoCard>
+
     <CollectionList
       :collections="(inventory.collections as Collection[])"
     />
@@ -89,6 +100,7 @@
 
 <script setup lang="ts">
 import CollectionList from '@/components/CollectionList.vue'
+import InfoCard from '@/components/InfoCard.vue'
 import UserPage from '@/layout/UserPage.vue'
 import { Collection } from '@/model/inventory/collection'
 import { useInventory } from '@/stores/inventory'
