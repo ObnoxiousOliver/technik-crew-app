@@ -1,6 +1,7 @@
 import router, { back, temporaryRoute } from '@/router'
 import { defineStore } from 'pinia'
 import { ref, Component, watch } from 'vue'
+import { RouteLocationRaw } from 'vue-router'
 
 export const useTemp = defineStore('temp', () => {
   const data = ref({} as Record<string, unknown>)
@@ -37,7 +38,15 @@ export const useTemp = defineStore('temp', () => {
 
     temporaryRoute(name, pathName, component, meta)
 
-    return (_deleteData = true) => getData(name, _deleteData)
+    return {
+      getData: (_deleteData = true) => getData(name, _deleteData),
+      route: {
+        name,
+        query: {
+          back: router.currentRoute.value.fullPath
+        }
+      } as RouteLocationRaw
+    }
   }
 
   function setDataFromTempRoute (d: unknown, routeBack = true) {

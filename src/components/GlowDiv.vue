@@ -1,6 +1,8 @@
 <template>
   <div
-    class="glow"
+    :class="['glow', {
+      'glow--inline': inline
+    }]"
     ref="root"
     :style="{
       '--glow-spread': `${spread ?? 1}`,
@@ -22,6 +24,7 @@ import { onBeforeUnmount, onMounted, ref } from 'vue'
 defineProps<{
   spread?: number
   opacity?: number
+  inline?: boolean
 }>()
 
 const root = ref<HTMLElement>()
@@ -57,6 +60,10 @@ onMounted(() => {
 <style lang="scss" scoped>
 .glow {
   position: relative;
+
+  &--inline {
+    display: inline-block;
+  }
 
   &__glow {
     position: absolute;

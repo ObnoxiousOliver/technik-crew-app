@@ -126,10 +126,13 @@ const btnEl = ref<HTMLButtonElement | HTMLAnchorElement | null>(null)
   }
 
   &.btn--danger {
-    background: rgba(r.$danger, .1);
     color: lighten(r.$danger, 5);
-    &:hover:not(:disabled) {
-      background: rgba(r.$danger, .2);
+
+    &:not(.btn--transparent) {
+      background: rgba(r.$danger, .1);
+      &:hover:not(:disabled) {
+        background: rgba(r.$danger, .2);
+      }
     }
 
     &:focus-visible {

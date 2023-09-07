@@ -67,6 +67,11 @@ onMounted(() => {
 
 function input (e: Event) {
   value.value = (e.target as HTMLSpanElement).innerText
+  if (inputEl.value) {
+    if (inputEl.value.children.length > 0) {
+      inputEl.value.innerHTML = inputEl.value.innerText
+    }
+  }
 }
 
 function paste (e: ClipboardEvent) {

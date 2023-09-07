@@ -58,7 +58,7 @@
         { to: 'wiki', icon: 'compass' },
         { to: 'events', icon: 'calendar2-week' },
         { to: 'dashboard', icon: 'house-door' },
-        { to: 'equipment', icon: 'speaker' },
+        { to: 'inventory', icon: 'box-seam' },
         { to: 'settings', icon: 'gear' },
       ]"
     />
@@ -124,7 +124,7 @@ watch(isOffline, (offline) => {
 
 const bp = useBreakpoint()
 
-const showNavigation = computed(() => ['dashboard', 'wiki', 'events', 'equipment', 'settings'].includes(route.meta.root as string))
+const showNavigation = computed(() => ['dashboard', 'wiki', 'events', 'inventory', 'settings'].includes(route.meta.root as string))
 
 const toasts = ref<{
   id: string

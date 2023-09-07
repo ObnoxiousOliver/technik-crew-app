@@ -10,6 +10,7 @@
       v-wave
       :to="props.to"
       @click="emit('click')"
+      :type="props.isButton ? 'button' : undefined"
     >
       <div class="settings-list-item__content">
         <slot />
