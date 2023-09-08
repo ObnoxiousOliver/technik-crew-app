@@ -3,7 +3,7 @@ import { User } from '@/model/user'
 import CryptoJS from 'crypto-js'
 import { FirebaseError } from 'firebase/app'
 import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword, signOut as _signOut, updateEmail } from 'firebase/auth'
-import { collection, doc, getDoc, getFirestore, setDoc } from 'firebase/firestore'
+import { collection, doc, getDoc, getDocs, getFirestore, setDoc } from 'firebase/firestore'
 import { logOnServer } from './log'
 import { useUser } from '@/stores/user'
 
@@ -13,6 +13,7 @@ export async function signIn (name: string, password: string) {
   console.log('Logging in as', name)
 
   const userDoc = await getDoc(doc(db, 'user-mail', name))
+  console.log((await getDocs(collection(db, 'user-mail'))).docs.map(doc => doc.id))
   if (!userDoc.exists()) {
     throw new FirebaseError('auth/user-not-found', 'User not found')
   }
