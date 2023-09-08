@@ -43,6 +43,17 @@
           <ToggleSwitch id="forceOfflineMode" v-model="offlineMode" />
         </template>
       </SettingsListOption>
+
+      <SettingsListOption for="useInventory">
+        <i class="bi-box" />Neues Inventar-System benutzen
+        <template #desc>
+          Das neue Inventar-System ist noch in der Entwicklung.
+          Es ist noch nicht vollständig und kann Fehler enthalten.
+        </template>
+        <template #input>
+          <ToggleSwitch id="useInventory" v-model="useInventoryFlag" />
+        </template>
+      </SettingsListOption>
     </SettingsList>
 
     <ActionSheet v-model:show="showConfirmDevModeDisable">
@@ -93,6 +104,13 @@ const offlineMode = computed({
   get: () => devMode.flags.forceOfflineMode ?? false,
   set: (value) => {
     devMode.flags.forceOfflineMode = value
+  }
+})
+
+const useInventoryFlag = computed({
+  get: () => devMode.flags.useInventory ?? false,
+  set: (value) => {
+    devMode.flags.useInventory = value
   }
 })
 

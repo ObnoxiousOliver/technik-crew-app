@@ -12,9 +12,9 @@
       <Btn :to="{ name: 'locations' }" aria-label="Standorte">
         <i class="bi-geo-alt" />
       </Btn>
-      <Btn :to="{ name: 'equipment-scan' }" aria-label="Equipment Code Scannen">
+      <!-- <Btn :to="{ name: 'equipment-scan' }" aria-label="Equipment Code Scannen">
         <i class="bi-qr-code-scan" />
-      </Btn>
+      </Btn> -->
     </template>
 
     <!-- <LensCard /> -->
