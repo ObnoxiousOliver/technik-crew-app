@@ -240,6 +240,21 @@ export function createRouter (routes: AbstractRoute[], options: Partial<RouterOp
     }
   })
 
+  // 404
+  router.beforeEach((to, from, next) => {
+    if (to.matched.find(record => record.name === '404')) {
+      console.log(...dev(logRouter), '404')
+
+      if (to.query.back) {
+        next(to.query.back as string)
+      } else {
+        next()
+      }
+    } else {
+      next()
+    }
+  })
+
   const lastPageOfRoot: {
     [key: string]: RouteLocationNormalized
   } = {}
@@ -289,9 +304,11 @@ export function createRouter (routes: AbstractRoute[], options: Partial<RouterOp
   function temporaryRoute (name: string, pathName: string, component: Component, meta: RouteMeta = {}) {
     const currentRoute = router.currentRoute.value
 
+    const currentPath = currentRoute.path.split('?')[0]
+
     router.addRoute({
       name,
-      path: `${currentRoute.path}/${pathName}`,
+      path: `${currentPath}/${pathName}`,
       component,
       meta: {
         root: currentRoute.meta.root,
@@ -306,7 +323,7 @@ export function createRouter (routes: AbstractRoute[], options: Partial<RouterOp
     })
 
     localStorage.setItem('temporary_route', JSON.stringify({
-      path: `${currentRoute.path}/${pathName}`,
+      path: `${currentPath}/${pathName}`,
       backPath: currentRoute.path
     }))
 

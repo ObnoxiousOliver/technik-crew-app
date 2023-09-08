@@ -7,7 +7,10 @@
       'input--has-before': !!$slots.before,
       'input--has-after': !!$slots.after,
       'input--focused': focused,
-      'input--label': label
+      'input--label': label,
+      'input--dark': dark,
+      'input--before-padding': beforePadding,
+      'input--after-padding': afterPadding
     }]"
   >
     <div class="input__label" v-if="label">
@@ -20,15 +23,16 @@
       class="input__field"
       ref="input"
       :disabled="disabled"
-      @change="onChange"
-      @keydown="onChange"
       @keydown.enter="enter"
       @focus="focused = true"
       @blur="focused = false"
-      :type="type === 'number' ? 'text' : type"
-      :inputmode="type === 'number' ? 'decimal' : undefined"
+      :type="type"
       v-bind="$attrs"
+      v-model="value"
     >
+    <!-- @change="onChange"
+    @keydown="onChange" -->
+    <!-- :inputmode="type === 'number' ? 'decimal' : undefined" -->
     <div v-if="$slots.after" class="input__after">
       <slot name="after" />
     </div>
@@ -48,37 +52,15 @@ const props = defineProps<{
   disabled?: boolean
   modelValue?: string | number
   type?: 'text' | 'password' | 'email' | 'number' | 'search'
-  min?: number
-  max?: number
-  steps?: number
+  dark?: boolean,
+  beforePadding?: boolean,
+  afterPadding?: boolean
 }>()
 const disabled = computed(() => props.disabled ?? false)
 const type = computed(() => props.type ?? 'text')
 
-const min = computed(() => props.min ?? 0)
-const max = computed(() => props.max ?? 100)
-const steps = computed(() => props.steps ?? 1)
-
 const value = ref(props.modelValue)
 watch(value, (val, old) => {
-  if (props.type === 'number') {
-    val = typeof val === 'number' ? val : parseFloat(val as string)
-    if (min.value) val = Math.max(val, min.value)
-    if (max.value) val = Math.min(val, max.value)
-
-    if (min.value) {
-      val = Math.round((val - min.value) / steps.value) * steps.value + min.value
-    } else {
-      val = Math.round(val / steps.value) * steps.value
-    }
-
-    if (!isFinite(val) || isNaN(val)) {
-      value.value = old
-      input.value.value = old
-      return
-    }
-  }
-
   input.value.value = val
   emit('update:modelValue', val)
 })
@@ -87,10 +69,10 @@ watch(() => props.modelValue, (val) => {
   input.value.value = val
 })
 
-function onChange (e: InputEvent) {
-  value.value = (e.target as HTMLInputElement).value
-  input.value.value = value.value
-}
+// function onChange (e: InputEvent) {
+//   value.value = (e.target as HTMLInputElement).value
+//   input.value.value = value.value
+// }
 
 async function enter () {
   setTimeout(() => {
@@ -155,15 +137,27 @@ defineExpose({
     }
   }
 
+  &--dark {
+    background: r.$bg-primary;
+  }
+
   &__before {
     & > :deep(i) {
       margin-left: 1rem;
+    }
+
+    .input--before-padding > & {
+      padding-left: 1rem;
     }
   }
 
   &__after {
     & > :deep(i) {
       margin-right: 1rem;
+    }
+
+    .input--after-padding > & {
+      padding-right: 1rem;
     }
   }
 
