@@ -1,7 +1,16 @@
 <template>
-  <Page>
+  <NotFoundView v-if="!item" />
+  <Page v-else>
     <template #btns>
-      <Btn aria-label="Bearbeiten">
+      <Btn
+        :to="{
+          name: 'inventory-item-edit',
+          params: {
+            itemId: item?.id
+          }
+        }"
+        aria-label="Bearbeiten"
+      >
         <i class="bi-pencil-square" />
       </Btn>
     </template>
@@ -97,12 +106,26 @@
 
         <SettingsListDivider />
 
-        <SettingsListLink isButton>
+        <SettingsListLink
+          :to="{
+            name: 'inventory-item-edit',
+            params: {
+              itemId: item?.id
+            }
+          }"
+        >
           <i class="bi-pencil-square" />
           Bearbeiten
         </SettingsListLink>
 
-        <SettingsListLink isButton>
+        <SettingsListLink
+          :to="{
+            name: 'inventory-item-history',
+            params: {
+              itemId: item.id
+            }
+          }"
+        >
           <i class="bi-clock-history" />
           Verlauf anzeigen
         </SettingsListLink>
@@ -183,6 +206,7 @@ import { Location } from '@/model/location'
 import { CollectionItem } from '@/model/inventory/collectionItem'
 import SettingsListItem from '@/components/SettingsListItem.vue'
 import ItemFieldsList from '@/components/ItemFieldsList.vue'
+import NotFoundView from '../NotFoundView.vue'
 
 const route = useRoute()
 const inventory = useInventory()

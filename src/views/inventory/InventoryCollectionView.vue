@@ -1,5 +1,6 @@
 <template>
-  <Page>
+  <NotFoundView v-if="!collection" />
+  <Page v-else>
     <template #btns>
       <Btn
         :to="{

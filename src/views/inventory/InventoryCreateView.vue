@@ -1,7 +1,7 @@
 <template>
   <Page>
     <template #title>
-      <i class="bi-collection" /> Kollektion erstellen
+      <i class="bi-collection" />Kollektion erstellen
     </template>
 
     <FormContainer @submit.prevent="submit">

@@ -244,7 +244,7 @@ watch(fieldValue, (val) => {
 const fieldValueNullDatetime = computed<boolean>({
   get: () => {
     if (props.fieldTemplate.type === 'datetime') {
-      console.log(fieldValue.value)
+      // console.log(fieldValue.value)
       return fieldValue.value !== null
     }
     return false

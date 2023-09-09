@@ -1,11 +1,7 @@
 <template>
   <Page>
     <template #title>
-      <template v-if="item && !splitFirstEmojiFromString(item.name ?? '')">
-        <i class="bi-box" />
-      </template>
-
-      {{ item?.name }}
+      <template v-if="item && !splitFirstEmojiFromString(item.name ?? '')"><i class="bi-box" /></template>{{ item?.name }}
     </template>
 
     <template v-if="unassignedFields">

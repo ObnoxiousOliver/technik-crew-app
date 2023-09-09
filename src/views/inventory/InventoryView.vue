@@ -7,7 +7,7 @@
     }"
   >
     <template #title>
-      <i class="bi-box-seam" /> Inventar
+      <i class="bi-box-seam" />Inventar
     </template>
 
     <template #btns>

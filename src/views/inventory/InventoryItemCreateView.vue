@@ -1,7 +1,16 @@
 <template>
   <Page>
     <template #title>
-      Neuen Gegenstand erstellen
+      <i class="bi-file-plus" />Neuen Gegenstand erstellen
+    </template>
+
+    <template #btns>
+      <Btn
+        @click="submit"
+        aria-label="Bestätigen"
+      >
+        <i class="bi-check-lg" />
+      </Btn>
     </template>
 
     <FormContainer @submit.prevent="submit" :disabled="submitting">

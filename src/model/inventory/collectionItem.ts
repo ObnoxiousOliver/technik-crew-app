@@ -12,6 +12,7 @@ export interface CollectionItemDB {
   code: string | null
   locationId: string | null
   fields: FieldValue<FieldTypes>[]
+  is_hidden: boolean
 }
 
 export class CollectionItem {
@@ -66,6 +67,14 @@ export class CollectionItem {
     this.collectionItem.fields = val
   }
 
+  get isHidden () {
+    return this.collectionItem.is_hidden
+  }
+
+  private set isHidden (val) {
+    this.collectionItem.is_hidden = val
+  }
+
   constructor (id: string | null, options: Partial<CollectionItemDB>) {
     this.id = id
     this.collectionItem = {
@@ -74,7 +83,8 @@ export class CollectionItem {
       description: options.description ?? '',
       code: options.code ?? null,
       locationId: options.locationId ?? null,
-      fields: options.fields ?? []
+      fields: options.fields ?? [],
+      is_hidden: options.is_hidden ?? false
     }
   }
 
@@ -85,8 +95,49 @@ export class CollectionItem {
       description: this.description,
       code: this.code,
       locationId: this.locationId,
-      fields: this.fields
+      fields: this.fields,
+      is_hidden: this.isHidden
     }
+  }
+
+  async set (options: Partial<CollectionItemDB>) {
+    if (!this.id) {
+      throw new Error('Cannot change a collection item without an id')
+    }
+
+    const changes = []
+
+    if (options.name && options.name !== this.name) {
+      this.name = options.name
+      changes.push(`Name geändert -> ${options.name}`)
+    }
+    if (options.description && options.description !== this.description) {
+      this.description = options.description
+      changes.push(`Beschreibung geändert ->\n${options.description}`)
+    }
+    if (options.code && options.code !== this.code) {
+      this.code = options.code
+      changes.push(options.code ? 'Code geändert -> ' + options.code : 'Code entfernt')
+    }
+    if (options.locationId && options.locationId !== this.locationId) {
+      this.locationId = options.locationId
+      changes.push(options.locationId ? 'Standort geändert -> ' + useLocations().getLocationById(options.locationId)?.name ?? options.locationId : 'Standort entfernt')
+    }
+    if (options.fields && JSON.stringify(options.fields) !== JSON.stringify(this.fields)) {
+      this.fields = options.fields
+      changes.push('Felder geändert')
+    }
+    if (options.is_hidden && options.is_hidden !== this.isHidden) {
+      this.isHidden = options.is_hidden
+      changes.push(options.is_hidden ? 'Ausgeblendet' : 'Wieder sichtbar')
+    }
+
+    if (changes.length === 0) return
+
+    await this.save()
+    await this.recordHistory({
+      description: changes.join('\n')
+    })
   }
 
   async save () {
@@ -123,6 +174,14 @@ export class CollectionItem {
       }).toDB())
   }
 
+  async getHistory () {
+    if (!this.id) {
+      throw new Error('Cannot get history on an collection item without an id')
+    }
+
+    return HistoryState.get(itemsId, this.id)
+  }
+
   async setCode (code: string | null) {
     this.code = code
     await this.save()
@@ -153,10 +212,17 @@ export class CollectionItem {
 
   static async create (options: Partial<CollectionItemDB>) {
     const db = getFirestore()
+
     let item = new CollectionItem(null, options)
-    console.log(item.toDB())
+
     const docRef = await addDoc(collection(db, itemsId), item.toDB())
+
     item = new CollectionItem(docRef.id, options)
+
+    await item.recordHistory({
+      description: 'Gegenstand erstellt'
+    })
+
     return item
   }
 
