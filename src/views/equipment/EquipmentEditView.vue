@@ -1,12 +1,12 @@
 <template>
   <NotFoundView v-if="!equipment" />
 
-  <EquipmentScanView
+  <!-- <EquipmentScanView
     v-else-if="editField === 'code'"
     @scan="scan"
     preventDefault
     :errMsg="scanErr"
-  />
+  /> -->
 
   <Page v-else>
     <template #title>
@@ -83,7 +83,6 @@
 <script lang="ts" setup>
 import TextBox from '@/components/TextBox.vue'
 import DropdownSelection from '@/components/DropdownSelection.vue'
-import EquipmentScanView from '@/views/equipment/EquipmentScanView.vue'
 import FloatingLabelInput from '@/components/FloatingLabelInput.vue'
 import SettingsList from '@/components/SettingsList.vue'
 import SettingsListLink from '@/components/SettingsListLink.vue'

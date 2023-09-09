@@ -2,7 +2,8 @@
   <div
     class="home-sidebar"
     :style="{
-      '--active': active
+      '--active': active,
+      '--amount': dev.flags.useInventory ? 6 : 5
     }"
   >
     <h2>
@@ -19,6 +20,13 @@
         </li>
 
         <li>
+          <DesktopSidebarBtn :to="{ name: 'equipment' }">
+            <i class="bi bi-speaker" />
+            Equipment
+          </DesktopSidebarBtn>
+        </li>
+
+        <li v-if="dev.flags.useInventory">
           <DesktopSidebarBtn :to="{ name: 'inventory' }">
             <i class="bi bi-box-seam" />
             Inventar
@@ -57,8 +65,11 @@ import { useUser } from '@/stores/user'
 import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import UsernameDisplay from './UsernameDisplay.vue'
+import { useDev } from '@/stores/developer'
 
 const userStore = useUser()
+
+const dev = useDev()
 
 const route = useRoute()
 watch(route, setActiveButton)
@@ -69,7 +80,7 @@ setActiveButton()
 
 function setActiveButton () {
   const prev = active.value
-  active.value = ['dashboard', 'inventory', 'events', 'wiki', 'settings'].indexOf(route.meta.root as string ?? 'dashboard')
+  active.value = ['dashboard', 'equipment', 'inventory', 'events', 'wiki', 'settings'].indexOf(route.meta.root as string ?? 'dashboard')
   if (prev < active.value) {
     upDown.value = 'down'
   } else if (prev > active.value) {
@@ -87,7 +98,7 @@ function setActiveButton () {
   &__page-indicator {
     position: absolute;
     top: calc(var(--active) * 3rem + 1rem);
-    bottom: calc((4 - var(--active)) * 3rem + 1rem);
+    bottom: calc((var(--amount) - 1 - var(--active)) * 3rem + 1rem);
     left: .1rem;
     width: .2rem;
     border-radius: .1rem;
