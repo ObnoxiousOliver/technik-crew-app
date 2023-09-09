@@ -270,13 +270,34 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
           {
             title: 'Gegenstand',
             name: 'inventory-item-details',
-            pathName: 'item/:itemId',
-            component: () => import('../views/inventory/InventoryItemDetailsView.vue' /* webpackChunkName: "inventory-item-details" */)
+            path: '/:id/item/:itemId',
+            component: () => import('../views/inventory/InventoryItemDetailsView.vue' /* webpackChunkName: "inventory-item-details" */),
+
+            children: [
+              {
+                title: 'Gegenstand verlauf',
+                name: 'inventory-item-history',
+                path: '/:id/item/:itemId/history',
+                component: () => import('../views/inventory/InventoryItemHistoryView.vue' /* webpackChunkName: "inventory-item-history" */)
+              },
+              {
+                title: 'Gegenstand bearbeiten',
+                name: 'inventory-item-edit',
+                path: '/:id/item/:itemId/edit',
+                component: () => import('../views/inventory/InventoryItemEditView.vue' /* webpackChunkName: "inventory-item-edit" */)
+              },
+              {
+                title: 'Unzugewiesene Felder',
+                name: 'inventory-item-unassigned',
+                path: '/:id/item/:itemId/unassigned',
+                component: () => import('../views/inventory/InventoryItemUnassignedView.vue' /* webpackChunkName: "inventory-item-unassigned" */)
+              }
+            ]
           },
           {
             title: 'Kollektion bearbeiten',
             name: 'inventory-edit',
-            pathName: 'edit',
+            path: '/:id/edit',
             component: () => import('../views/inventory/InventoryEditView.vue' /* webpackChunkName: "inventory-edit" */)
           }
         ]
