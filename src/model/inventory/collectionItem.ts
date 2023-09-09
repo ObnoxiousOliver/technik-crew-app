@@ -1,6 +1,6 @@
 import { DocumentChange, addDoc, collection, doc, getFirestore, onSnapshot, setDoc } from 'firebase/firestore'
 import { FieldTypes, FieldValue } from './collectionField'
-import { itemsId } from './collection'
+import { Collection, itemsId } from './collection'
 import { HistoryState } from '../history'
 import { useUser } from '@/stores/user'
 import { useLocations } from '@/stores/locations'
@@ -158,5 +158,11 @@ export class CollectionItem {
     const docRef = await addDoc(collection(db, itemsId), item.toDB())
     item = new CollectionItem(docRef.id, options)
     return item
+  }
+
+  static getUnassignedFields (item: CollectionItem, collection: Collection) {
+    return item.fields.filter((field) => {
+      return !collection.fields.find((templateField) => templateField.id === field.id)
+    })
   }
 }

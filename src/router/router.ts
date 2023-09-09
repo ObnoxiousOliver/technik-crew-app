@@ -272,7 +272,7 @@ export function createRouter (routes: AbstractRoute[], options: Partial<RouterOp
     let metaBackPath = route.meta.backPath as string | null
     if (metaBackPath !== null && route.params) {
       Object.keys(route.params).forEach(key => {
-        metaBackPath = (metaBackPath as string).replace(`:${key}`, route.params[key] as string).replaceAll(/:[^/]*/g, '')
+        metaBackPath = (metaBackPath as string).replace(`:${key}`, route.params[key] as string) // .replaceAll(/:[^/]*/g, '')
       })
     }
     const queryBackPath = route.query.back as string | null

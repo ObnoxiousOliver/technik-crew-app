@@ -109,6 +109,24 @@
 
         <SettingsListDivider>Zusätzliche Felder</SettingsListDivider>
 
+        <SettingsListLink
+          v-if="unassignedFields.length > 0"
+          :to="{
+            name: 'inventory-item-unassigned',
+            params: {
+              itemId: item.id
+            }
+          }"
+        >
+          <i class="bi-question-square" />
+          <template v-if="unassignedFields.length === 1">
+            1 nicht zugewiesenes Feld
+          </template>
+          <template v-else>
+            {{ unassignedFields.length }} nicht zugewiesene Felder
+          </template>
+        </SettingsListLink>
+
         <SettingsListItem>
           <ItemFieldsList
             :field-template="collection?.fields ?? []"
@@ -157,11 +175,12 @@ import SettingsListOption from '@/components/SettingsListOption.vue'
 import { useInventory } from '@/stores/inventory'
 import { useLocations } from '@/stores/locations'
 import { splitFirstEmojiFromString } from '@/utilities/getFirstEmojiOfString'
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 import { ScanCodePreset, SelectLocationPreset } from '../tempViews/presets'
 import { useTemp } from '@/stores/temp'
 import { Location } from '@/model/location'
+import { CollectionItem } from '@/model/inventory/collectionItem'
 import SettingsListItem from '@/components/SettingsListItem.vue'
 import ItemFieldsList from '@/components/ItemFieldsList.vue'
 
@@ -175,35 +194,45 @@ const showCodeSheet = ref(false)
 const selectLocation = temp.tempRoute(SelectLocationPreset('inventory-item-edit-location'))
 const scanCode = temp.tempRoute(ScanCodePreset('inventory-item-edit-code'))
 
-const item = inventory.getItemById(route.params.itemId as string)
+const item = computed(() => inventory.getItemById(route.params.itemId as string))
 const collection = computed(() => {
-  if (item?.collectionId) {
-    return inventory.getCollectionById(item.collectionId)
+  if (item.value?.collectionId) {
+    return inventory.getCollectionById(item.value.collectionId)
   }
   return null
 })
 
+watchEffect(() => {
+  if (!item.value || !collection.value) return
+  document.title = `${collection.value.icon ? collection.value.icon + ' ' : ''}${collection.value.name} > ${item.value.name}`
+})
+
 const tempLocation = selectLocation.getData() as Location | null | undefined
 if (tempLocation !== undefined) {
-  item?.setLocation(tempLocation ? tempLocation.id : null)
+  item.value?.setLocation(tempLocation ? tempLocation.id : null)
 }
 
 const location = computed(() => {
-  if (item?.locationId) {
-    return locStore.getLocationById(item.locationId)
+  if (item.value?.locationId) {
+    return locStore.getLocationById(item.value.locationId)
   }
   return null
 })
 
 const tempCode = scanCode.getData() as string | null
 if (tempCode) {
-  item?.setCode(tempCode)
+  item.value?.setCode(tempCode)
 }
 
-const codeInput = ref<string>(item?.code ?? '')
+const codeInput = ref<string>(item.value?.code ?? '')
 watch(showCodeSheet, () => {
   if (showCodeSheet.value) {
-    codeInput.value = item?.code ?? ''
+    codeInput.value = item.value?.code ?? ''
   }
+})
+
+const unassignedFields = computed(() => {
+  if (!item.value || !collection.value) return []
+  return CollectionItem.getUnassignedFields(item.value, collection.value)
 })
 </script>

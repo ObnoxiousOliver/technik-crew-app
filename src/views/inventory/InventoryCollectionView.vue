@@ -76,7 +76,7 @@ import CollectionItemList from '@/components/CollectionItemList.vue'
 import GlowDiv from '@/components/GlowDiv.vue'
 import InfoCard from '@/components/InfoCard.vue'
 import { useInventory } from '@/stores/inventory'
-import { computed } from 'vue'
+import { computed, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
@@ -84,6 +84,11 @@ const inventory = useInventory()
 
 const collection = computed(() => inventory.getCollectionById(route.params.id as string))
 const items = computed(() => inventory.getItemsByCollectionId(route.params.id as string))
+
+watchEffect(() => {
+  if (!collection.value) return
+  document.title = `${collection.value.icon ? collection.value.icon + ' ' : ''}${collection.value.name}`
+})
 
 // const showActionSheet = ref(false)
 </script>

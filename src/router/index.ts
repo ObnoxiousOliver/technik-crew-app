@@ -157,95 +157,95 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
     offlineVisible: true
   },
 
-  // // Equipment
-  // {
-  //   title: 'Equipment',
-  //   name: 'equipment',
-  //   path: '/equipment',
-  //   component: () => import('../views/equipment/EquipmentView.vue' /* webpackChunkName: "equipment" */),
-  //   requiresAuth: true,
-  //   offlineVisible: true,
+  // Equipment
+  {
+    title: 'Equipment',
+    name: 'equipment',
+    path: '/equipment',
+    component: () => import('../views/equipment/EquipmentView.vue' /* webpackChunkName: "equipment" */),
+    requiresAuth: true,
+    offlineVisible: true,
 
-  //   children: [
-  //     {
-  //       title: 'Neues Equipment',
-  //       name: 'equipment-add',
-  //       pathName: 'add',
-  //       component: () => import('../views/equipment/EquipmentAddView.vue' /* webpackChunkName: "equipment-add" */)
-  //     },
-  //     {
-  //       title: 'Equipment Details',
-  //       name: 'equipment-details',
-  //       path: '/equipment/:id',
-  //       component: () => import('../views/equipment/EquipmentDetailsView.vue' /* webpackChunkName: "equipment-details" */),
-  //       offlineVisible: true,
-  //       children: [
-  //         {
-  //           title: 'Equipment Verlauf',
-  //           name: 'equipment-history',
-  //           path: '/equipment/:id/history',
-  //           component: () => import('../views/equipment/EquipmentHistoryView.vue' /* webpackChunkName: "equipment-history" */),
-  //           offlineVisible: true
-  //         },
-  //         {
-  //           title: 'Equipment bearbeiten',
-  //           name: 'equipment-edit',
-  //           path: '/equipment/:id/edit/:field?',
-  //           component: () => import('../views/equipment/EquipmentEditView.vue' /* webpackChunkName: "equipment-edit" */),
+    children: [
+      {
+        title: 'Neues Equipment',
+        name: 'equipment-add',
+        pathName: 'add',
+        component: () => import('../views/equipment/EquipmentAddView.vue' /* webpackChunkName: "equipment-add" */)
+      },
+      {
+        title: 'Equipment Details',
+        name: 'equipment-details',
+        path: '/equipment/:id',
+        component: () => import('../views/equipment/EquipmentDetailsView.vue' /* webpackChunkName: "equipment-details" */),
+        offlineVisible: true,
+        children: [
+          {
+            title: 'Equipment Verlauf',
+            name: 'equipment-history',
+            path: '/equipment/:id/history',
+            component: () => import('../views/equipment/EquipmentHistoryView.vue' /* webpackChunkName: "equipment-history" */),
+            offlineVisible: true
+          },
+          {
+            title: 'Equipment bearbeiten',
+            name: 'equipment-edit',
+            path: '/equipment/:id/edit/:field?',
+            component: () => import('../views/equipment/EquipmentEditView.vue' /* webpackChunkName: "equipment-edit" */),
 
-  //           children: [
-  //             {
-  //               title: 'Standort ändern',
-  //               name: 'equipment-edit-location',
-  //               path: '/equipment/:id/edit/location',
-  //               component: () => import('../views/equipment/EquipmentEditLocationView.vue' /* webpackChunkName: "equipment-edit-location" */)
-  //             }
-  //           ]
-  //         },
-  //         {
-  //           title: 'Equipment Anzahl Teilen',
-  //           name: 'equipment-split',
-  //           path: '/equipment/:id/split',
-  //           component: () => import('../views/equipment/EquipmentSplitView.vue' /* webpackChunkName: "equipment-split" */)
-  //         }
-  //       ]
-  //     },
-  //     {
-  //       title: 'Equipment Code Scannen',
-  //       name: 'equipment-scan',
-  //       pathName: '/scan',
-  //       component: () => import('../views/equipment/EquipmentScanView.vue' /* webpackChunkName: "equipment-scan" */)
-  //     },
+            children: [
+              {
+                title: 'Standort ändern',
+                name: 'equipment-edit-location',
+                path: '/equipment/:id/edit/location',
+                component: () => import('../views/equipment/EquipmentEditLocationView.vue' /* webpackChunkName: "equipment-edit-location" */)
+              }
+            ]
+          },
+          {
+            title: 'Equipment Anzahl Teilen',
+            name: 'equipment-split',
+            path: '/equipment/:id/split',
+            component: () => import('../views/equipment/EquipmentSplitView.vue' /* webpackChunkName: "equipment-split" */)
+          }
+        ]
+      },
+      // {
+      //   title: 'Equipment Code Scannen',
+      //   name: 'equipment-scan',
+      //   pathName: '/scan',
+      //   component: () => import('../views/equipment/EquipmentScanView.vue' /* webpackChunkName: "equipment-scan" */)
+      // },
 
-  //     // Locations
-  //     {
-  //       title: 'Standorte',
-  //       name: 'locations',
-  //       path: '/locations',
-  //       component: () => import('../views/LocationsView.vue' /* webpackChunkName: "locations" */),
-  //       children: [
-  //         {
-  //           title: 'Neuer Standort',
-  //           name: 'location-add',
-  //           path: '/locations/add',
-  //           component: () => import('../views/LocationAddView.vue' /* webpackChunkName: "location-add" */)
-  //         },
-  //         {
-  //           title: 'Standort bearbeiten',
-  //           name: 'location-edit',
-  //           path: '/locations/:id',
-  //           component: () => import('../views/LocationEditView.vue' /* webpackChunkName: "location-edit" */)
-  //         },
-  //         {
-  //           title: 'Standortverlauf',
-  //           name: 'location-history',
-  //           path: '/locations/:id/history',
-  //           component: () => import('../views/LocationHistoryView.vue' /* webpackChunkName: "location-history" */)
-  //         }
-  //       ]
-  //     }
-  //   ]
-  // },
+      // Locations
+      {
+        title: 'Standorte',
+        name: 'locations',
+        path: '/locations',
+        component: () => import('../views/LocationsView.vue' /* webpackChunkName: "locations" */),
+        children: [
+          {
+            title: 'Neuer Standort',
+            name: 'location-add',
+            path: '/locations/add',
+            component: () => import('../views/LocationAddView.vue' /* webpackChunkName: "location-add" */)
+          },
+          {
+            title: 'Standort bearbeiten',
+            name: 'location-edit',
+            path: '/locations/:id',
+            component: () => import('../views/LocationEditView.vue' /* webpackChunkName: "location-edit" */)
+          },
+          {
+            title: 'Standortverlauf',
+            name: 'location-history',
+            path: '/locations/:id/history',
+            component: () => import('../views/LocationHistoryView.vue' /* webpackChunkName: "location-history" */)
+          }
+        ]
+      }
+    ]
+  },
 
   {
     title: 'Inventar',
@@ -270,13 +270,34 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
           {
             title: 'Gegenstand',
             name: 'inventory-item-details',
-            pathName: 'item/:itemId',
-            component: () => import('../views/inventory/InventoryItemDetailsView.vue' /* webpackChunkName: "inventory-item-details" */)
+            path: '/:id/item/:itemId',
+            component: () => import('../views/inventory/InventoryItemDetailsView.vue' /* webpackChunkName: "inventory-item-details" */),
+
+            children: [
+              {
+                title: 'Gegenstand verlauf',
+                name: 'inventory-item-history',
+                path: '/:id/item/:itemId/history',
+                component: () => import('../views/inventory/InventoryItemHistoryView.vue' /* webpackChunkName: "inventory-item-history" */)
+              },
+              {
+                title: 'Gegenstand bearbeiten',
+                name: 'inventory-item-edit',
+                path: '/:id/item/:itemId/edit',
+                component: () => import('../views/inventory/InventoryItemEditView.vue' /* webpackChunkName: "inventory-item-edit" */)
+              },
+              {
+                title: 'Unzugewiesene Felder',
+                name: 'inventory-item-unassigned',
+                path: '/:id/item/:itemId/unassigned',
+                component: () => import('../views/inventory/InventoryItemUnassignedView.vue' /* webpackChunkName: "inventory-item-unassigned" */)
+              }
+            ]
           },
           {
             title: 'Kollektion bearbeiten',
             name: 'inventory-edit',
-            pathName: 'edit',
+            path: '/:id/edit',
             component: () => import('../views/inventory/InventoryEditView.vue' /* webpackChunkName: "inventory-edit" */)
           }
         ]
