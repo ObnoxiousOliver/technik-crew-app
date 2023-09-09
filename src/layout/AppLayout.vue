@@ -58,7 +58,8 @@
         { to: 'wiki', icon: 'compass' },
         { to: 'events', icon: 'calendar2-week' },
         { to: 'dashboard', icon: 'house-door' },
-        { to: 'inventory', icon: 'box-seam' },
+        { to: 'equipment', icon: 'speaker' },
+        ...(dev.flags.useInventory ? [{ to: 'inventory', icon: 'box-seam' }] : []),
         { to: 'settings', icon: 'gear' },
       ]"
     />
@@ -102,6 +103,7 @@ import { useRoute } from 'vue-router'
 import { useToast } from '@/utilities/toast'
 import { createId } from '@/utilities/id'
 import { useOffline } from '@/utilities/offline'
+import { useDev } from '@/stores/developer'
 
 const route = useRoute()
 
@@ -111,6 +113,8 @@ const showNetworkIndicator = computed(() => {
   if (route.meta.root === 'login') return false
   return _showNetworkIndicator.value
 })
+
+const dev = useDev()
 
 watch(isOffline, (offline) => {
   _showNetworkIndicator.value = offline
@@ -124,7 +128,7 @@ watch(isOffline, (offline) => {
 
 const bp = useBreakpoint()
 
-const showNavigation = computed(() => ['dashboard', 'wiki', 'events', 'inventory', 'settings'].includes(route.meta.root as string))
+const showNavigation = computed(() => ['dashboard', 'wiki', 'events', 'equipment', 'inventory', 'settings'].includes(route.meta.root as string))
 
 const toasts = ref<{
   id: string
