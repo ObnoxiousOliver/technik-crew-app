@@ -1,6 +1,18 @@
 <template>
-  <Page>
+  <NotFoundView v-if="!collection" />
+  <Page v-else>
     <template #btns>
+      <Btn
+        :to="{
+          name: 'inventory-archive',
+          params: {
+            id: collection?.id
+          }
+        }"
+        aria-label="Archiv"
+      >
+        <i class="bi-archive" />
+      </Btn>
       <Btn
         :to="{
           name: 'inventory-edit',
@@ -76,14 +88,20 @@ import CollectionItemList from '@/components/CollectionItemList.vue'
 import GlowDiv from '@/components/GlowDiv.vue'
 import InfoCard from '@/components/InfoCard.vue'
 import { useInventory } from '@/stores/inventory'
-import { computed } from 'vue'
+import { computed, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
+import NotFoundView from '../NotFoundView.vue'
 
 const route = useRoute()
 const inventory = useInventory()
 
 const collection = computed(() => inventory.getCollectionById(route.params.id as string))
-const items = computed(() => inventory.getItemsByCollectionId(route.params.id as string))
+const items = computed(() => inventory.getItemsByCollectionId(route.params.id as string).filter(x => !x.isHidden))
+
+watchEffect(() => {
+  if (!collection.value) return
+  document.title = `${collection.value.icon ? collection.value.icon + ' ' : ''}${collection.value.name}`
+})
 
 // const showActionSheet = ref(false)
 </script>

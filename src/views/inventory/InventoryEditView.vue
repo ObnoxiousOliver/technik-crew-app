@@ -1,7 +1,7 @@
 <template>
   <Page>
     <template #title>
-      <i class="bi-pencil-square" /> Kollektion bearbeiten
+      <i class="bi-pencil-square" />Kollektion bearbeiten
     </template>
 
     <FormContainer @submit.prevent="submit">

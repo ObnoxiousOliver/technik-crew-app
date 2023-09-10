@@ -268,10 +268,38 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
 
         children: [
           {
+            title: 'Archivierte Gegenstände',
+            name: 'inventory-archive',
+            pathName: 'archive',
+            component: () => import('../views/inventory/InventoryArchiveView.vue' /* webpackChunkName: "inventory-archive" */)
+          },
+          {
             title: 'Gegenstand',
             name: 'inventory-item-details',
-            pathName: 'item/:itemId',
-            component: () => import('../views/inventory/InventoryItemDetailsView.vue' /* webpackChunkName: "inventory-item-details" */)
+            pathName: '/item/:itemId',
+            depth: 4,
+            component: () => import('../views/inventory/InventoryItemDetailsView.vue' /* webpackChunkName: "inventory-item-details" */),
+
+            children: [
+              {
+                title: 'Gegenstand verlauf',
+                name: 'inventory-item-history',
+                pathName: '/item/:itemId/history',
+                component: () => import('../views/inventory/InventoryItemHistoryView.vue' /* webpackChunkName: "inventory-item-history" */)
+              },
+              {
+                title: 'Gegenstand bearbeiten',
+                name: 'inventory-item-edit',
+                pathName: '/item/:itemId/edit',
+                component: () => import('../views/inventory/InventoryItemEditView.vue' /* webpackChunkName: "inventory-item-edit" */)
+              },
+              {
+                title: 'Unzugewiesene Felder',
+                name: 'inventory-item-unassigned',
+                pathName: '/item/:itemId/unassigned',
+                component: () => import('../views/inventory/InventoryItemUnassignedView.vue' /* webpackChunkName: "inventory-item-unassigned" */)
+              }
+            ]
           },
           {
             title: 'Kollektion bearbeiten',
@@ -280,6 +308,12 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
             component: () => import('../views/inventory/InventoryEditView.vue' /* webpackChunkName: "inventory-edit" */)
           }
         ]
+      },
+      {
+        title: 'Ohne Kollektion',
+        name: 'inventory-unassigned',
+        pathName: '/unassigned',
+        component: () => import('../views/inventory/InventoryUnassignedView.vue' /* webpackChunkName: "inventory-unassigned" */)
       },
       {
         title: 'Gegenstand erstellen',

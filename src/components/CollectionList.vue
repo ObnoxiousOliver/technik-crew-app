@@ -1,9 +1,10 @@
 <template>
   <ul class="collection-list">
     <CollectionListBtn
-      v-for="collection in collections.filter((c) => c.id)"
+      v-for="collection in collections.filter(x => x.id)"
       :key="(collection.id as string)"
       :collection="collection"
+      :includeBack="includeBack"
     />
     <!-- :selectionMode="selectedMode"
       v-model:selected="selectedCollections[collection.id as string]" -->
@@ -15,7 +16,8 @@ import { Collection } from '@/model/inventory/collection'
 import CollectionListBtn from './CollectionListBtn.vue'
 
 const props = defineProps<{
-  collections: Collection[]
+  collections: Collection[],
+  includeBack?: boolean
   // selectionMode?: boolean,
   // selected: Record<string, boolean>
 }>()

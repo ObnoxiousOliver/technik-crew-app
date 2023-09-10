@@ -1,13 +1,23 @@
 <template>
   <Page>
     <template #title>
-      Neuen Gegenstand erstellen
+      <i class="bi-file-plus" />Neuen Gegenstand erstellen
+    </template>
+
+    <template #btns>
+      <Btn
+        @click="submit"
+        aria-label="Bestätigen"
+      >
+        <i class="bi-check-lg" />
+      </Btn>
     </template>
 
     <FormContainer @submit.prevent="submit" :disabled="submitting">
       <FormGroup>
         <p>Gegenstand wird erstellt in</p>
         <DropdownSelection v-model="collectionId">
+          <option value="">Keine Sammlung</option>
           <option
             v-for="(collection, i) in inventory.collections"
             :key="collection.id ?? i"
@@ -204,7 +214,7 @@ const fields = ref<FieldValue<FieldTypes>[]>(state?.fields ?? [])
 
 watchEffect(() => {
   temp.setData('inventory-item-create', {
-    collectionId: collectionId.value,
+    collectionId: collectionId.value.length,
     name: name.value,
     description: description.value,
     locationId: location.value?.id,

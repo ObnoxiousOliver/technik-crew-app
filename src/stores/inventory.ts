@@ -1,7 +1,8 @@
-import { Collection } from '@/model/inventory/collection'
+import { Collection, itemsId } from '@/model/inventory/collection'
 import { FieldTemplate, FieldTypes } from '@/model/inventory/collectionField'
 import { CollectionItem, CollectionItemDB } from '@/model/inventory/collectionItem'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
+import { deleteDoc, doc, getFirestore } from 'firebase/firestore'
 import { defineStore } from 'pinia'
 import { ref, watch } from 'vue'
 
@@ -22,19 +23,30 @@ export const useInventory = defineStore('inventory', () => {
     return CollectionItem.create(options)
   }
 
-  function getCollectionById (id: string | 'none'): Collection | undefined {
+  function getCollectionById (id: string | 'unassigned'): Collection | undefined {
     return collections.value.find(x => x.id === id) as Collection | undefined
   }
 
-  function getItemsByCollectionId (id: string | 'none'): CollectionItem[] {
+  function getItemsByCollectionId (id: string | 'unassigned'): CollectionItem[] {
     return items.value.filter(x => {
-      if (id === 'none') return !x.collectionId
+      if (id === 'unassigned') {
+        return !x.collectionId || collections.value.every(c => c.id !== x.collectionId)
+      }
       return x.collectionId === id
     }) as CollectionItem[]
   }
 
   function getItemById (id: string): CollectionItem | undefined {
     return items.value.find(x => x.id === id) as CollectionItem | undefined
+  }
+
+  async function deleteItem (id?: string | null) {
+    if (!id) {
+      throw new Error('Cannot delete an inventory item without an id')
+    }
+
+    const db = getFirestore()
+    await deleteDoc(doc(db, itemsId, id))
   }
 
   let unsubscribe: (() => void) | null
@@ -121,6 +133,7 @@ export const useInventory = defineStore('inventory', () => {
     getCollectionById,
     getItemsByCollectionId,
     getItemById,
-    loading
+    loading,
+    deleteItem
   }
 })

@@ -77,7 +77,7 @@ export class Collection {
 
   async set (options: Partial<CollectionDB>) {
     if (!this.id) {
-      throw new Error('Cannot get history on an equipment without an id')
+      throw new Error('Cannot change a collection without an id')
     }
 
     const changes = []

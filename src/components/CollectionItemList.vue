@@ -31,7 +31,10 @@
               params: {
                 id: collection.id,
                 itemId: item.id
-              }
+              },
+              query: includeBack ? {
+                back: route.fullPath
+              } : {}
             }"
             class="collection-item-list__item"
             v-wave
@@ -65,11 +68,15 @@ import { Collection } from '@/model/inventory/collection'
 import { CollectionItem } from '@/model/inventory/collectionItem'
 import { computed } from 'vue'
 import ItemFieldsListItemDisplay from './ItemFieldsListItemDisplay.vue'
+import { useRoute } from 'vue-router'
 
 const props = defineProps<{
   collection: Collection,
-  items: CollectionItem[]
+  items: CollectionItem[],
+  includeBack?: boolean
 }>()
+
+const route = useRoute()
 
 const items = computed(() => {
   const sortedItems = [...props.items]

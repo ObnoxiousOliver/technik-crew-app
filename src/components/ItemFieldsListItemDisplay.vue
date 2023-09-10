@@ -9,7 +9,12 @@
     </template>
 
     <template v-if="fieldTemplate.type === 'number'">
-      {{ fieldValue }}{{ fieldTemplate.options.number?.symbol }}
+      <template v-if="typeof fieldValue === 'number'">
+        {{ fieldValue }} {{ fieldTemplate.options.number?.symbol }}
+      </template>
+      <template v-else>
+        <i class="text-secondary">Ungültiger Wert ({{ fieldValue }})</i>
+      </template>
     </template>
 
     <template v-if="fieldTemplate.type === 'boolean'">

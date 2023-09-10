@@ -51,7 +51,7 @@ const fieldValues = ref<{
 watch(fieldValues, (val) => {
   if (!val) return
 
-  console.log(Object.values(val))
+  // console.log(Object.values(val))
   fields.value = Object.values(val).filter(field => field.value !== null)
 }, { deep: true })
 </script>
