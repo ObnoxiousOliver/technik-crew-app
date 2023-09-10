@@ -1,5 +1,9 @@
 <template>
-  <li class="collection-btn">
+  <li
+    :class="['collection-btn', {
+      'collection-btn--unassigned': (collection.id ?? 'unassigned') === 'unassigned'
+    }]"
+  >
     <!-- :class="['collection-btn', {
       'collection-btn--selected': selected,
       'collection-btn--selection-mode': selectionMode
@@ -9,7 +13,9 @@
     <Btn
       ref="btn"
       class="collection-btn__btn"
-      :to="{
+      :to="(collection.id ?? 'unassigned') === 'unassigned' ? {
+        name: 'inventory-unassigned'
+      } : {
         name: 'inventory-collection',
         params: {
           id: collection.id
@@ -20,6 +26,9 @@
         <GlowDiv>
           <template v-if="collection.icon">
             {{ collection.icon }}
+          </template>
+          <template v-else-if="(collection.id ?? 'unassigned') === 'unassigned'">
+            <i class="bi-slash-circle" />
           </template>
           <template v-else>
             <i class="bi-collection" />
@@ -76,11 +85,10 @@ import { ref } from 'vue'
 import ActionSheet from './ActionSheet.vue'
 import ActionSheetButton from './ActionSheetButton.vue'
 import AppButton from './AppButton.vue'
-import { useRouter } from 'vue-router'
 
-const router = useRouter()
+// const router = useRouter()
 
-const props = defineProps<{
+/* const props =  */defineProps<{
   collection: Collection
   // selected?: boolean
   // selectionMode?: boolean
@@ -136,7 +144,7 @@ const showOptions = ref(false)
 .collection-btn {
   position: relative;
   margin: 1rem 0;
-  border-radius: r.$radius;
+  // border-radius: r.$radius;
   transition: .5s cubic-bezier(0.19, 1, 0.22, 1);
 
   &--selection-mode:not(&--selected) {
@@ -209,6 +217,12 @@ const showOptions = ref(false)
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
+  }
+
+  &--unassigned {
+    .collection-btn__icon {
+      color: r.$danger;
+    }
   }
 }
 </style>

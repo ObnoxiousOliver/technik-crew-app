@@ -38,7 +38,9 @@ const collection = computed(() => {
 })
 
 const unassignedFields = computed(() => {
-  if (!item.value || !collection.value) return []
+  if (!item.value) return []
+  if (!collection.value) return item.value.fields
+
   return CollectionItem.getUnassignedFields(item.value, collection.value)
 })
 </script>

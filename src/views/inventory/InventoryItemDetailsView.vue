@@ -130,6 +130,36 @@
           Verlauf anzeigen
         </SettingsListLink>
 
+        <SettingsListDivider />
+
+        <SettingsListLink
+          v-if="!item.isHidden"
+          danger
+          isButton
+          :arrow="false"
+          @click="showArchiveSheet = true"
+        >
+          <i class="bi-archive" />Archivieren
+        </SettingsListLink>
+
+        <template v-else>
+          <SettingsListLink
+            isButton
+            :arrow="false"
+            @click="recover"
+          >
+            <i class="bi-arrow-clockwise" />Wiederherstellen
+          </SettingsListLink>
+          <SettingsListLink
+            isButton
+            danger
+            :arrow="false"
+            @click="showDeleteSheet = true"
+          >
+            <i class="bi-trash" />Löschen
+          </SettingsListLink>
+        </template>
+
         <SettingsListDivider>Zusätzliche Felder</SettingsListDivider>
 
         <SettingsListLink
@@ -162,7 +192,7 @@
 
     <ActionSheet v-model:show="showCodeSheet">
       <template #title>
-        Code manuell eingeben
+        <i class="bi-pencil-square" />Code manuell eingeben
       </template>
 
       <InputField
@@ -177,6 +207,44 @@
         <ActionSheetButton @click="item?.setCode(codeInput.length > 0 ? codeInput : null)">
           <i class="bi-check-lg" />Bestätigen
         </ActionSheetButton>
+        <ActionSheetButton>
+          <i class="bi-x-lg" />Abbrechen
+        </ActionSheetButton>
+      </template>
+    </ActionSheet>
+
+    <ActionSheet v-model:show="showArchiveSheet">
+      <template #title>
+        <i class="bi-archive" />Gegenstand Archivieren
+      </template>
+
+      Möchtest du diesen Gegenstand wirklich archivieren?<br>
+      Du kannst ihn jederzeit wiederherstellen.
+
+      <template #buttons>
+        <ActionSheetButton danger @click="archive">
+          <i class="bi-archive" />Archivieren
+        </ActionSheetButton>
+        <ActionSheetDivider />
+        <ActionSheetButton>
+          <i class="bi-x-lg" />Abbrechen
+        </ActionSheetButton>
+      </template>
+    </ActionSheet>
+
+    <ActionSheet v-model:show="showDeleteSheet">
+      <template #title>
+        <i class="bi-trash" />Gegenstand Löschen
+      </template>
+
+      Möchtest du diesen Gegenstand wirklich löschen?<br>
+      Dieser Vorgang kann nicht rückgängig gemacht werden.
+
+      <template #buttons>
+        <ActionSheetButton danger @click="deleteItem">
+          <i class="bi-trash" />Löschen
+        </ActionSheetButton>
+        <ActionSheetDivider />
         <ActionSheetButton>
           <i class="bi-x-lg" />Abbrechen
         </ActionSheetButton>
@@ -207,6 +275,7 @@ import { CollectionItem } from '@/model/inventory/collectionItem'
 import SettingsListItem from '@/components/SettingsListItem.vue'
 import ItemFieldsList from '@/components/ItemFieldsList.vue'
 import NotFoundView from '../NotFoundView.vue'
+import router from '@/router'
 
 const route = useRoute()
 const inventory = useInventory()
@@ -229,6 +298,16 @@ const collection = computed(() => {
 watchEffect(() => {
   if (!item.value || !collection.value) return
   document.title = `${collection.value.icon ? collection.value.icon + ' ' : ''}${collection.value.name} > ${item.value.name}`
+
+  if (route.params.id !== collection.value.id) {
+    router.replace({
+      name: 'inventory-item-details',
+      params: {
+        id: collection.value?.id ?? 'unassigned',
+        itemId: item.value.id
+      }
+    })
+  }
 })
 
 const tempLocation = selectLocation.getData() as Location | null | undefined
@@ -256,7 +335,39 @@ watch(showCodeSheet, () => {
 })
 
 const unassignedFields = computed(() => {
-  if (!item.value || !collection.value) return []
+  if (!item.value) return []
+  if (!collection.value) return item.value.fields
+
   return CollectionItem.getUnassignedFields(item.value, collection.value)
 })
+
+const showArchiveSheet = ref(false)
+function archive () {
+  if (!item.value) return
+
+  item.value.setHidden(true)
+}
+function recover () {
+  if (!item.value) return
+  item.value.setHidden(false)
+}
+
+const showDeleteSheet = ref(false)
+function deleteItem () {
+  if (!item.value) return
+
+  inventory.deleteItem(item.value.id)
+
+  router.replace(item.value.collectionId
+    ? {
+        name: 'inventory-collection',
+        params: {
+          id: item.value.collectionId
+        }
+      }
+    : {
+        name: 'inventory-unassigned'
+      }
+  )
+}
 </script>

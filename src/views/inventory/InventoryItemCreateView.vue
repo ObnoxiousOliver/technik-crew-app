@@ -17,6 +17,7 @@
       <FormGroup>
         <p>Gegenstand wird erstellt in</p>
         <DropdownSelection v-model="collectionId">
+          <option value="">Keine Sammlung</option>
           <option
             v-for="(collection, i) in inventory.collections"
             :key="collection.id ?? i"
@@ -213,7 +214,7 @@ const fields = ref<FieldValue<FieldTypes>[]>(state?.fields ?? [])
 
 watchEffect(() => {
   temp.setData('inventory-item-create', {
-    collectionId: collectionId.value,
+    collectionId: collectionId.value.length,
     name: name.value,
     description: description.value,
     locationId: location.value?.id,

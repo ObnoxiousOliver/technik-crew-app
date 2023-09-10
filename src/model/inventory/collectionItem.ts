@@ -78,7 +78,7 @@ export class CollectionItem {
   constructor (id: string | null, options: Partial<CollectionItemDB>) {
     this.id = id
     this.collectionItem = {
-      collectionId: options.collectionId ?? null,
+      collectionId: (options.collectionId?.length ?? 0) > 0 ? options.collectionId ?? null : null,
       name: options.name ?? '',
       description: options.description ?? '',
       code: options.code ?? null,
@@ -107,6 +107,11 @@ export class CollectionItem {
 
     const changes = []
 
+    console.log(options)
+    if (options.collectionId !== undefined && options.collectionId !== this.collectionId) {
+      this.collectionId = options.collectionId
+      changes.push(options.collectionId ? 'Gegenstand verschoben' : 'Gegenstand ohne Sammlung')
+    }
     if (options.name && options.name !== this.name) {
       this.name = options.name
       changes.push(`Name geändert -> ${options.name}`)
@@ -137,6 +142,15 @@ export class CollectionItem {
     await this.save()
     await this.recordHistory({
       description: changes.join('\n')
+    })
+  }
+
+  async setHidden (isHidden: boolean) {
+    this.isHidden = isHidden
+    await this.save()
+
+    await this.recordHistory({
+      description: isHidden ? 'Ausgeblendet' : 'Wieder sichtbar'
     })
   }
 

@@ -57,9 +57,28 @@
       </template>
     </InfoCard>
 
-    <CollectionList
-      :collections="(inventory.collections as Collection[])"
-    />
+    <SettingsList>
+      <SettingsListDivider />
+      <SettingsListItem>
+        <CollectionList
+          :collections="collections"
+        />
+      </SettingsListItem>
+
+      <template v-if="hasUnassigned">
+        <SettingsListDivider />
+        <SettingsListItem>
+          <CollectionList
+            :collections="[
+              new Collection('unassigned', {
+                name: 'Ohne Kollektion',
+                description: 'Gegenstände, die keiner Kollektion zugewiesen sind, werden hier angezeigt.'
+              })
+            ]"
+          />
+        </SettingsListItem>
+      </template>
+    </SettingsList>
     <!-- v-model:selectionMode="selectionMode"
       v-model:selected="selected" -->
 
@@ -101,11 +120,22 @@
 <script setup lang="ts">
 import CollectionList from '@/components/CollectionList.vue'
 import InfoCard from '@/components/InfoCard.vue'
+import SettingsList from '@/components/SettingsList.vue'
+import SettingsListDivider from '@/components/SettingsListDivider.vue'
+import SettingsListItem from '@/components/SettingsListItem.vue'
 import UserPage from '@/layout/UserPage.vue'
 import { Collection } from '@/model/inventory/collection'
 import { useInventory } from '@/stores/inventory'
+import { computed } from 'vue'
 
 const inventory = useInventory()
+
+const collections = computed<Collection[]>(() => {
+  return inventory.collections as Collection[]
+})
+const hasUnassigned = computed(() => {
+  return inventory.getItemsByCollectionId('unassigned').length > 0
+})
 
 // const selectionMode = ref(false)
 // const selected = ref<Record<string, boolean>>({})

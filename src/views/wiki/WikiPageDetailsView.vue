@@ -91,11 +91,11 @@
 
       <template #buttons>
         <ActionSheetButton danger @click="archive">
-          <i class="bi-archive" /> Archivieren
+          <i class="bi-archive" />Archivieren
         </ActionSheetButton>
         <ActionSheetDivider />
         <ActionSheetButton>
-          <i class="bi-x-lg" /> Abbrechen
+          <i class="bi-x-lg" />Abbrechen
         </ActionSheetButton>
       </template>
     </ActionSheet>
@@ -110,11 +110,11 @@
 
       <template #buttons>
         <ActionSheetButton danger @click="deletePage">
-          <i class="bi-trash" /> Löschen
+          <i class="bi-trash" />Löschen
         </ActionSheetButton>
         <ActionSheetDivider />
         <ActionSheetButton>
-          <i class="bi-x-lg" /> Abbrechen
+          <i class="bi-x-lg" />Abbrechen
         </ActionSheetButton>
       </template>
     </ActionSheet>

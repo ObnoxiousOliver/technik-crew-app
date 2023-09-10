@@ -4,6 +4,17 @@
     <template #btns>
       <Btn
         :to="{
+          name: 'inventory-archive',
+          params: {
+            id: collection?.id
+          }
+        }"
+        aria-label="Archiv"
+      >
+        <i class="bi-archive" />
+      </Btn>
+      <Btn
+        :to="{
           name: 'inventory-edit',
           params: {
             id: collection?.id
@@ -79,12 +90,13 @@ import InfoCard from '@/components/InfoCard.vue'
 import { useInventory } from '@/stores/inventory'
 import { computed, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
+import NotFoundView from '../NotFoundView.vue'
 
 const route = useRoute()
 const inventory = useInventory()
 
 const collection = computed(() => inventory.getCollectionById(route.params.id as string))
-const items = computed(() => inventory.getItemsByCollectionId(route.params.id as string))
+const items = computed(() => inventory.getItemsByCollectionId(route.params.id as string).filter(x => !x.isHidden))
 
 watchEffect(() => {
   if (!collection.value) return

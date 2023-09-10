@@ -16,8 +16,9 @@
 
     <FormContainer @submit.prevent="submit" :disabled="submitting">
       <FormGroup>
-        <p>Gegenstand wird erstellt in</p>
+        <p>Gegenstand in Sammlung</p>
         <DropdownSelection v-model="collectionId">
+          <option value="">Keine Sammlung</option>
           <option
             v-for="(collection, i) in inventory.collections"
             :key="collection.id ?? i"
@@ -36,7 +37,7 @@
 
       <TextBox placeholder="Keine Beschreibung" label="Beschreibung" v-model="description" />
 
-      <SettingsList>
+      <SettingsList v-if="collection?.fields">
         <SettingsListDivider>
           Zusätzliche Felder
         </SettingsListDivider>
@@ -73,7 +74,7 @@ import { splitFirstEmojiFromString } from '@/utilities/getFirstEmojiOfString'
 import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { FieldTypes, FieldValue } from '@/model/inventory/collectionField'
-import { back } from '@/router'
+import router, { back } from '@/router'
 import ItemFieldsList from '@/components/ItemFieldsList.vue'
 import TextBox from '@/components/TextBox.vue'
 import NotFoundView from '../NotFoundView.vue'
@@ -107,12 +108,25 @@ async function submit () {
 
   submitting.value = true
 
+  const oldCollectionId = item.value.collectionId
+
   item.value?.set({
+    collectionId: collectionId.value || null,
     name: name.value,
     description: description.value,
     fields: fields.value
   })
 
-  back()
+  if (collectionId.value !== oldCollectionId) {
+    router.replace({
+      name: 'inventory-item-details',
+      params: {
+        id: collectionId.value,
+        itemId: item.value.id
+      }
+    })
+  } else {
+    back()
+  }
 }
 </script>
