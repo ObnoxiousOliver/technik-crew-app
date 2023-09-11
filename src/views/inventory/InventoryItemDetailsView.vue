@@ -358,7 +358,7 @@ function deleteItem () {
 
   inventory.deleteItem(item.value.id)
 
-  router.replace(item.value.collectionId
+  router.replace(collection.value?.id
     ? {
         name: 'inventory-collection',
         params: {
