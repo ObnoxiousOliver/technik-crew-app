@@ -6,7 +6,7 @@
 
     <template v-if="unassignedFields">
       <ItemFieldsList
-        :fieldTemplate="unassignedFields.map(f => new FieldTemplate(f.template))"
+        :fieldTemplate="unassignedFieldTemplates"
         :fields="unassignedFields"
         readonly
       />
@@ -43,4 +43,5 @@ const unassignedFields = computed(() => {
 
   return CollectionItem.getUnassignedFields(item.value, collection.value)
 })
+const unassignedFieldTemplates = computed(() => unassignedFields.value.map(f => new FieldTemplate(f.template)))
 </script>
