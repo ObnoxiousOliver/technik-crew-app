@@ -69,12 +69,7 @@
         <SettingsListDivider />
         <SettingsListItem>
           <CollectionList
-            :collections="[
-              new Collection('unassigned', {
-                name: 'Ohne Kollektion',
-                description: 'Gegenstände, die keiner Kollektion zugewiesen sind, werden hier angezeigt.'
-              })
-            ]"
+            :collections="hasUnassigned"
           />
         </SettingsListItem>
       </template>
@@ -135,6 +130,13 @@ const collections = computed<Collection[]>(() => {
 })
 const hasUnassigned = computed(() => {
   return inventory.getItemsByCollectionId('unassigned').length > 0
+    ? [
+        new Collection('unassigned', {
+          name: 'Ohne Kollektion',
+          description: 'Gegenstände, die keiner Kollektion zugewiesen sind, werden hier angezeigt.'
+        })
+      ]
+    : null
 })
 
 // const selectionMode = ref(false)
