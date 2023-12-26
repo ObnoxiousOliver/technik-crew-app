@@ -47,6 +47,7 @@
             v-if="collection?.fields"
             :fieldTemplate="collection?.fields"
             v-model:fields="fields"
+            :collection-id="collectionId"
           />
         </SettingsListItem>
 
@@ -121,7 +122,7 @@ async function submit () {
     router.replace({
       name: 'inventory-item-details',
       params: {
-        id: collectionId.value,
+        id: collectionId.value || 'unassigned',
         itemId: item.value.id
       }
     })

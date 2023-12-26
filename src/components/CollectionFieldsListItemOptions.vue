@@ -1,4 +1,28 @@
 <template>
+  <!-- String -->
+  <div v-if="field.type === 'string'" class="collection-fields-list-item-option collection-fields-list-item-option--string">
+    <div>
+      <label :for="'multiline' + id">
+        Mehrzeilig
+      </label>
+      <ToggleSwitch
+        :id="'multiline' + id"
+        v-model="multiline"
+      />
+    </div>
+
+    <div>
+      <label :for="'autofill' + id">
+        Textvorschläge
+      </label>
+      <ToggleSwitch
+        :disabled="multiline"
+        :id="'autofill' + id"
+        v-model="autofill"
+      />
+    </div>
+  </div>
+
   <!-- Number -->
   <div v-if="field.type === 'number'" class="collection-fields-list-item-option collection-fields-list-item-option--number">
     <DropdownSelection v-model="unit">
@@ -73,6 +97,10 @@ import DropdownSelection from './DropdownSelection.vue'
 import InputField from './InputField.vue'
 import { ref, watch, watchEffect } from 'vue'
 import { useVModel } from '@vueuse/core'
+import ToggleSwitch from './ToggleSwitch.vue'
+import { createId } from '@/utilities/id'
+
+const id = ref(createId())
 
 const props = defineProps<{
   field: {
@@ -83,6 +111,18 @@ const props = defineProps<{
 const emit = defineEmits(['update:field'])
 
 const field = useVModel(props, 'field', emit)
+
+// String
+const multiline = ref<boolean>(props.field.options.string?.multiline ?? false)
+const autofill = ref<boolean>(props.field.options.string?.autofill ?? false)
+watch([multiline, autofill], () => {
+  field.value.options = {
+    string: {
+      multiline: multiline.value,
+      autofill: multiline.value ? false : autofill.value
+    }
+  } as Option<'string'>
+})
 
 // Number
 const unit = ref<FieldTypeNumberUnits>(props.field.options.number?.unit ?? 'none')
@@ -143,6 +183,21 @@ watchEffect(() => {
 
   > .collection-fields-list-item-option {
     width: stretch;
+  }
+
+  &--string {
+    padding-left: .5rem;
+
+    & > div {
+      width: stretch;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      label {
+        flex: 1 1 auto;
+      }
+    }
   }
 
   &--enum {

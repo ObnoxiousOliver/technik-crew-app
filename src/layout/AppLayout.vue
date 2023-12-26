@@ -58,8 +58,8 @@
         { to: 'wiki', icon: 'compass' },
         { to: 'events', icon: 'calendar2-week' },
         { to: 'dashboard', icon: 'house-door' },
-        { to: 'equipment', icon: 'speaker' },
-        ...(dev.flags.useInventory ? [{ to: 'inventory', icon: 'box-seam' }] : []),
+        ...dev.flags.showEquipmentPage ? [{ to: 'equipment', icon: 'speaker' }] : [],
+        { to: 'inventory', icon: 'box-seam' },
         { to: 'settings', icon: 'gear' },
       ]"
     />

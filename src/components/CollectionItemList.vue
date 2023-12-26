@@ -14,6 +14,8 @@
       <table>
         <thead class="collection-item-list__header">
           <th>Name</th>
+          <th>Beschreibung</th>
+          <th>Standort</th>
           <th v-for="field in collection.fields" :key="field.id">
             {{ field.name }}
           </th>
@@ -42,6 +44,24 @@
             <td>
               {{ item.name }}
             </td>
+            <td>
+              <template v-if="item.description">
+                <div class="collection-item-list__text-field">
+                  {{ item.description }}
+                </div>
+              </template>
+              <template v-else>
+                <i class="text-secondary">Keine Beschreibung</i>
+              </template>
+            </td>
+            <td>
+              <template v-if="item.locationId && locations.getLocationById(item.locationId)?.name">
+                {{ locations.getLocationById(item.locationId)?.name }}
+              </template>
+              <template v-else>
+                <i class="text-secondary">Kein Standort</i>
+              </template>
+            </td>
             <td v-for="field in collection.fields" :key="field.id">
               <ItemFieldsListItemDisplay
                 inline
@@ -69,6 +89,9 @@ import { CollectionItem } from '@/model/inventory/collectionItem'
 import { computed } from 'vue'
 import ItemFieldsListItemDisplay from './ItemFieldsListItemDisplay.vue'
 import { useRoute } from 'vue-router'
+import { useLocations } from '@/stores/locations'
+
+const locations = useLocations()
 
 const props = defineProps<{
   collection: Collection,
@@ -96,7 +119,7 @@ const items = computed(() => {
 @use '../scss' as r;
 
 .collection-item-list {
-  margin: 0 -1.5rem;
+  margin: 1rem -1.5rem;
   position: relative;
 
   &::before, &::after {
@@ -167,12 +190,19 @@ const items = computed(() => {
     padding: 1rem;
   }
 
+  &__text-field {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   td, th {
     border: none;
     padding: .75rem 1rem;
     text-align: left;
     white-space: nowrap;
     border: 1px solid r.$bg-stroke;
+    max-width: 70vw;
   }
 
   th {

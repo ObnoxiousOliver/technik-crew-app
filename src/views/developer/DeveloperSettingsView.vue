@@ -44,14 +44,14 @@
         </template>
       </SettingsListOption>
 
-      <SettingsListOption for="useInventory">
-        <i class="bi-box" />Neues Inventar-System benutzen
+      <SettingsListOption for="showEquipmentPage">
+        <i class="bi-speaker" /> Alte Equipment Seite anzeigen
         <template #desc>
-          Das neue Inventar-System ist noch in der Entwicklung.
-          Es ist noch nicht vollständig und kann Fehler enthalten.
+          Zeigt die alte Equipment Seite an, die vor der
+          Version 1.1.0 verwendet wurde.
         </template>
         <template #input>
-          <ToggleSwitch id="useInventory" v-model="useInventoryFlag" />
+          <ToggleSwitch id="showEquipmentPage" v-model="showEquipmentPageFlag" />
         </template>
       </SettingsListOption>
     </SettingsList>
@@ -107,10 +107,10 @@ const offlineMode = computed({
   }
 })
 
-const useInventoryFlag = computed({
-  get: () => devMode.flags.useInventory ?? false,
+const showEquipmentPageFlag = computed({
+  get: () => devMode.flags.showEquipmentPage ?? false,
   set: (value) => {
-    devMode.flags.useInventory = value
+    devMode.flags.showEquipmentPage = value
   }
 })
 

@@ -3,7 +3,7 @@
     class="home-sidebar"
     :style="{
       '--active': active,
-      '--amount': dev.flags.useInventory ? 6 : 5
+      '--amount': dev.flags.showEquipmentPage ? 6 : 5
     }"
   >
     <h2>
@@ -19,14 +19,14 @@
           </DesktopSidebarBtn>
         </li>
 
-        <li>
+        <li v-if="dev.flags.showEquipmentPage">
           <DesktopSidebarBtn :to="{ name: 'equipment' }">
             <i class="bi bi-speaker" />
             Equipment
           </DesktopSidebarBtn>
         </li>
 
-        <li v-if="dev.flags.useInventory">
+        <li>
           <DesktopSidebarBtn :to="{ name: 'inventory' }">
             <i class="bi bi-box-seam" />
             Inventar

@@ -19,6 +19,7 @@
           @focus="focused = true"
           @blur="focused = false"
           @input="input"
+          inputmode="text"
         />
         <span class="text-box__placeholder" v-if="value.trim().length === 0">
           {{ placeholder }}
@@ -66,10 +67,14 @@ onMounted(() => {
 })
 
 function input (e: Event) {
+  console.log('input', (e.target as HTMLSpanElement).innerText)
+
   value.value = (e.target as HTMLSpanElement).innerText
   if (inputEl.value) {
     if (inputEl.value.children.length > 0) {
-      inputEl.value.innerHTML = inputEl.value.innerText
+      if (inputEl.value.innerHTML === inputEl.value.innerText) {
+        inputEl.value.innerHTML = inputEl.value.innerText
+      }
     }
   }
 }
@@ -83,6 +88,8 @@ function paste (e: ClipboardEvent) {
   selectedRange.deleteContents()
   selectedRange.insertNode(document.createTextNode(text))
   selectedRange.setStart(selectedRange.endContainer, selectedRange.endOffset)
+
+  input(e)
 }
 </script>
 
@@ -136,6 +143,7 @@ function paste (e: ClipboardEvent) {
     word-break: break-word;
     user-select: text;
     line-height: 1.5;
+    white-space: pre-wrap;
 
     &:focus {
       outline: none;
@@ -157,6 +165,7 @@ function paste (e: ClipboardEvent) {
 
   &__content {
     grid-row: span 2;
+    height: fit-content;
   }
 
   &__placeholder {

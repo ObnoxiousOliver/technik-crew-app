@@ -6,7 +6,7 @@ import { computed, ref, watch, watchEffect } from 'vue'
 export const useDev = defineStore('developer', () => {
   const flags = ref<{
     forceOfflineMode?: boolean
-    useInventory?: boolean
+    showEquipmentPage?: boolean
   }>({})
   const enabled = ref(false)
 

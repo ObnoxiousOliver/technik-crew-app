@@ -7,7 +7,7 @@
     <template #btns>
       <Btn
         :to="{
-          name: 'inventory-archive',
+          name: 'inventory-collection-archive',
           params: {
             id: 'unassigned'
           },

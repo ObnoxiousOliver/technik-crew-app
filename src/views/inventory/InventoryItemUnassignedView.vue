@@ -9,6 +9,7 @@
         :fieldTemplate="unassignedFieldTemplates"
         :fields="unassignedFields"
         readonly
+        :collectionId="collection?.id ?? ''"
       />
     </template>
     <template v-else>

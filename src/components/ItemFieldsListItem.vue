@@ -14,6 +14,7 @@
       v-if="!readonly"
       v-model="fieldValue"
       :fieldTemplate="fieldTemplate"
+      :string-suggestions="suggestions"
     />
 
     <div class="item-fields-list-item__display">
@@ -33,16 +34,25 @@ import { useVModel } from '@vueuse/core'
 import { computed } from 'vue'
 import ItemFieldsListItemInput from './ItemFieldsListItemInput.vue'
 import ItemFieldsListItemDisplay from './ItemFieldsListItemDisplay.vue'
+import { useInventory } from '@/stores/inventory'
 
 const props = defineProps<{
   field: FieldValue<FieldTypes> | undefined
   fieldTemplate: FieldTemplate<FieldTypes>
   readonly?: boolean
+  collectionId: string
 }>()
 
 const emit = defineEmits(['update:field'])
 
 const field = useVModel(props, 'field', emit)
+
+const suggestions = computed(() => {
+  if (props.fieldTemplate.type === 'string') {
+    return useInventory().getSuggestions(props.collectionId, props.fieldTemplate.id)
+  }
+  return undefined
+})
 
 const fieldValue = computed({
   get: () => {
@@ -79,7 +89,7 @@ const fieldValue = computed({
     if (
       value === null ||
       value === '' ||
-      value?.length === 0
+      (Array.isArray(value) && value?.length === 0)
     ) value = null
 
     field.value = {

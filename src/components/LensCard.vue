@@ -85,13 +85,13 @@
 import QrcodeScanner from '@/components/QrcodeScanner.vue'
 import { Result } from '@zxing/library'
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { useEquipment } from '@/stores/equipment'
 import { useRouter } from 'vue-router'
 import { AppError } from '@/model/error'
 import GlowDiv from './GlowDiv.vue'
+import { useInventory } from '@/stores/inventory'
 
 const router = useRouter()
-const equipment = useEquipment()
+const inventory = useInventory()
 const scanner = ref<{ startScan:() => Promise<void>, pauseScan: () => void, loading: boolean } | null>(null)
 
 const root = ref<HTMLElement | null>(null)
@@ -134,10 +134,18 @@ onMounted(() => {
 function result (result: Result) {
   if (!result) return
 
-  const eq = equipment.findByCode(result.getText())
-  if (!eq) return
+  console.log(result.getText())
 
-  router.push({ name: 'equipment-details', params: { id: eq?.id } })
+  const item = inventory.getItemByCode(result.getText())
+  if (!item) return
+
+  router.push({
+    name: 'inventory-item-details',
+    params: {
+      id: item.collectionId,
+      itemId: item.id
+    }
+  })
 }
 </script>
 

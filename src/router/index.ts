@@ -209,13 +209,103 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
             component: () => import('../views/equipment/EquipmentSplitView.vue' /* webpackChunkName: "equipment-split" */)
           }
         ]
-      },
+      }
       // {
       //   title: 'Equipment Code Scannen',
       //   name: 'equipment-scan',
       //   pathName: '/scan',
       //   component: () => import('../views/equipment/EquipmentScanView.vue' /* webpackChunkName: "equipment-scan" */)
       // },
+    ]
+  },
+
+  {
+    title: 'Inventar',
+    name: 'inventory',
+    component: () => import('../views/inventory/InventoryView.vue' /* webpackChunkName: "inventory" */),
+    requiresAuth: true,
+
+    children: [
+      {
+        title: 'Kollektion erstellen',
+        name: 'inventory-create',
+        pathName: 'create',
+        component: () => import('../views/inventory/InventoryCreateView.vue' /* webpackChunkName: "inventory-create" */)
+      },
+      {
+        title: 'Kollektion',
+        name: 'inventory-collection',
+        pathName: '/:id',
+        component: () => import('../views/inventory/InventoryCollectionView.vue' /* webpackChunkName: "inventory-collection" */),
+
+        children: [
+          {
+            title: 'Gegenstand',
+            name: 'inventory-item-details',
+            pathName: '/item/:itemId',
+            depth: 4,
+            component: () => import('../views/inventory/InventoryItemDetailsView.vue' /* webpackChunkName: "inventory-item-details" */),
+
+            children: [
+              {
+                title: 'Gegenstandverlauf',
+                name: 'inventory-item-history',
+                pathName: '/item/:itemId/history',
+                component: () => import('../views/inventory/InventoryItemHistoryView.vue' /* webpackChunkName: "inventory-item-history" */)
+              },
+              {
+                title: 'Gegenstand bearbeiten',
+                name: 'inventory-item-edit',
+                pathName: '/item/:itemId/edit',
+                component: () => import('../views/inventory/InventoryItemEditView.vue' /* webpackChunkName: "inventory-item-edit" */)
+              },
+              {
+                title: 'Unzugewiesene Felder',
+                name: 'inventory-item-unassigned',
+                pathName: '/item/:itemId/unassigned',
+                component: () => import('../views/inventory/InventoryItemUnassignedView.vue' /* webpackChunkName: "inventory-item-unassigned" */)
+              }
+            ]
+          },
+          {
+            title: 'Archivierte Gegenstände',
+            name: 'inventory-collection-archive',
+            pathName: 'archive',
+            component: () => import('../views/inventory/InventoryCollectionArchiveView.vue' /* webpackChunkName: "inventory-archive" */)
+          },
+          {
+            title: 'Kollektion bearbeiten',
+            name: 'inventory-edit',
+            pathName: 'edit',
+            component: () => import('../views/inventory/InventoryEditView.vue' /* webpackChunkName: "inventory-edit" */)
+          },
+          {
+            title: 'Kollektionverlauf',
+            name: 'inventory-history',
+            pathName: 'history',
+            component: () => import('../views/inventory/InventoryCollectionHistoryView.vue' /* webpackChunkName: "inventory-history" */)
+          }
+        ]
+      },
+      {
+        title: 'Ohne Kollektion',
+        name: 'inventory-unassigned',
+        pathName: '/unassigned',
+        component: () => import('../views/inventory/InventoryUnassignedView.vue' /* webpackChunkName: "inventory-unassigned" */)
+      },
+      {
+        title: 'Archiv',
+        name: 'inventory-archive',
+        pathName: '/archive',
+        component: () => import('../views/inventory/InventoryArchiveView.vue' /* webpackChunkName: "inventory-collections" */)
+      },
+      {
+        title: 'Gegenstand erstellen',
+        name: 'inventory-item-create',
+        pathName: 'create-item',
+        depth: 2.1,
+        component: () => import('../views/inventory/InventoryItemCreateView.vue' /* webpackChunkName: "inventory-item-create" */)
+      },
 
       // Locations
       {
@@ -243,84 +333,6 @@ const { router, back, getLastPageOfRoot, temporaryRoute } = createRouter([
             component: () => import('../views/LocationHistoryView.vue' /* webpackChunkName: "location-history" */)
           }
         ]
-      }
-    ]
-  },
-
-  {
-    title: 'Inventar',
-    name: 'inventory',
-    component: () => import('../views/inventory/InventoryView.vue' /* webpackChunkName: "inventory" */),
-    requiresAuth: true,
-
-    children: [
-      {
-        title: 'Kollektion erstellen',
-        name: 'inventory-create',
-        pathName: 'create',
-        component: () => import('../views/inventory/InventoryCreateView.vue' /* webpackChunkName: "inventory-create" */)
-      },
-      {
-        title: 'Kollektion',
-        name: 'inventory-collection',
-        pathName: '/:id',
-        component: () => import('../views/inventory/InventoryCollectionView.vue' /* webpackChunkName: "inventory-collection" */),
-
-        children: [
-          {
-            title: 'Archivierte Gegenstände',
-            name: 'inventory-archive',
-            pathName: 'archive',
-            component: () => import('../views/inventory/InventoryArchiveView.vue' /* webpackChunkName: "inventory-archive" */)
-          },
-          {
-            title: 'Gegenstand',
-            name: 'inventory-item-details',
-            pathName: '/item/:itemId',
-            depth: 4,
-            component: () => import('../views/inventory/InventoryItemDetailsView.vue' /* webpackChunkName: "inventory-item-details" */),
-
-            children: [
-              {
-                title: 'Gegenstand verlauf',
-                name: 'inventory-item-history',
-                pathName: '/item/:itemId/history',
-                component: () => import('../views/inventory/InventoryItemHistoryView.vue' /* webpackChunkName: "inventory-item-history" */)
-              },
-              {
-                title: 'Gegenstand bearbeiten',
-                name: 'inventory-item-edit',
-                pathName: '/item/:itemId/edit',
-                component: () => import('../views/inventory/InventoryItemEditView.vue' /* webpackChunkName: "inventory-item-edit" */)
-              },
-              {
-                title: 'Unzugewiesene Felder',
-                name: 'inventory-item-unassigned',
-                pathName: '/item/:itemId/unassigned',
-                component: () => import('../views/inventory/InventoryItemUnassignedView.vue' /* webpackChunkName: "inventory-item-unassigned" */)
-              }
-            ]
-          },
-          {
-            title: 'Kollektion bearbeiten',
-            name: 'inventory-edit',
-            pathName: 'edit',
-            component: () => import('../views/inventory/InventoryEditView.vue' /* webpackChunkName: "inventory-edit" */)
-          }
-        ]
-      },
-      {
-        title: 'Ohne Kollektion',
-        name: 'inventory-unassigned',
-        pathName: '/unassigned',
-        component: () => import('../views/inventory/InventoryUnassignedView.vue' /* webpackChunkName: "inventory-unassigned" */)
-      },
-      {
-        title: 'Gegenstand erstellen',
-        name: 'inventory-item-create',
-        pathName: 'create-item',
-        depth: 2.1,
-        component: () => import('../views/inventory/InventoryItemCreateView.vue' /* webpackChunkName: "inventory-item-create" */)
       }
     ]
   },

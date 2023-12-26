@@ -1,9 +1,17 @@
 <template>
   <template v-if="fieldTemplate.type === 'string'">
-    <InputField
+    <TextBox
+      v-if="fieldTemplate.options.string?.multiline"
       class="item-fields-list-item-input w-stretch"
       v-model="fieldValue"
       placeholder="Kein Wert"
+    />
+    <InputField
+      v-else
+      class="item-fields-list-item-input w-stretch"
+      v-model="fieldValue"
+      placeholder="Kein Wert"
+      :suggestions="fieldTemplate.options.string?.autofill ? stringSuggestions : undefined"
     />
   </template>
 
@@ -125,11 +133,13 @@ import { computed, ref, watch } from 'vue'
 import InputCheckbox from './InputCheckbox.vue'
 import TimeSelect from './TimeSelect.vue'
 import DateTimeSelect from './DateTimeSelect.vue'
+import TextBox from './TextBox.vue'
 
 const props = defineProps<{
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   modelValue: any
   fieldTemplate: FieldTemplateBase<FieldTypes>
+  stringSuggestions?: string[]
 }>()
 
 const emit = defineEmits(['update:modelValue'])

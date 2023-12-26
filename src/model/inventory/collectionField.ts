@@ -353,6 +353,12 @@ export const fieldTypes: {
 }
 
 export function getOptionString (preset: FieldTemplate<FieldTypes>): string | undefined {
+  if (preset.type === 'string') {
+    const multiline = preset.options.string?.multiline ?? false
+    const autofill = preset.options.string?.autofill ?? false
+
+    return multiline ? 'Mehrzeilig' : autofill ? 'Autofill' : undefined
+  }
   if (preset.type === 'number') {
     const unit = preset.options.number?.unit ?? 'none'
     const symbol = preset.options.number?.symbol
@@ -383,6 +389,12 @@ export interface FieldTemplateBase<T extends FieldTypes> {
 }
 
 export interface Option<T extends FieldTypes> {
+  // String
+  string?: T extends 'string' ? {
+    multiline?: boolean
+    autofill?: boolean
+  } : never
+
   // Number
   number?: T extends 'number' ? {
     unit?: FieldTypeNumberUnits
@@ -441,12 +453,12 @@ export class FieldTemplate<T extends FieldTypes> {
 export class FieldValue<T extends FieldTypes> {
   readonly id: string
   readonly template: FieldTemplateDB<T>
-  readonly value: any
+  readonly value: unknown
 
   constructor (opt: {
     id: string
     template: FieldTemplateDB<T>
-    value: any
+    value: unknown
   }) {
     this.id = opt.id
     this.template = opt.template

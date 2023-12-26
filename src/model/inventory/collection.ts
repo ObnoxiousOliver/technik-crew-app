@@ -56,7 +56,8 @@ export class Collection {
       name: this.name,
       icon: this.icon,
       description: this.description,
-      fields: this._fields.map(field => field.toDB())
+      fields: this._fields.map(field => field.toDB()),
+      is_hidden: this.isHidden
     }
   }
 
@@ -135,6 +136,14 @@ export class Collection {
       }).toDB())
   }
 
+  async getHistory () {
+    if (!this.id) {
+      throw new Error('Cannot get history on a collection without an id')
+    }
+
+    return await HistoryState.get(collectionId, this.id)
+  }
+
   async save () {
     if (!this.id) {
       throw new Error('Cannot save a collection without an id')
@@ -150,7 +159,7 @@ export class Collection {
 
     const icon = splitFirstEmojiFromString(name)
 
-    const c = new Collection(null, {
+    let c = new Collection(null, {
       name: icon ? icon[1] : name,
       icon: icon ? icon[0] : null,
       description,
@@ -158,7 +167,12 @@ export class Collection {
     })
 
     const docRef = await addDoc(collection(db, collectionId), c.toDB())
-    return new Collection(docRef.id, c.toDB())
+    c = new Collection(docRef.id, c.toDB())
+    c.recordHistory({
+      description: 'Kollektion erstellt'
+    })
+
+    return c
   }
 
   static subscribe (onChange: (change: DocumentChange<CollectionDB>) => void) {

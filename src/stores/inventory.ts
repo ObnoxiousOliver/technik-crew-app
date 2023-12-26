@@ -40,6 +40,10 @@ export const useInventory = defineStore('inventory', () => {
     return items.value.find(x => x.id === id) as CollectionItem | undefined
   }
 
+  function getItemByCode (code: string): CollectionItem | undefined {
+    return items.value.find(x => x.code === code) as CollectionItem | undefined
+  }
+
   async function deleteItem (id?: string | null) {
     if (!id) {
       throw new Error('Cannot delete an inventory item without an id')
@@ -47,6 +51,35 @@ export const useInventory = defineStore('inventory', () => {
 
     const db = getFirestore()
     await deleteDoc(doc(db, itemsId, id))
+  }
+
+  function getSuggestions (collectionId: string, fieldId: string) {
+    const collection = getCollectionById(collectionId)
+    if (!collection) return []
+
+    const field = collection.fields.find(x => x.id === fieldId)
+    if (!field) return []
+
+    const items = getItemsByCollectionId(collectionId)
+    const suggestions = new Set<string>()
+
+    items.forEach(x => {
+      const val = x.fields.find(f => f.id === fieldId && f.template.type === 'string')?.value
+      if (val) {
+        suggestions.add(val as string)
+      }
+    })
+
+    return [...suggestions]
+  }
+
+  function deleteCollection (id?: string | null) {
+    if (!id) {
+      throw new Error('Cannot delete an inventory collection without an id')
+    }
+
+    const db = getFirestore()
+    deleteDoc(doc(db, 'inventory-collections', id))
   }
 
   let unsubscribe: (() => void) | null
@@ -133,7 +166,10 @@ export const useInventory = defineStore('inventory', () => {
     getCollectionById,
     getItemsByCollectionId,
     getItemById,
+    getItemByCode,
+    getSuggestions,
     loading,
-    deleteItem
+    deleteItem,
+    deleteCollection
   }
 })
