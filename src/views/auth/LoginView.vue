@@ -27,6 +27,8 @@
           label="vorname.nachname oder Lehrerkürzel"
           v-model="name"
           autocomplete="username"
+          autocapitalize="off"
+          autocorrect="off"
         />
         <FloatingLabelInput
           label="Passwort"
@@ -77,7 +79,7 @@ async function submit () {
   submitting.value = true
 
   try {
-    await signIn(name.value, password.value)
+    await signIn(name.value.trim().toLocaleLowerCase(), password.value)
     router.push('/')
   } catch (error) {
     const err = error as FirebaseError
