@@ -1,6 +1,6 @@
 {
   "name": "technik-crew-app",
-  "version": "1.0.6",
+  "version": "1.1.0",
   "private": true,
   "scripts": {
     "start": "vue-cli-service serve",
