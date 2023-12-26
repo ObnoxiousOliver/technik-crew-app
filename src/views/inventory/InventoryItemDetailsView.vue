@@ -127,7 +127,7 @@
           }"
         >
           <i class="bi-clock-history" />
-          Verlauf anzeigen
+          Verlauf
         </SettingsListLink>
 
         <SettingsListDivider />
@@ -185,6 +185,7 @@
             :field-template="collection?.fields ?? []"
             :fields="item.fields"
             readonly
+            :collection-id="collection?.id ?? ''"
           />
         </SettingsListItem>
       </SettingsList>
@@ -276,6 +277,7 @@ import SettingsListItem from '@/components/SettingsListItem.vue'
 import ItemFieldsList from '@/components/ItemFieldsList.vue'
 import NotFoundView from '../NotFoundView.vue'
 import router from '@/router'
+import ActionSheetDivider from '@/components/ActionSheetDivider.vue'
 
 const route = useRoute()
 const inventory = useInventory()
@@ -358,7 +360,7 @@ function deleteItem () {
 
   inventory.deleteItem(item.value.id)
 
-  router.replace(item.value.collectionId
+  router.replace(collection.value?.id
     ? {
         name: 'inventory-collection',
         params: {

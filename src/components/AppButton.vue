@@ -23,7 +23,7 @@
     ref="btnEl"
   >
     <div class="btn__content">
-      <i class="btn__chip-x bi-x-lg" v-if="chip" />
+      <i class="btn__chip-x bi-x-lg" v-if="chipX" />
       <slot />
     </div>
   </Component>
@@ -42,6 +42,7 @@ const props = defineProps<{
   transparent?: boolean,
   small?: boolean,
   chip?: boolean,
+  chipX?: boolean,
   disabled?: boolean,
   accent?: boolean,
 }>()

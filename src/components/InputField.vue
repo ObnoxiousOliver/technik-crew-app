@@ -10,13 +10,14 @@
       'input--label': label,
       'input--dark': dark,
       'input--before-padding': beforePadding,
-      'input--after-padding': afterPadding
+      'input--after-padding': afterPadding,
+      'input--suggestions': suggestions
     }]"
   >
     <div class="input__label" v-if="label">
       {{ label }}
     </div>
-    <div v-if="$slots.before" class="input__before">
+    <div class="input__before">
       <slot name="before" />
     </div>
     <input
@@ -24,8 +25,8 @@
       ref="input"
       :disabled="disabled"
       @keydown.enter="enter"
-      @focus="focused = true"
-      @blur="focused = false"
+      @focus="inputFocused = true"
+      @blur="inputFocused = false"
       :type="type"
       v-bind="$attrs"
       v-model="value"
@@ -33,8 +34,26 @@
     <!-- @change="onChange"
     @keydown="onChange" -->
     <!-- :inputmode="type === 'number' ? 'decimal' : undefined" -->
-    <div v-if="$slots.after" class="input__after">
+    <div class="input__after">
       <slot name="after" />
+    </div>
+    <div
+      v-if="!disabled && suggestions && focused"
+      class="input__suggestions"
+    >
+      <ul>
+        <li v-for="suggestion in suggestions" :key="suggestion">
+          <Btn
+            chip
+            class="input__suggestion"
+            @focus="buttonFocused[suggestion] = true"
+            @blur="buttonFocused[suggestion] = false"
+            @click="selectSuggestion(suggestion)"
+          >
+            {{ suggestion }}
+          </Btn>
+        </li>
+      </ul>
     </div>
   </div>
 </template>
@@ -42,7 +61,16 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref, watch } from 'vue'
 
+const inputFocused = ref(false)
+const buttonFocused = ref<Record<string, boolean>>({})
+
 const focused = ref(false)
+watch([inputFocused, buttonFocused], () => {
+  setTimeout(() => {
+    focused.value = inputFocused.value || Object.values(buttonFocused.value).some((v) => v)
+  })
+}, { immediate: true, deep: true })
+
 const input = ref(null as HTMLInputElement | null)
 
 const emit = defineEmits(['update:modelValue', 'submit'])
@@ -54,17 +82,22 @@ const props = defineProps<{
   type?: 'text' | 'password' | 'email' | 'number' | 'search'
   dark?: boolean,
   beforePadding?: boolean,
-  afterPadding?: boolean
+  afterPadding?: boolean,
+  suggestions?: string[]
 }>()
 const disabled = computed(() => props.disabled ?? false)
 const type = computed(() => props.type ?? 'text')
 
 const value = ref(props.modelValue)
 watch(value, (val, old) => {
+  if (!input.value) return
+
   input.value.value = val
   emit('update:modelValue', val)
 })
 watch(() => props.modelValue, (val) => {
+  if (!input.value) return
+
   value.value = val
   input.value.value = val
 })
@@ -76,13 +109,24 @@ watch(() => props.modelValue, (val) => {
 
 async function enter () {
   setTimeout(() => {
+    if (!input.value) return
     emit('submit', input.value.value)
   })
 }
 
 onMounted(() => {
-  input.value.value = value.value
+  if (!input.value) return
+
+  input.value.value = value.value?.toString() ?? ''
 })
+
+function selectSuggestion (suggestion: string) {
+  if (!input.value) return
+
+  value.value = suggestion
+  input.value.value = suggestion
+  input.value.focus()
+}
 
 defineExpose({
   input,
@@ -108,7 +152,6 @@ defineExpose({
   background: r.$bg-secondary;
   border-radius: r.$radius;
   align-items: center;
-  height: 3rem;
   overflow: hidden;
 
   transition: box-shadow .2s, opacity .2s;
@@ -174,9 +217,9 @@ defineExpose({
   }
 
   &__field {
-    flex: 1 1 auto;
+    flex: 1;
     width: 0;
-    height: 100%;
+    height: 3rem;
     padding: 0 .5rem 0 1rem;
     display: inline-block;
     background: none;
@@ -204,6 +247,39 @@ defineExpose({
 
     &[type=number] {
       -moz-appearance: textfield;
+    }
+  }
+
+  &__suggestions {
+    overflow: auto;
+    grid-row: 2;
+    grid-column: 1 / -1;
+    padding: 0 1rem 1rem;
+    margin-top: -.5rem;
+
+    ul {
+      display: flex;
+      flex-direction: row;
+      gap: 0.5rem;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    li {
+      flex: 0 0 auto;
+
+      padding: 0;
+      margin: 0;
+    }
+  }
+
+  &--suggestions {
+    display: inline-grid;
+    grid-template-columns: auto 1fr auto;
+
+    .input__field {
+      width: stretch;
     }
   }
 }

@@ -1,8 +1,8 @@
 <template>
-  <NotFoundView v-if="!page" />
+  <NotFoundView v-if="!collection" />
   <Page v-else opaqueTitlebar>
     <template #title>
-      <i class="bi-clock-history" />Wikiverlauf
+      <i class="bi-clock-history" />Kollektionverlauf
     </template>
 
     <HistoryList v-if="history" :history="history" />
@@ -20,28 +20,29 @@ import NotFoundView from '../NotFoundView.vue'
 import { useHistory } from '@/stores/history'
 import { useOffline } from '@/utilities/offline'
 import OfflineMessage from '../../components/OfflineMessage.vue'
-import { useWiki } from '@/stores/wiki'
+import { useInventory } from '@/stores/inventory'
 
 const route = useRoute()
 const offline = useOffline()
 
-const wiki = useWiki()
-const page = computed(() => wiki.getPageFromId(route.params.id as string))
+const inventory = useInventory()
+const collection = computed(() => inventory.getCollectionById(route.params.id as string))
 
 const history = computed({
-  get: () => page.value?.id && useHistory().history.wiki?.[page.value?.id],
-  set: (value) => value && page.value?.id && useHistory().set('wiki', page.value.id, value)
+  get: () => collection.value?.id && useHistory().history.collection?.[collection.value.id],
+  set: (value) => value && collection.value?.id && useHistory().set('collection', collection.value.id, value)
 })
 
 const loading = ref(true)
 onMounted(async () => {
   if (offline.value) return
 
-  history.value = await page.value?.getHistory()
+  history.value = await collection.value?.getHistory()
     .catch((err) => {
-      logOnServer('Error in wiki history:', err)
+      logOnServer('Error in inventory collection history:', err)
       return []
     }) ?? null
+
   loading.value = false
 })
 </script>

@@ -23,6 +23,10 @@
         Felder
       </FormDivider>
 
+      <p>
+        Alle Gegenstände haben standardmäßig ein Name und eine Beschreibung.
+      </p>
+
       <CollectionFieldsList v-model="fields" />
 
       <FormDivider />

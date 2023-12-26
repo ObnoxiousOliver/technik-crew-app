@@ -1,16 +1,35 @@
 <template>
-  <UserPage
-    add-btn
-    search
-    :add-btn-to="{
-      name: 'inventory-create'
-    }"
-  >
+  <UserPage>
     <template #title>
       <i class="bi-box-seam" />Inventar
     </template>
 
     <template #btns>
+      <Btn
+        :to="{
+          name: 'locations'
+        }"
+        aria-label="Standorte"
+      >
+        <i class="bi-geo-alt" />
+      </Btn>
+
+      <Btn
+        :to="{
+          name: 'inventory-archive'
+        }"
+        aria-label="Archiv"
+      >
+        <i class="bi-archive" />
+      </Btn>
+      <Btn
+        :to="{
+          name: 'inventory-create'
+        }"
+        aria-label="Neue Sammlung"
+      >
+        <i class="bi-plus-lg" />
+      </Btn>
       <!-- <template v-if="selectionMode">
         <Btn @click="showArchiveSheet = true" aria-label="Archivieren">
           <i class="bi-archive" />
@@ -61,7 +80,7 @@
       <SettingsListDivider />
       <SettingsListItem>
         <CollectionList
-          :collections="collections"
+          :collections="collections.filter(x => !x.isHidden)"
         />
       </SettingsListItem>
 

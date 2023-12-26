@@ -5,6 +5,7 @@
     v-model="value"
     v-bind="$attrs"
     ref="input"
+    :disabled="props.disabled"
   />
 </template>
 
@@ -14,6 +15,10 @@ import { ref, watch } from 'vue'
 const input = ref<HTMLInputElement>()
 
 const props = defineProps({
+  disabled: {
+    type: Boolean,
+    default: false
+  },
   modelValue: {
     type: Boolean,
     default: undefined
@@ -71,6 +76,7 @@ watch(() => props.modelValue, (val) => {
   }
 
   &:disabled {
+    pointer-events: none;
     opacity: 0.5;
   }
 

@@ -22,6 +22,7 @@
     </Btn>
     <Btn
       chip
+      chipX
       v-for="(filter, i) in filters"
       :key="filter.value"
       class="filter-panel__filter"

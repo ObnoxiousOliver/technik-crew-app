@@ -5,7 +5,9 @@
 
   <template v-else-if="fieldValue !== undefined">
     <template v-if="fieldTemplate.type === 'string'">
-      {{ fieldValue }}
+      <div class="prewrap">
+        {{ fieldValue }}
+      </div>
     </template>
 
     <template v-if="fieldTemplate.type === 'number'">

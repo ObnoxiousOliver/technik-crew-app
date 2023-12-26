@@ -107,6 +107,7 @@
             v-if="collection?.fields"
             :fieldTemplate="collection?.fields"
             v-model:fields="fields"
+            :collection-id="collectionId ?? ''"
           />
         </SettingsListItem>
 

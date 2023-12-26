@@ -54,6 +54,8 @@ const props = defineProps({
 
   &__desc {
     color: r.$text-secondary;
+    word-wrap: break-word;
+    white-space: pre-wrap;
   }
 
   &__input {

@@ -6,6 +6,7 @@
       v-model:field="fieldValues[template.id]"
       :fieldTemplate="template"
       :readonly="readonly"
+      :collectionId="collectionId"
     />
 
     <!-- {{ fields }} -->
@@ -26,6 +27,7 @@ const props = defineProps<{
   fields: FieldValue<FieldTypes>[]
   fieldTemplate: FieldTemplate<FieldTypes>[]
   readonly?: boolean
+  collectionId: string
 }>()
 const emit = defineEmits(['update:fields'])
 
